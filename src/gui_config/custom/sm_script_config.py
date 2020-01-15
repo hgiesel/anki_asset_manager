@@ -191,11 +191,22 @@ class SMScriptConfig(QDialog):
         })
 
         try:
-            self.iface.setter(self.meta.id, result)
-            return attr.evolve(
-                self.meta,
-                storage = fix_storage(self.meta.storage, result, self.iface.store),
-            )
+            user_result = self.iface.setter(self.meta.id, result)
+
+            if type(user_result) == SMScript:
+                return attr.evolve(
+                    self.meta,
+                    storage = fix_storage(self.meta.storage, user_result, self.iface.store),
+                )
+
+            elif user_result:
+                return attr.evolve(
+                    self.meta,
+                    storage = fix_storage(self.meta.storage, result, self.iface.store),
+                )
+
+            else:
+                return self.meta
 
         except AttributeError:
             return result

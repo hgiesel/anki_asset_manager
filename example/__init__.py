@@ -43,7 +43,11 @@ if sm:
 
                 # What happens when the user commits new changes to the script
                 # Can be used for internal computation
-                setter = lambda id, script: None,
+                # returns a bool or smi.SMScript.
+                # if returns True all fields defined in `store` are stored
+                # if returns False no fields are stored ever
+                # if returns smi.SMScript, this SMScript is used for saving, otherwise it's the same as the argument
+                setter = lambda id, script: True,
 
                 # Collection of fields that are stored on the side of Script Manager
                 store = ['enabled', 'code', 'conditions'],
@@ -69,7 +73,6 @@ if sm:
                     storage.conditions if storage.conditions else [],
                     script,
                 ),
-
                 # ...or...
                 # reset = False (your code cannot be reset + reset button is hidden)
 

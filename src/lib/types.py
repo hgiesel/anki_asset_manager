@@ -56,8 +56,9 @@ class SMInterface:
     # name for the type of the interface
     tag: str = attr.ib()
     getter: 'Callable[[id, SMScriptStorage] -> SMScript]' = attr.ib()
-    # setting a SMScript with id
-    setter: 'Callable[[id, SMScript] -> None]' = attr.ib()
+
+    # result is used for storing
+    setter: 'Callable[[id, SMScript] -> bool or SMScript]' = attr.ib()
 
     # function (id, note type, e.g. 'Standard', card type, e.g. 'FromQuestion', 'qfmt' | 'afmt')
     generator: 'Callable[[id, SMScriptStorage, model, tmpl, fmt]] -> str or False]' = attr.ib()
