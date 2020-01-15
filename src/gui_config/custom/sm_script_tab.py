@@ -34,6 +34,7 @@ class SMScriptTab(QWidget):
         self.ui.scriptsTable.cellDoubleClicked.connect(self.editScript)
         self.ui.scriptsTable.setColumnWidth(1, 75)
         self.ui.scriptsTable.setColumnWidth(2, 55)
+        self.ui.scriptsTable.setColumnWidth(3, 55)
 
     def setupUi(self, setting):
         self.modelName = setting.model_name
@@ -59,6 +60,7 @@ class SMScriptTab(QWidget):
                     scr.name,
                     scr.version,
                     mapTruthValueToIcon(scr.enabled),
+                    mapTruthValueToIcon(False),
                     json.dumps(scr.conditions),
                 )
 
@@ -71,6 +73,7 @@ class SMScriptTab(QWidget):
                     script.name,
                     script.version,
                     mapTruthValueToIcon(script.enabled),
+                    mapTruthValueToIcon(True),
                     json.dumps(script.conditions),
                 )
 

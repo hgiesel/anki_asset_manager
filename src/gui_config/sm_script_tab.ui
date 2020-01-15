@@ -149,6 +149,11 @@
      </column>
      <column>
       <property name="text">
+       <string>Meta</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
        <string>Conditions</string>
       </property>
      </column>
@@ -164,6 +169,11 @@
      </item>
      <item row="0" column="3">
       <property name="text">
+       <string>✗</string>
+      </property>
+     </item>
+     <item row="0" column="4">
+      <property name="text">
        <string>[&quot;tag&quot;, &quot;endsWith&quot;, &quot;context&quot;]</string>
       </property>
      </item>
@@ -178,6 +188,11 @@
       </property>
      </item>
      <item row="1" column="3">
+      <property name="text">
+       <string>✗</string>
+      </property>
+     </item>
+     <item row="1" column="4">
       <property name="text">
        <string>[&quot;&amp;&quot;, [&quot;tag&quot;, &quot;endsWith&quot;, &quot;context&quot;], [&quot;iter&quot;, &quot;startsWith&quot;, &quot;+&quot;]]</string>
       </property>
