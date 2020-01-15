@@ -27,24 +27,3 @@ def meta_script_is_registered(model_name, tag, id):
         return next(filter(lambda v: v[0] == model_name and v[1].tag == tag and v[1].id == id, _meta_scripts))
     except StopIteration:
         return False
-
-
-from .types import SMScript
-register_interface(
-    SMInterface(
-        'My tag',
-        getter = lambda id, store: SMScript(
-            store.enabled if store.enabled else True,
-            'Awesome script',
-            'v0.2',
-            'This is my awesome script',
-            store.conditions if store.conditions else [],
-            store.code if store.code else 'var f = 5;',
-        ),
-        setter = lambda id, script: None, # setter
-        store = ['enabled', 'code', 'conditions'],
-        readonly = ['name', 'version', 'description'],
-    )
-)
-
-add_meta_script('Cloze (overlapping)', 'My tag', '1234')

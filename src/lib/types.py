@@ -65,17 +65,20 @@ class SMInterface:
     def __generator_default(self):
         return lambda id, storage, _model, _tmpl, _fmt: self.getter(id, storage).code
 
-    label: False or 'Callable[[id, SMScript] -> None]' = attr.ib()
+    label: False or 'Callable[[id, SMScriptStorage] -> None]' = attr.ib()
     @label.default
     def __label_default(self):
-        return lambda id, _: f"{self.tag}: {id}"
+        return lambda id, _storage: f"{self.tag}: {id}"
 
-    reset: False or 'Callable[[id, SMScript] -> SMScript]' = attr.ib()
+    reset: False or 'Callable[[id, SMScriptStorage] -> SMScript]' = attr.ib()
     @reset.default
     def __reset_default(self):
-        return lambda id, _: self.getter(id, SMScriptBool())
+        return lambda id, _storage: self.getter(id, SMScriptBool())
 
-    deleteable: False or 'Callable[[id, SMScript] -> None]' = attr.ib(default = False)
+    deletable: False or 'Callable[[id, SMScriptStorage] -> Bool]' = attr.ib()
+    @reset.deletable
+    def __reset_default(self):
+        return lambda _id, _storage: False
 
     # list of values that are readonly; or stored in `storage` field
     # can contain: 'enabled', 'name', 'version', 'description', 'conditions', 'code'

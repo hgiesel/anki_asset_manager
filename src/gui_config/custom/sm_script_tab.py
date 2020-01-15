@@ -122,12 +122,14 @@ class SMScriptTab(QWidget):
         else:
             iface = get_interface(current_scr.tag)
 
-            if iface.deleteable:
-                script = iface.getter(current_scr.id, current_scr.storage)
-                iface.deleteable(current_scr.id, script)
+            if iface.deletable:
+                is_deletable = iface.deletable(current_scr.id, current_scr.storage)
+
+                if is_deletable:
+                    del self.scr[self.ui.scriptsTable.currentRow()] # gotta delete within dict
             else:
                 from aqt.utils import showInfo # not to be deleted!
-                showInfo('This script cannot be deleted')
+                showInfo('This script cannot be deleted.')
 
         self.drawScripts()
         self.updateButtons(False)

@@ -96,14 +96,14 @@ class SMScriptConfig(QDialog):
         self.iface = get_interface(meta_script.tag)
 
         self.setupUiConcr(self.iface.getter(self.meta.id, self.meta.storage))
-        self.ui.metaLabel.setText(self.iface.label(self.meta.id, self.iface.getter(self.meta.id, self.meta.storage)))
+        self.ui.metaLabel.setText(self.iface.label(self.meta.id, self.meta.storage))
 
         if self.iface.reset:
             self.ui.resetButton.show()
 
     def reset(self):
         # only available for meta scripts
-        self.setupUiConcr(self.iface.reset(self.meta.id, self.iface.getter(self.meta.id, self.meta.storage)))
+        self.setupUiConcr(self.iface.reset(self.meta.id, self.meta.storage))
 
         self.ui.nameLineEdit.repaint()
         self.ui.versionLineEdit.repaint()
