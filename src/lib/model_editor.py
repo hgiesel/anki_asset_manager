@@ -8,7 +8,6 @@ from string import Template
 
 from anki import media
 from aqt import mw
-from aqt.utils import showInfo
 
 from .interface import get_interface
 from .types import SMScript
@@ -327,10 +326,6 @@ def get_model_template(template, settings) -> (str, str):
                 }
 
                 back_scripts.append(bs)
-
-            showInfo(str(the_scr.name) +' '+ str(needs_front_inject) +' '+ str(needs_back_inject))
-
-    showInfo(str(len(front_scripts)) +' '+ str(len(back_scripts)))
 
     front_string = encapsulate_scripts([
         turn_script_to_string(qscr, settings.indent_size) for qscr in front_scripts

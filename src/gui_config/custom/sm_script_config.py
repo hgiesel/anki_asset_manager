@@ -103,14 +103,21 @@ class SMScriptConfig(QDialog):
 
     def reset(self):
         # only available for meta scripts
-        self.setupUiConcr(self.iface.reset(self.meta.id, self.meta.storage))
 
-        self.ui.nameLineEdit.repaint()
-        self.ui.versionLineEdit.repaint()
-        self.ui.descriptionTextEdit.repaint()
-        self.ui.enableScriptCheckBox.repaint()
-        self.ui.conditionsTextEdit.repaint()
-        self.ui.codeTextEdit.repaint()
+        try:
+            self.validateConditionsRaw()
+        except:
+            showInfo('Invalid Conditions. Please fix the conditions before resetting.')
+        else:
+            self.setupUi(self.exportData())
+            self.setupUiConcr(self.iface.reset(self.meta.id, self.meta.storage))
+
+            self.ui.nameLineEdit.repaint()
+            self.ui.versionLineEdit.repaint()
+            self.ui.descriptionTextEdit.repaint()
+            self.ui.enableScriptCheckBox.repaint()
+            self.ui.conditionsTextEdit.repaint()
+            self.ui.codeTextEdit.repaint()
 
     def tryAccept(self):
         try:

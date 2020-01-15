@@ -76,7 +76,7 @@ class SMInterface:
         return lambda id, _storage: self.getter(id, SMScriptBool())
 
     deletable: False or 'Callable[[id, SMScriptStorage] -> Bool]' = attr.ib()
-    @reset.deletable
+    @deletable.default
     def __reset_default(self):
         return lambda _id, _storage: False
 
