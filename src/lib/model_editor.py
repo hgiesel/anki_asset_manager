@@ -16,9 +16,8 @@ from .utils import version_string
 
 def setup_models(settings):
     for st in settings:
-        if st.enabled:
-            model = mw.col.models.byName(st.model_name)
-            setup_model(model, st)
+        model = mw.col.models.byName(st.model_name)
+        setup_model(model, st)
 
 def setup_model(model, setting):
     for template in model['tmpls']:
@@ -36,15 +35,17 @@ def gen_data_attributes(name, version):
 from bs4 import BeautifulSoup
 
 def get_template_slice(t):
-    startpos_regex = re.compile(r'^.*?<div.*?id="anki\-sm".*?>', re.MULTILINE)
-    endpos_regex = re.compile(r'^.*?</div.*?>.*?$', re.MULTILINE)
+    try:
+        startpos_regex = re.compile(r'^.*?<div.*?id="anki\-sm".*?>', re.MULTILINE)
+        endpos_regex = re.compile(r'^.*?</div.*?>.*?$', re.MULTILINE)
 
-    startpos = re.search(startpos_regex, t)
-    endpos = re.search(endpos_regex, t[startpos.end():])
+        startpos = re.search(startpos_regex, t)
+        endpos = re.search(endpos_regex, t[startpos.end():])
 
-    return ((startpos.start(), startpos.end() + endpos.end())
-            if startpos is not None and endpos is not None
-            else None)
+        return (startpos.start(), startpos.end() + endpos.end())
+
+    except AttributeError:
+        return None
 
 
 def update_model_template(template, qfmt_scripts, afmt_scripts) -> None:
@@ -292,7 +293,7 @@ def encapsulate_scripts(scripts, version, indent_size) -> str:
 
     return top_delim + '\n' + '\n\n'.join([indent_lines(scc, indent_size) for scc in scripts]) + '\n' + bottom_delim
 
-def get_model_template(template, settings) -> (str, str):
+def get_model_template(template, setting) -> (str, str):
     cardtype_name = template['name']
 
     front_scripts = []
@@ -301,38 +302,39 @@ def get_model_template(template, settings) -> (str, str):
     front_parser = get_condition_parser(cardtype_name, True)
     back_parser = get_condition_parser(cardtype_name, False)
 
-    for scr in settings.scripts:
-        the_scr = scr if type(scr) == SMScript else get_interface(scr.tag).getter(scr.id, scr.storage)
+    if setting.enabled:
+        for scr in setting.scripts:
+            the_scr = scr if type(scr) == SMScript else get_interface(scr.tag).getter(scr.id, scr.storage)
 
-        if the_scr.enabled:
-            needs_front_inject, simplified_conditions_front = front_parser(the_scr.conditions)
+            if the_scr.enabled:
+                needs_front_inject, simplified_conditions_front = front_parser(the_scr.conditions)
 
-            if needs_front_inject:
-                fs = {
-                    'tag': gen_data_attributes(the_scr.name, the_scr.version),
-                    'code': the_scr.code if type(scr) == SMScript else get_interface(scr.tag).generator(scr.id, scr.storage, settings.model_name, cardtype_name, 'qfmt'),
-                    'conditions': simplified_conditions_front,
-                }
+                if needs_front_inject:
+                    fs = {
+                        'tag': gen_data_attributes(the_scr.name, the_scr.version),
+                        'code': the_scr.code if type(scr) == SMScript else get_interface(scr.tag).generator(scr.id, scr.storage, setting.model_name, cardtype_name, 'qfmt'),
+                        'conditions': simplified_conditions_front,
+                    }
 
-                front_scripts.append(fs)
+                    front_scripts.append(fs)
 
-            needs_back_inject, simplified_conditions_back = back_parser(the_scr.conditions)
+                needs_back_inject, simplified_conditions_back = back_parser(the_scr.conditions)
 
-            if needs_back_inject:
-                bs = {
-                    'tag': gen_data_attributes(the_scr.name, the_scr.version),
-                    'code': the_scr.code if type(scr) == SMScript else get_interface(scr.tag).generator(scr.id, scr.storage, settings.model_name, cardtype_name, 'afmt'),
-                    'conditions': simplified_conditions_back,
-                }
+                if needs_back_inject:
+                    bs = {
+                        'tag': gen_data_attributes(the_scr.name, the_scr.version),
+                        'code': the_scr.code if type(scr) == SMScript else get_interface(scr.tag).generator(scr.id, scr.storage, setting.model_name, cardtype_name, 'afmt'),
+                        'conditions': simplified_conditions_back,
+                    }
 
-                back_scripts.append(bs)
+                    back_scripts.append(bs)
 
     front_string = encapsulate_scripts([
-        turn_script_to_string(qscr, settings.indent_size) for qscr in front_scripts
-    ], version_string, settings.indent_size)
+        turn_script_to_string(qscr, setting.indent_size) for qscr in front_scripts
+    ], version_string, setting.indent_size)
 
     back_string = encapsulate_scripts([
-        turn_script_to_string(ascr, settings.indent_size) for ascr in back_scripts
-    ], version_string, settings.indent_size)
+        turn_script_to_string(ascr, setting.indent_size) for ascr in back_scripts
+    ], version_string, setting.indent_size)
 
     return (front_string, back_string)
