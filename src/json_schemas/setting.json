@@ -6,6 +6,9 @@
     },
     "scripts": {
       "$ref": "scripts.json#/definitions/scripts"
+    },
+    "meta": {
+      "type": "object"
     }
   },
   "additionalProperties": false,

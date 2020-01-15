@@ -290,4 +290,4 @@ def update_model_template(model, settings):
         tmpl['afmt'] += back_string
 
     # notify anki that models changed (for synchronization e.g.)
-    mw.col.models.save(model)
+    mw.col.models.save(model, True)

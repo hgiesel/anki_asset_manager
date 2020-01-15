@@ -29,6 +29,7 @@ def deserialize_setting(model_name, model_setting, access_func = safenav_setting
     return model_setting if type(model_setting) == SMSetting else SMSetting(
         model_name,
         [deserialize_script(script) for script in access_func([model_setting], ['scripts'])],
+        access_func([model_setting], ['meta'], default={}),
     )
 
 def deserialize_script(script_data, access_func = safenav_script) -> SMScript:
@@ -42,10 +43,15 @@ def deserialize_script(script_data, access_func = safenav_script) -> SMScript:
     )
 
 def serialize_setting(setting: SMSetting) -> dict:
-    return {
+    result = {
         'modelName': setting.model_name,
         'scripts': [serialize_script(script) for script in setting.scripts],
     }
+
+    if setting.meta and len(setting.meta.keys()) > 0:
+        result['meta'] = setting.meta
+
+    return result
 
 def serialize_script(script: SMScript) -> dict:
     return {
@@ -68,26 +74,42 @@ def deserialize_setting_with_default(model_name, settings):
 
     return model_deserialized
 
-def get_settings(model_name=None):
-    CONFIG = mw.addonManager.getConfig(__name__)
+def sr_to_sm_setting():
+    pass
 
-    if model_name:
-        return deserialize_setting(model_name, safenav([CONFIG], ['settings'], default=None))
+def anki_persistence_to_sm_setting():
+    pass
 
-    else:
-        model_settings = []
+def get_settings(sr=None):
+    config = mw.addonManager.getConfig(__name__)
+    sr_config = mw.addonManager.getConfig(sr) if sr else None
 
-        for model in mw.col.models.models.values():
-            model_name = (model['name'])
-            model_deserialized = deserialize_setting_with_default(model_name, safenav([CONFIG], ['settings'], default=[]))
-            model_settings.append(model_deserialized)
+    from aqt.utils import showInfo
+    # showInfo(str(model))
 
-        return model_settings
+    def get_setting(model_name):
+        return filter(lambda v: v['modelName'] == model_name, safenav([config], ['settings'], default=None))
+
+    model_settings = []
+
+    for model in mw.col.models.models.values():
+        model_name = model['name']
+        model_deserialized = deserialize_setting_with_default(model_name, get_setting(model_name))
+
+        for model_sr in safenav([sr_config], ['settings'], default=[]):
+            if model_sr['enabled'] and model_sr['modelName'] == model_name:
+
+                if not safenav([model_deserialized.meta], ['set_randomizer'], default=False):
+                    model_deserialized.meta['set_randomizer'] = True
+
+                if not safenav([model_deserialized.meta], ['anki_persistence'], default=False):
+                    model_deserialized.meta['anki_persistence_from_sr'] = True
+
+        model_settings.append(model_deserialized)
+
+    return model_settings
 
 def write_settings(serializedSettings):
-    from aqt.utils import showInfo
-    showInfo(str(serializedSettings))
-
     mw.addonManager.writeConfig(__name__, {
         'settings': serializedSettings,
     })

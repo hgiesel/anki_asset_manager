@@ -3,9 +3,11 @@ from aqt import QAction, mw
 from .gui_config.custom.sm_config import SMConfigDialog
 from .lib.config import get_settings
 
+from .utils import find_addon_by_name
+
 def invoke_options():
     dialog = SMConfigDialog(mw)
-    dialog.setupUi(get_settings())
+    dialog.setupUi(get_settings(sr = find_addon_by_name('Set Randomizer')))
 
     return dialog.exec_()
 

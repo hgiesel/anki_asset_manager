@@ -4,6 +4,7 @@ import attr
 class SMSetting:
     model_name: str = attr.ib()
     scripts: list = attr.ib()
+    meta: dict = attr.ib(default = {})
 
 @attr.s(slots=True, frozen=True)
 class SMScript:
