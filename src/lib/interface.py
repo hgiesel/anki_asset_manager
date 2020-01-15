@@ -84,10 +84,9 @@ def make_script_storage(
 ScriptKeys = Literal['enabled', 'name', 'version', 'description', 'conditions', 'code']
 
 def __list_to_sm_script_bool(vals: List[ScriptKeys]) -> SMScriptBool:
-    return (
-        vals
-        if type(vals) == SMScriptBool
-        else replace(SMScriptBool(), **dict([(key, True) for key in vals]))
+    return replace(
+        make_script_bool(),
+        **dict([(key, True) for key in vals])
     )
 
 def make_interface(

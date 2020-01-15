@@ -6,8 +6,8 @@ from .utils import find_addon_by_name
 sm = find_addon_by_name('Script Manager')
 
 if sm:
-    smt = __import__(sm).src.lib.types
     smi = __import__(sm).src.lib.interface
+    smr = __import__(sm).src.lib.registrar
 
     script_name = 'MyAwesomeScript'
     version = 'v1.0'
@@ -21,8 +21,8 @@ if sm:
     with open(filepath, 'r') as file:
         script = file.read().strip()
 
-        smi.register_interface(
-            smt.SMInterface(
+        smr.register_interface(
+            smi.make_interface(
                 # The name of script tag
                 # Multiple scripts can be registered under the same tag
                 # Scripts under one tag share one *interface*: rules for setting, getting, generation, stored fields, readonly fields, etc.
@@ -32,7 +32,7 @@ if sm:
                 # This is is used for displaying the script in the tag window
                 # the code is not necessarily the code that is actually inserted into the template: for that, see `generator`
                 # however the conditions are used for calculating whether to insert
-                getter = lambda id, storage: smt.SMScript(
+                getter = lambda id, storage: smi.make_script(
                     storage.enabled if storage.enabled else True,
                     script_name,
                     version,
@@ -65,7 +65,7 @@ if sm:
                 # Change the behavior when resetting the script
                 # By default your script is reset to the getter function with an empty storage
                 # this reset function does not reset the enabled status or the conditions
-                reset = lambda id, storage: smt.SMScript(
+                reset = lambda id, storage: smi.make_script(
                     storage.enabled if storage.enabled else True,
                     script_name,
                     version,
@@ -85,15 +85,19 @@ if sm:
         )
 
     def install_script():
+        # create the meta script which points to your interface
+        my_meta_script = smi.make_meta_script(
+            # this is the tag you interface above is registered on!
+            f"{script_name}_tag",
+            # your id: you can register an id only once per model per tag
+            f"{script_name}_id",
+        )
+
         # insert the script for every model
         for model_name in mw.col.models.allNames():
-
-            smi.add_meta_script(
+            smr.register_meta_script(
                 model_name,
-                # the interface above is registered on the same name!
-                f"{script_name}_tag",
-                # your id: you can register an id only once per model per tag
-                f"{script_name}_id",
+                my_meta_script,
             )
 
     from anki.hooks import addHook

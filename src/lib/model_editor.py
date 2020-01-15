@@ -9,8 +9,8 @@ from string import Template
 from anki import media
 from aqt import mw
 
-from .interface import get_interface
-from .types import SMScript
+from .registrar import get_interface
+from .types import SMConcrScript
 from .config import serialize_setting
 from .utils import version_string
 
@@ -77,8 +77,8 @@ def update_model_template(template, qfmt_scripts, afmt_scripts) -> None:
     return qdid_insert or adid_insert
 
 def get_condition_parser(card, frontside):
-    is_true = lambda v: type(v) == bool and v == True
-    is_false = lambda v: type(v) == bool and v == False
+    is_true = lambda v: isinstance(v, bool) and v == True
+    is_false = lambda v: isinstance(v, bool) and v == False
 
     # [needscondection, newcondection]
     def parse_condition(cond) -> [bool, list]:
@@ -86,7 +86,7 @@ def get_condition_parser(card, frontside):
             # empty conditions
             return True, cond
 
-        elif type(cond) == bool:
+        elif isinstance(cond, bool):
             return cond, cond
 
         elif cond[0] == '&':
@@ -130,7 +130,7 @@ def get_condition_parser(card, frontside):
         elif cond[0] == '!':
             parsed_cond = parse_condition(cond[1])
 
-            if type(parsed_cond[1]) == bool:
+            if isinstance(parsed_cond[1], bool):
                 return True, not parsed_cond[1]
             else:
                 return True, [cond[0], parsed_cond[1]]
@@ -183,10 +183,10 @@ def stringify_conds(conds) -> str:
     if len(conds) == 0:
         return 'true'
 
-    elif type(conds) == bool and conds:
+    elif isinstance(conds, bool) and conds:
         return 'true'
 
-    elif type(conds) == bool and not conds:
+    elif isinstance(conds, bool) and not conds:
         return 'false'
 
     elif conds[0] == '&':
@@ -264,7 +264,7 @@ def stringify_conds(conds) -> str:
             return f"'{{{{Tags}}}}'.split(' ').some(v => v.endsWith('{conds[2]}'))"
 
 def wrap_code(code, conditions):
-    if (type(conditions) == bool and conditions) or len(conditions) == 0:
+    if (isinstance(conditions, bool) and conditions) or len(conditions) == 0:
         return code
 
     else:
@@ -314,7 +314,7 @@ def get_model_template(template, setting) -> (str, str):
 
     if setting.enabled:
         for scr in setting.scripts:
-            the_scr = scr if type(scr) == SMScript else get_interface(scr.tag).getter(scr.id, scr.storage)
+            the_scr = scr if isinstance(scr, SMConcrScript) else get_interface(scr.tag).getter(scr.id, scr.storage)
 
             if the_scr.enabled:
                 needs_front_inject, simplified_conditions_front = front_parser(the_scr.conditions)
@@ -322,7 +322,7 @@ def get_model_template(template, setting) -> (str, str):
                 if needs_front_inject:
                     fs = {
                         'tag': gen_data_attributes(the_scr.name, the_scr.version),
-                        'code': the_scr.code if type(scr) == SMScript else get_interface(scr.tag).generator(scr.id, scr.storage, setting.model_name, cardtype_name, 'qfmt'),
+                        'code': the_scr.code if isinstance(scr, SMConcrScript) else get_interface(scr.tag).generator(scr.id, scr.storage, setting.model_name, cardtype_name, 'qfmt'),
                         'conditions': simplified_conditions_front,
                     }
 
@@ -333,7 +333,7 @@ def get_model_template(template, setting) -> (str, str):
                 if needs_back_inject:
                     bs = {
                         'tag': gen_data_attributes(the_scr.name, the_scr.version),
-                        'code': the_scr.code if type(scr) == SMScript else get_interface(scr.tag).generator(scr.id, scr.storage, setting.model_name, cardtype_name, 'afmt'),
+                        'code': the_scr.code if isinstance(scr, SMConcrScript) else get_interface(scr.tag).generator(scr.id, scr.storage, setting.model_name, cardtype_name, 'afmt'),
                         'conditions': simplified_conditions_back,
                     }
 

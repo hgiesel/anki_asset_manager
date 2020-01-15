@@ -1,6 +1,8 @@
 import os
 import json
-import attr
+
+from typing import Union
+from dataclasses import asdict, replace
 
 import jsonschema
 from jsonschema import validate, RefResolver, Draft7Validator
@@ -16,15 +18,17 @@ from .sm_setting_update import SMSettingUpdate
 from ..sm_script_config_ui import Ui_SMScriptConfig
 
 from ...lib.config import deserialize_script, serialize_script
-from ...lib.types import SMScript, SMMetaScript, SMScriptStorage, SMScriptBool
-from ...lib.interface import get_interface
 
-def fix_storage(store: SMScriptStorage, script: SMScript, to_store: SMScriptBool) -> SMScriptStorage:
+from ...lib.types import SMConcrScript, SMMetaScript, SMScriptStorage, SMScriptBool
+from ...lib.interface import make_script_bool
+from ...lib.registrar import get_interface
+
+def fix_storage(store: SMScriptStorage, script: SMConcrScript, to_store: SMScriptBool) -> SMScriptStorage:
     def filter_store(tost):
         return [
             storekey[0]
             for storekey
-            in attr.asdict(tost).items() if storekey[1]
+            in asdict(tost).items() if storekey[1]
         ]
 
     filtered_store = filter_store(to_store)
@@ -34,7 +38,7 @@ def fix_storage(store: SMScriptStorage, script: SMScript, to_store: SMScriptBool
         in filtered_store
     ])
 
-    return attr.evolve(store, **the_dict)
+    return replace(store, **the_dict)
 
 class SMScriptConfig(QDialog):
     def __init__(self, parent, model_name, callback):
@@ -76,7 +80,7 @@ class SMScriptConfig(QDialog):
         self.highlighter = JSHighlighter(editor.document())
 
     def setupUi(self, script):
-        if type(script) == SMScript:
+        if isinstance(script, SMConcrScript):
             self.setupUiConcr(script)
         else:
             self.setupUiMeta(script)
@@ -139,7 +143,7 @@ class SMScriptConfig(QDialog):
         except AttributeError:
             self.enableChange(self.ui.enableScriptCheckBox.isChecked())
 
-    def enableChange(self, state=True, readonly=SMScriptBool()):
+    def enableChange(self, state=True, readonly=make_script_bool()):
         def get_state(newstate, readonlystate):
             return newstate or readonlystate
 
@@ -179,7 +183,7 @@ class SMScriptConfig(QDialog):
         else:
             showInfo('Valid Conditions.')
 
-    def exportData(self) -> SMScript or SMMetaScript:
+    def exportData(self) -> Union[SMConcrScript, SMMetaScript]:
         result = deserialize_script(self.modelName, {
             'name': self.ui.nameLineEdit.text(),
             'version': self.ui.versionLineEdit.text(),
@@ -193,14 +197,14 @@ class SMScriptConfig(QDialog):
         try:
             user_result = self.iface.setter(self.meta.id, result)
 
-            if type(user_result) == SMScript:
-                return attr.evolve(
+            if isinstance(user_result, SMConcrScript):
+                return replace(
                     self.meta,
                     storage = fix_storage(self.meta.storage, user_result, self.iface.store),
                 )
 
             elif user_result:
-                return attr.evolve(
+                return replace(
                     self.meta,
                     storage = fix_storage(self.meta.storage, result, self.iface.store),
                 )

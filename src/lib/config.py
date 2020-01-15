@@ -1,22 +1,16 @@
 import json
-import attr
 import os.path as path
+
+from dataclasses import asdict
+from typing import Union, Optional, List
 
 from aqt import mw
 
-from .utils import (
-    safenav,
-    safenav_preset,
-)
+from .utils import safenav, safenav_preset
 
-from .types import (
-    SMSetting,
-    SMScript,
-    SMMetaScript,
-    SMScriptStorage,
-)
-
-from .interface import has_interface, get_meta_scripts, meta_script_is_registered
+from .types import SMSetting, SMScript, SMConcrScript, SMMetaScript, SMScriptStorage
+from .interface import make_setting, make_script, make_meta_script, make_script_storage
+from .registrar import has_interface, get_meta_scripts, meta_script_is_registered
 
 # initialize default type
 SCRIPTNAME = path.dirname(path.realpath(__file__))
@@ -32,7 +26,7 @@ with open(path.join(SCRIPTNAME, '../../config.json'), encoding='utf-8') as confi
     safenav_meta_script = safenav_preset(model_default['scripts'][1])
 
 def deserialize_setting(model_name, model_setting, access_func = safenav_setting) -> SMSetting:
-    return model_setting if type(model_setting) == SMSetting else SMSetting(
+    return model_setting if isinstance(model_setting, SMSetting) else make_setting(
         model_name,
         access_func([model_setting], ['enabled']),
         access_func([model_setting], ['indentSize']),
@@ -41,29 +35,29 @@ def deserialize_setting(model_name, model_setting, access_func = safenav_setting
          in access_func([model_setting], ['scripts'])] if s]),
     )
 
-def add_other_metas(model_name, scripts):
+def add_other_metas(model_name, scripts: List[SMScript]) -> List[SMScript]:
     meta_scripts = get_meta_scripts(model_name)
 
     for ms in meta_scripts:
         try:
-            found = next(filter(lambda v: type(v) == SMMetaScript and v.tag == ms.tag and v.id == ms.id, scripts))
+            found = next(filter(lambda v: isinstance(v, SMMetaScript) and v.tag == ms.tag and v.id == ms.id, scripts))
         except StopIteration:
-            scripts.append(SMMetaScript(
+            scripts.append(make_meta_script(
                 ms.tag,
                 ms.id,
             ))
 
     return scripts
 
-def deserialize_script(model_name, script_data) -> SMScript or SMScript:
-    return script_data if type(script_data) in [SMScript, SMMetaScript] else (
+def deserialize_script(model_name, script_data) -> Union[SMConcrScript, SMMetaScript]:
+    return script_data if isinstance(script_data, SMScript) else (
         deserialize_concr_script(script_data)
         if 'name' in script_data
         else deserialize_meta_script(model_name, script_data)
     )
 
-def deserialize_concr_script(script_data, access_func = safenav_concr_script) -> SMScript:
-    result = script_data if type(script_data) == SMScript else SMScript(
+def deserialize_concr_script(script_data, access_func = safenav_concr_script) -> SMConcrScript:
+    result = script_data if isinstance(script_data, SMConcrScript) else make_script(
         access_func([script_data], ['enabled']),
         access_func([script_data], ['name']),
         access_func([script_data], ['version']),
@@ -74,11 +68,11 @@ def deserialize_concr_script(script_data, access_func = safenav_concr_script) ->
 
     return result
 
-def deserialize_meta_script(model_name, script_data, access_func = safenav_meta_script) -> SMMetaScript or None:
-    result = script_data if type(script_data) == SMMetaScript else SMMetaScript(
+def deserialize_meta_script(model_name, script_data, access_func = safenav_meta_script) -> Optional[SMMetaScript]:
+    result = script_data if isinstance(script_data, SMMetaScript) else make_meta_script(
         access_func([script_data], ['tag']),
         access_func([script_data], ['id']),
-        SMScriptStorage(**access_func([script_data], ['storage'])),
+        make_script_storage(**access_func([script_data], ['storage'])),
     )
 
     return result if has_interface(result.tag) and meta_script_is_registered(
@@ -95,11 +89,11 @@ def serialize_setting(setting: SMSetting) -> dict:
         'scripts': [serialize_script(script) for script in setting.scripts],
     }
 
-def serialize_script(script: SMScript or SMMetaScript) -> dict:
-    if type(script) == SMScript:
-        return attr.asdict(script)
+def serialize_script(script: Union[SMConcrScript, SMMetaScript]) -> dict:
+    if isinstance(script, SMConcrScript):
+        return asdict(script)
     else:
-        preresult = attr.asdict(script)
+        preresult = asdict(script)
 
         return {
             'tag': preresult['tag'],

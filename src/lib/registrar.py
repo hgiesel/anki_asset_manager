@@ -1,11 +1,25 @@
-from typing import Optional, List
-from .types import SMInterface, SMMetaScript
+from typing import Optional, List, Tuple
 
-_meta_interfaces = []
-_meta_scripts = []
+from .types import SMInterface, SMMetaScript
+from .interface import make_meta_script
+
+_meta_interfaces: List[SMInterface] = []
+_meta_scripts: List[Tuple[str, SMMetaScript]] = []
+
+class SMInterfaceIsNotRegistered(Exception):
+    pass
 
 def register_interface(iface: SMInterface) -> None:
     _meta_interfaces.append(iface)
+
+def register_meta_script(model_name: str, meta_script: SMMetaScript) -> None:
+    if has_interface(meta_script.tag):
+        _meta_scripts.append((model_name, meta_script,))
+    else:
+        raise SMInterfaceIsNotRegistered(
+            'You tried to register a meta script for a non existing interface. '
+            'Make sure to register the interface first.'
+        )
 
 def get_interface(tag: str) -> Optional[SMInterface]:
     try:
@@ -13,15 +27,11 @@ def get_interface(tag: str) -> Optional[SMInterface]:
     except StopIteration:
         return None
 
-def has_interface(tag: str) -> bool:
-    return True if get_interface(tag) else False
-
-def add_meta_script(model_name: str, tag: str, id: str) -> None:
-    if get_interface(tag) != None:
-        _meta_scripts.append((model_name, SMMetaScript(tag, id),))
-
 def get_meta_scripts(model_name: Optional[str] = None) -> List[SMMetaScript]:
     return [ms[1] for ms in _meta_scripts if ms[0] == model_name or model_name is None]
+
+def has_interface(tag: str) -> bool:
+    return True if get_interface(tag) else False
 
 def meta_script_is_registered(model_name: str, tag: str, id: str) -> bool:
     try:

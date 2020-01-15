@@ -1,6 +1,8 @@
 import json
 import os
 
+from typing import Union
+
 from pathlib import Path
 from jsonschema import RefResolver, Draft7Validator
 
@@ -8,8 +10,9 @@ from aqt import mw
 from aqt.qt import QWidget, QLabel, Qt
 
 from ...lib.config import deserialize_script, serialize_script, deserialize_setting, serialize_setting
-from ...lib.types import SMScript
-from ...lib.interface import get_interface
+from ...lib.types import SMConcrScript, SMMetaScript
+from ...lib.registrar import get_interface
+
 from ..sm_script_tab_ui import Ui_SMScriptTab
 
 from .sm_setting_add_replace import SMSettingAddReplace
@@ -54,7 +57,7 @@ class SMScriptTab(QWidget):
         for idx, scr in enumerate(self.scr):
             headerLabels.append(f'Script {idx}')
 
-            if type(scr) == SMScript:
+            if isinstance(scr, SMConcrScript):
                 self.setRowMod(
                     idx,
                     scr.name,
@@ -119,7 +122,7 @@ class SMScriptTab(QWidget):
         self.drawScripts()
 
     def deleteScript(self):
-        current_scr = self.scr[self.ui.scriptsTable.currentRow()]
+        current_scr: Union[SMConcrScript, SMMetaScript] = self.scr[self.ui.scriptsTable.currentRow()]
 
         def show_nondeletable():
             from aqt.utils import showInfo # not to be deleted!
@@ -128,7 +131,7 @@ class SMScriptTab(QWidget):
                 'You might have to uninstall the add-on which inserted this script.'
             )
 
-        if type(current_scr) == SMScript:
+        if isinstance(current_scr, SMConcrScript):
             del self.scr[self.ui.scriptsTable.currentRow()] # gotta delete within dict
         else:
             iface = get_interface(current_scr.tag)

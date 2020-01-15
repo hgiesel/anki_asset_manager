@@ -8,8 +8,12 @@ class SMSetting:
     indent_size: int
     scripts: list
 
+dataclass(frozen=True)
+class SMScript:
+    pass
+
 @dataclass(frozen=True)
-class SMConcrScript:
+class SMConcrScript(SMScript):
     enabled: bool
     name: str
     version: str
@@ -38,7 +42,7 @@ class SMScriptStorage:
     code: Optional[str]
 
 @dataclass(frozen=True)
-class SMMetaScript:
+class SMMetaScript(SMScript):
     tag: str
     id: str
     storage: SMScriptStorage
