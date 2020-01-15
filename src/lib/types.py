@@ -1,87 +1,69 @@
-import attr
+from typing import Optional, Callable, Union, List, Literal
+from dataclasses import dataclass, replace
 
-@attr.s(slots=True, frozen=True)
+@dataclass(frozen=True)
 class SMSetting:
-    model_name: str = attr.ib()
-    enabled: bool = attr.ib()
-    indent_size: int = attr.ib()
-    scripts: list = attr.ib()
+    model_name: str
+    enabled: bool
+    indent_size: int
+    scripts: list
 
-@attr.s(slots=True, frozen=True)
-class SMScript:
-    enabled: bool = attr.ib(False)
-    name: str = attr.ib('')
-    version: str = attr.ib('')
-    description: str = attr.ib('')
-    conditions: list = attr.ib([])
-    code: str = attr.ib('')
+@dataclass(frozen=True)
+class SMConcrScript:
+    enabled: bool
+    name: str
+    version: str
+    description: str
+    conditions: list
+    code: str
 
 ################################
 
-@attr.s(slots=True, frozen=True)
+@dataclass(frozen=True)
 class SMScriptBool:
-    enabled: bool = attr.ib(False)
-    name: bool = attr.ib(False)
-    version: bool = attr.ib(False)
-    description: bool = attr.ib(False)
-    conditions: bool = attr.ib(False)
-    code: bool = attr.ib(False)
+    enabled: bool
+    name: bool
+    version: bool
+    description: bool
+    conditions: bool
+    code: bool
 
-@attr.s(slots=True, frozen=True)
+@dataclass(frozen=True)
 class SMScriptStorage:
-    enabled: bool = attr.ib(default=None)
-    name: str = attr.ib(default=None)
-    version: str = attr.ib(default=None)
-    description: str = attr.ib(default=None)
-    conditions: list = attr.ib(default=None)
-    code: str = attr.ib(default=None)
+    enabled: Optional[bool]
+    name: Optional[str]
+    version: Optional[str]
+    description: Optional[str]
+    conditions: Optional[list]
+    code: Optional[str]
 
-@attr.s(slots=True, frozen=True)
+@dataclass(frozen=True)
 class SMMetaScript:
-    tag: str = attr.ib()
-    id: str = attr.ib()
-    storage: SMScriptStorage = attr.ib(default=SMScriptStorage())
+    tag: str
+    id: str
+    storage: SMScriptStorage
 
 ################################
 
-def list_to_sm_script_bool(vals):
-    return (
-        vals
-        if type(vals) == SMScriptBool
-        else attr.evolve(SMScriptBool(), **dict([(key, True) for key in vals]))
-    )
+anki_model = str
+anki_tmpl = str
+anki_fmt = Literal['qfmt', 'afmt']
+script_text = str
+label_text = str
 
-@attr.s(slots=True, frozen=True)
+@dataclass(frozen=True)
 class SMInterface:
     # name for the type of the interface
-    tag: str = attr.ib()
-    getter: 'Callable[[id, SMScriptStorage] -> SMScript]' = attr.ib()
-
+    tag: str
+    getter: Callable[[str, SMScriptStorage], SMConcrScript]
     # result is used for storing
-    setter: 'Callable[[id, SMScript] -> bool or SMScript]' = attr.ib()
+    setter: Callable[[str, SMConcrScript], Union[bool, SMConcrScript]]
+    generator: Callable[[str, SMScriptStorage, anki_model, anki_tmpl, anki_fmt], Union[script_text, Literal[False]]]
+    label: Union[Literal[False], Callable[[str, SMScriptStorage], label_text]]
+    reset: Union[Literal[False], Callable[[str, SMScriptStorage], SMConcrScript]]
+    deletable: Union[Literal[False], Callable[[str, SMScriptStorage], bool]]
 
-    # function (id, note type, e.g. 'Standard', card type, e.g. 'FromQuestion', 'qfmt' | 'afmt')
-    generator: 'Callable[[id, SMScriptStorage, model, tmpl, fmt]] -> str or False]' = attr.ib()
-    @generator.default
-    def __generator_default(self):
-        return lambda id, storage, _model, _tmpl, _fmt: self.getter(id, storage).code
-
-    label: False or 'Callable[[id, SMScriptStorage] -> None]' = attr.ib()
-    @label.default
-    def __label_default(self):
-        return lambda id, _storage: f"{self.tag}: {id}"
-
-    reset: False or 'Callable[[id, SMScriptStorage] -> SMScript]' = attr.ib()
-    @reset.default
-    def __reset_default(self):
-        return lambda id, _storage: self.getter(id, SMScriptBool())
-
-    deletable: False or 'Callable[[id, SMScriptStorage] -> Bool]' = attr.ib()
-    @deletable.default
-    def __reset_default(self):
-        return lambda _id, _storage: False
-
-    # list of values that are readonly; or stored in `storage` field
-    # can contain: 'enabled', 'name', 'version', 'description', 'conditions', 'code'
-    readonly: SMScriptBool = attr.ib(converter=list_to_sm_script_bool, default = SMScriptBool())
-    store: SMScriptBool = attr.ib(converter=list_to_sm_script_bool, default = SMScriptBool())
+    # list of values that are readonly
+    readonly: SMScriptBool
+    # list of values or stored in `storage` field
+    store: SMScriptBool
