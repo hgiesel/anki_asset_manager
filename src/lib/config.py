@@ -1,4 +1,5 @@
 import json
+import attr
 import os.path as path
 
 from aqt import mw
@@ -11,7 +12,10 @@ from .utils import (
 from .types import (
     SMSetting,
     SMScript,
+    SMMetaScript,
 )
+
+from .interface import has_interface
 
 # initialize default type
 SCRIPTNAME = path.dirname(path.realpath(__file__))
@@ -28,11 +32,19 @@ with open(path.join(SCRIPTNAME, '../../config.json'), encoding='utf-8') as confi
 def deserialize_setting(model_name, model_setting, access_func = safenav_setting) -> SMSetting:
     return model_setting if type(model_setting) == SMSetting else SMSetting(
         model_name,
-        [deserialize_script(script) for script in access_func([model_setting], ['scripts'])],
-        access_func([model_setting], ['meta'], default={}),
+        [deserialize_script(script)
+         for script
+         in access_func([model_setting], ['scripts'])],
     )
 
-def deserialize_script(script_data, access_func = safenav_script) -> SMScript:
+def deserialize_script(script_data) -> SMScript or SMScript:
+    return script_data if type(script_data) in [SMScript, SMMetaScript] else (
+        deserialize_concr_script(script_data)
+        if 'name' in script_data
+        else deserialize_meta_script(script_data)
+    )
+
+def deserialize_concr_script(script_data, access_func = safenav_script) -> SMScript:
     return script_data if type(script_data) == SMScript else SMScript(
         access_func([script_data], ['enabled']),
         access_func([script_data], ['name']),
@@ -42,26 +54,23 @@ def deserialize_script(script_data, access_func = safenav_script) -> SMScript:
         access_func([script_data], ['code']),
     )
 
+def deserialize_meta_script(script_data, access_func = safenav_script) -> SMMetaScript or None:
+    result = script_data if type(script_data) == SMMetaScript else SMMetaScript(
+        access_func([script_data], ['tag']),
+        access_func([script_data], ['id']),
+        SMScriptStorage(**access_func([script_data], ['storage'])),
+    )
+
+    return result if has_interface(result.tag) else None
+
 def serialize_setting(setting: SMSetting) -> dict:
-    result = {
+    return {
         'modelName': setting.model_name,
         'scripts': [serialize_script(script) for script in setting.scripts],
     }
 
-    if setting.meta and len(setting.meta.keys()) > 0:
-        result['meta'] = setting.meta
-
-    return result
-
-def serialize_script(script: SMScript) -> dict:
-    return {
-        'enabled': script.enabled,
-        'name': script.name,
-        'version': script.version,
-        'description': script.description,
-        'conditions': script.conditions,
-        'code': script.code,
-    }
+def serialize_script(script: SMScript or SMMetaScript) -> dict:
+    return attr.asdict(script)
 
 def deserialize_setting_with_default(model_name, settings):
     found = filter(lambda v: v['modelName'] == model_name, settings)
@@ -74,15 +83,9 @@ def deserialize_setting_with_default(model_name, settings):
 
     return model_deserialized
 
-def sr_to_sm_setting():
-    pass
-
-def anki_persistence_to_sm_setting():
-    pass
-
-def get_settings(sr=None):
+def get_settings():
     config = mw.addonManager.getConfig(__name__)
-    sr_config = mw.addonManager.getConfig(sr) if sr else None
+    # sr_config = mw.addonManager.getConfig(sr) if sr else None
 
     from aqt.utils import showInfo
     # showInfo(str(model))
@@ -95,15 +98,6 @@ def get_settings(sr=None):
     for model in mw.col.models.models.values():
         model_name = model['name']
         model_deserialized = deserialize_setting_with_default(model_name, get_setting(model_name))
-
-        for model_sr in safenav([sr_config], ['settings'], default=[]):
-            if model_sr['enabled'] and model_sr['modelName'] == model_name:
-
-                if not safenav([model_deserialized.meta], ['set_randomizer'], default=False):
-                    model_deserialized.meta['set_randomizer'] = True
-
-                if not safenav([model_deserialized.meta], ['anki_persistence'], default=False):
-                    model_deserialized.meta['anki_persistence_from_sr'] = True
 
         model_settings.append(model_deserialized)
 

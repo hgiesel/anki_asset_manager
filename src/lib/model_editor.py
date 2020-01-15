@@ -16,7 +16,7 @@ from .utils import version_string
 def setup_models(settings):
     for st in settings:
         model = mw.col.models.byName(st['modelName'])
-        setup_model(model, st)
+        # setup_model(model, st)
 
 def setup_model(model, setting):
     remove_model_template(model)

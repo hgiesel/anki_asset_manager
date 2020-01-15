@@ -7,7 +7,7 @@ from .utils import find_addon_by_name
 
 def invoke_options():
     dialog = SMConfigDialog(mw)
-    dialog.setupUi(get_settings(sr = find_addon_by_name('Set Randomizer')))
+    dialog.setupUi(get_settings())
 
     return dialog.exec_()
 

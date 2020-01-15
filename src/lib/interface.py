@@ -37,6 +37,9 @@ def get_interface(tag):
     except:
         return None
 
+def has_interface(tag):
+    return True if get_interface(tag) else False
+
 def add_meta_script(tag, id):
     if get_interface(tag) != None:
         _meta_scripts.append(SMMetaScript(tag, id))
@@ -45,4 +48,4 @@ def get_meta_scripts():
     return _meta_scripts
 
 from aqt.utils import showInfo
-showInfo(_meta_interfaces)
+showInfo(str(_meta_interfaces))

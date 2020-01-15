@@ -17,24 +17,6 @@ class SMScript:
 ################################
 
 @attr.s(slots=True, frozen=True)
-class SMInterface:
-    tag: str = attr.ib()
-    generator = attr.ib()
-    getter = attr.ib()
-    setter = attr.ib()
-    deleteable: bool or 'function' = attr.ib()
-    readonly: SMScriptBool = attr.ib(default = SMScriptBool())
-    store: SMScriptBool = attr.ib(default = SMScriptBool())
-
-################################
-
-@attr.s(slots=True, frozen=True)
-class SMMetaScript:
-    tag: str = attr.ib()
-    id: str = attr.ib()
-    storage: SMScriptStore = attr.ib(default=SMScriptStore())
-
-@attr.s(slots=True, frozen=True)
 class SMScriptBool:
     enabled: bool = attr.ib(False)
     name: bool = attr.ib(False)
@@ -44,10 +26,28 @@ class SMScriptBool:
     code: bool = attr.ib(False)
 
 @attr.s(slots=True, frozen=True)
-class SMScriptStore:
+class SMScriptStorage:
     enabled: bool = attr.ib(default=None)
     name: str = attr.ib(default=None)
     version: str = attr.ib(default=None)
     description: str = attr.ib(default=None)
     conditions: list = attr.ib(default=None)
     code: str = attr.ib(default=None)
+
+@attr.s(slots=True, frozen=True)
+class SMMetaScript:
+    tag: str = attr.ib()
+    id: str = attr.ib()
+    storage: SMScriptStorage = attr.ib(default=SMScriptStorage())
+
+################################
+
+@attr.s(slots=True, frozen=True)
+class SMInterface:
+    tag: str = attr.ib()
+    generator = attr.ib()
+    getter = attr.ib()
+    setter = attr.ib()
+    deleteable: bool or 'function' = attr.ib()
+    readonly: SMScriptBool = attr.ib(default = SMScriptBool())
+    store: SMScriptBool = attr.ib(default = SMScriptBool())
