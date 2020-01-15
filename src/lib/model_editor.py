@@ -20,14 +20,19 @@ def setup_models(settings):
         setup_model(model, st)
 
 def setup_model(model, setting):
+    needs_saving = False
+
     for template in model['tmpls']:
-        update_model_template(
+        did_insert = update_model_template(
             template,
             *get_model_template(template, setting),
         )
 
+        needs_saving = needs_saving or did_insert
+
     # notify anki that models changed (for synchronization e.g.)
-    mw.col.models.save(model, True)
+    if needs_saving:
+        mw.col.models.save(model, True)
 
 def gen_data_attributes(name, version):
     return f'data-name="{name}" data-version="{version}"'
@@ -47,7 +52,6 @@ def get_template_slice(t):
     except AttributeError:
         return None
 
-
 def update_model_template(template, qfmt_scripts, afmt_scripts) -> None:
     qslice = get_template_slice(template['qfmt'])
     aslice = get_template_slice(template['afmt'])
@@ -59,12 +63,18 @@ def update_model_template(template, qfmt_scripts, afmt_scripts) -> None:
                 scripts +
                 template[fmt][slice[1] : len(template[fmt])]
             )
+            return True
 
         elif len(scripts) > 0:
             template[fmt] = f"{template[fmt]}\n\n{scripts}"
+            return True
 
-    insert_scripts(qslice, 'qfmt', qfmt_scripts)
-    insert_scripts(aslice, 'afmt', afmt_scripts)
+        return False
+
+    qdid_insert = insert_scripts(qslice, 'qfmt', qfmt_scripts)
+    adid_insert = insert_scripts(aslice, 'afmt', afmt_scripts)
+
+    return qdid_insert or adid_insert
 
 def get_condition_parser(card, frontside):
     is_true = lambda v: type(v) == bool and v == True
