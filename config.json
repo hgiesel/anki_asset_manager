@@ -1,0 +1,10 @@
+{
+  "settings": [
+    {
+      "enabled": false,
+      "name": "Example Script",
+      "version": "0.1",
+      "code": ""
+    }
+  ]
+}
