@@ -1,0 +1,12 @@
+{
+  "definitions": {
+    "scripts": {
+      "type": "array",
+      "items": {
+        "$ref": "scr.json#/definitions/scr"
+      }
+    }
+  },
+
+  "$ref": "#/definitions/scripts"
+}

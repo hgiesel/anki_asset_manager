@@ -1,5 +1,6 @@
 {
-    "name": "Set Randomizer",
-    "package": "set_randomizer",
-    "conflicts": []
+    "name": "Script Manager",
+    "package": "anki_script_manager",
+    "conflicts": [],
+    "mod": 0
 }

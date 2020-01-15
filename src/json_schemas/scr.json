@@ -1,0 +1,43 @@
+{
+  "definitions": {
+    "scr": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+
+        "version": {
+          "type": "string"
+        },
+
+        "description": {
+          "type": "string"
+        },
+
+        "enabled": {
+          "type": "boolean"
+        },
+
+        "conditions": {
+          "$ref": "script_cond.json#/definitions/full_condition"
+        },
+
+        "code": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "enabled",
+        "name",
+        "version",
+        "description",
+        "conditions",
+        "code"
+      ]
+    }
+  },
+
+  "$ref": "#/definitions/scr"
+}

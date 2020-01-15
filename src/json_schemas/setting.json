@@ -1,0 +1,16 @@
+{
+  "type": "object",
+  "properties": {
+    "modelName": {
+      "type": "string"
+    },
+    "scripts": {
+      "$ref": "scripts.json#/definitions/scripts"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "modelName",
+    "scripts"
+  ]
+}

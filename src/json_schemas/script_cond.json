@@ -1,0 +1,154 @@
+{
+  "definitions": {
+    "truthValue": {
+      "type": "boolean"
+    },
+
+    "condition": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": [
+        {
+          "type": "string",
+          "enum": [
+            "card",
+            "tag",
+            "tagFull",
+            "iter"
+          ]
+        },
+        {
+          "type": "string",
+          "enum": [
+            "=",
+            "!=",
+            "includes",
+            "startsWith",
+            "endsWith"
+          ]
+        },
+        {
+          "type": "string"
+        }
+      ]
+    },
+
+    "sideCondition": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": [
+        {
+          "type": "string",
+          "enum": [
+            "side"
+          ]
+        },
+        {
+          "type": "string",
+          "enum": [
+            "=",
+            "!="
+          ]
+        },
+        {
+          "type": "string",
+          "enum": [
+            "front",
+            "quest",
+            "back",
+            "answer"
+          ]
+        }
+      ]
+    },
+
+    "negation": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": [
+        {
+          "type": "string",
+          "enum": [
+            "!"
+          ]
+        }
+      ],
+      "additionalItems": {
+        "oneOf": [
+          {
+            "$ref": "#/definitions/truthValue"
+          },
+          {
+            "$ref": "#/definitions/condition"
+          },
+          {
+            "$ref": "#/definitions/sideCondition"
+          },
+          {
+            "$ref": "#/definitions/negation"
+          },
+          {
+            "$ref": "#/definitions/conjunctionDisjunction"
+          }
+        ]
+      }
+    },
+
+    "conjunctionDisjunction": {
+      "type": "array",
+      "items": [
+        {
+          "type": "string",
+          "enum": [
+            "&",
+            "|"
+          ]
+        }
+      ],
+      "additionalItems": {
+        "oneOf": [
+          {
+            "$ref": "#/definitions/truthValue"
+          },
+          {
+            "$ref": "#/definitions/condition"
+          },
+          {
+            "$ref": "#/definitions/sideCondition"
+          },
+          {
+            "$ref": "#/definitions/negation"
+          },
+          {
+            "$ref": "#/definitions/conjunctionDisjunction"
+          }
+        ]
+      }
+    },
+
+    "full_condition": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/truthValue"
+        },
+        {
+          "$ref": "#/definitions/condition"
+        },
+        {
+          "$ref": "#/definitions/sideCondition"
+        },
+        {
+          "$ref": "#/definitions/negation"
+        },
+        {
+          "$ref": "#/definitions/conjunctionDisjunction"
+        }
+      ]
+    }
+  },
+
+  "$ref": "#/definitions/full_condition"
+}
