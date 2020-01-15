@@ -1,4 +1,4 @@
-# Your awesome script addon
+# This could be your script add-on
 
 This is a very simple layout to create an add-on for your script.
 

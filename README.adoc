@@ -1,4 +1,0 @@
-= Anki Script Manager
-
-*Script Manager* makes it easier for you to manage scripts on your note templates.
-It has built in support for [Set Randomizer](https://github.com/hgiesel/anki_set_randomizer).
