@@ -10,6 +10,7 @@
 1. Restrict scripts to only be inserted for the frontside or only for specific
    card types
 1. Change the order of scripts
-1. Offers a hook for you to insert your own script via your own add-on. That way
-   you can easily offer your script, give it a name, version it, and update it
+1. Offers a hook for you to insert your own script via
+   [your own add-on](https://github.com/hgiesel/anki_script_manager/tree/master/example).
+   That way you can easily offer your script, give it a name, version it, and update it
    through the AnkiWeb platform
