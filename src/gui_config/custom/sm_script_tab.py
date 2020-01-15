@@ -120,6 +120,14 @@ class SMScriptTab(QWidget):
 
     def deleteScript(self):
         current_scr = self.scr[self.ui.scriptsTable.currentRow()]
+
+        def show_nondeletable():
+            from aqt.utils import showInfo # not to be deleted!
+            showInfo(
+                'This script does not allow for deletion.\n'
+                'You might have to uninstall the add-on which inserted this script.'
+            )
+
         if type(current_scr) == SMScript:
             del self.scr[self.ui.scriptsTable.currentRow()] # gotta delete within dict
         else:
@@ -130,9 +138,12 @@ class SMScriptTab(QWidget):
 
                 if is_deletable:
                     del self.scr[self.ui.scriptsTable.currentRow()] # gotta delete within dict
+
+                else:
+                    show_nondeletable()
+
             else:
-                from aqt.utils import showInfo # not to be deleted!
-                showInfo('This script cannot be deleted.')
+                show_nondeletable()
 
         self.drawScripts()
         self.updateButtons(False)
