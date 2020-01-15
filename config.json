@@ -2,14 +2,21 @@
   "settings": [
     {
       "modelName": "Default",
+      "enabled": false,
+      "indentSize": 2,
       "scripts": [
         {
           "enabled": false,
           "name": "Example Script",
-          "version": "0.1",
+          "version": "v0.1",
           "description": "My description",
           "conditions": [],
-          "code": ""
+          "code": "var f = 5;\nvar g = 10;"
+        },
+        {
+          "tag": "This is a fake tag",
+          "id": "This is a fake id",
+          "store": {}
         }
       ]
     }

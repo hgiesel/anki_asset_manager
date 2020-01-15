@@ -20,11 +20,9 @@ from .sm_script_tab import SMScriptTab
 def sort_negative_first(v):
     return abs(int(v.name)) * 2 if int(v.name) < 0 else abs(int(v.name)) * 2 + 1
 
-def write_back(settings):
+def save_settings(settings):
     serializedSettings = [serialize_setting(setting) for setting in settings]
-
     write_settings(serializedSettings)
-    setup_models(serializedSettings)
 
 class SMConfigDialog(QDialog):
     def __init__(self, parent):
@@ -46,10 +44,24 @@ class SMConfigDialog(QDialog):
             oldSid = self.ui.modelChooser.findText(setting_data.model_name)
             settings[oldSid] = setting_data
 
-            write_back(settings)
+            save_settings(settings)
+            self.accept()
+
+        def wbCurrentSetting(isClicked):
+            nonlocal self
+            nonlocal settings
+
+            setting_data = self.ui.configWidget.exportData()
+            oldSid = self.ui.modelChooser.findText(setting_data.model_name)
+            settings[oldSid] = setting_data
+
+            save_settings(settings)
+            setup_models(settings)
             self.accept()
 
         self.ui.saveButton.clicked.connect(saveCurrentSetting)
+        self.ui.wbButton.clicked.connect(wbCurrentSetting)
+
         self.ui.helpButton.clicked.connect(self.showHelp)
         self.ui.aboutButton.clicked.connect(self.showAbout)
         self.ui.importButton.clicked.connect(self.importDialog)

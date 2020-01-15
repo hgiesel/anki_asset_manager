@@ -3,49 +3,48 @@ from .types import SMInterface, SMMetaScript, SMScriptBool
 _meta_interfaces = []
 _meta_scripts = []
 
-def register_interface(
-    # name for the type of the interface
-    tag: str,
-    # function (id, note type, e.g. 'Standard', card type, e.g. 'FromQuestion', 'qfmt' | 'afmt')
-    generator: 'Callable[[id, model, tmpl, fmt]] -> str or False]',
-    # getting a SMScript with id
-    getter: 'Callable[[id, SMScriptStore] -> SMScript]',
-    # setting a SMScript with id
-    setter: 'Callable[[id, SMScript] -> None]',
-    # if False then cannot be deleted, else, the function is called with id
-    deleteable: False or 'Callable[[id, SMScript] -> None]',
-    # list of values that are readonly
-    # can contain: 'enabled', 'name', 'version', 'description', 'conditions', 'code'
-    readonly: SMScriptBool,
-    # list of values that are stored in `store` field
-    # can contain: 'enabled', 'name', 'version', 'description', 'conditions', 'code'
-    store: SMScriptBool,
-):
-    _meta_interfaces.append(SMInterface(
-        tag,
-        generator,
-        getter,
-        setter,
-        deleteable,
-        readonly,
-        store,
-    ))
+def register_interface(iface: SMInterface):
+    _meta_interfaces.append(iface)
 
 def get_interface(tag):
     try:
         return next(filter(lambda v: v.tag == tag, _meta_interfaces))
-    except:
+    except StopIteration:
         return None
 
 def has_interface(tag):
     return True if get_interface(tag) else False
 
-def add_meta_script(tag, id):
+def add_meta_script(model_name, tag, id):
     if get_interface(tag) != None:
-        _meta_scripts.append(SMMetaScript(tag, id))
+        _meta_scripts.append((model_name, SMMetaScript(tag, id),))
 
-def get_meta_scripts():
-    return _meta_scripts
+def get_meta_scripts(model_name=None):
+    return [ms[1] for ms in _meta_scripts if ms[0] == model_name or model_name is None]
 
-from aqt.utils import showInfo
-showInfo(str(_meta_interfaces))
+def meta_script_is_registered(model_name, tag, id):
+    try:
+        return next(filter(lambda v: v[0] == model_name and v[1].tag == tag and v[1].id == id, _meta_scripts))
+    except StopIteration:
+        return False
+
+
+from .types import SMScript
+register_interface(
+    SMInterface(
+        'My tag',
+        getter = lambda id, store: SMScript(
+            store.enabled if store.enabled else True,
+            'Awesome script',
+            'v0.2',
+            'This is my awesome script',
+            store.conditions if store.conditions else [],
+            store.code if store.code else 'var f = 5;',
+        ),
+        setter = lambda id, script: None, # setter
+        store = ['enabled', 'code', 'conditions'],
+        readonly = ['name', 'version', 'description'],
+    )
+)
+
+add_meta_script('Cloze (overlapping)', 'My tag', '1234')

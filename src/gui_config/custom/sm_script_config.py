@@ -1,5 +1,6 @@
 import os
 import json
+import attr
 
 import jsonschema
 from jsonschema import validate, RefResolver, Draft7Validator
@@ -15,18 +16,41 @@ from .sm_setting_update import SMSettingUpdate
 from ..sm_script_config_ui import Ui_SMScriptConfig
 
 from ...lib.config import deserialize_script, serialize_script
+from ...lib.types import SMScript, SMMetaScript, SMScriptStorage, SMScriptBool
+from ...lib.interface import get_interface
+
+def fix_storage(store: SMScriptStorage, script: SMScript, to_store: SMScriptBool) -> SMScriptStorage:
+    def filter_store(tost):
+        return [
+            storekey[0]
+            for storekey
+            in attr.asdict(tost).items() if storekey[1]
+        ]
+
+    filtered_store = filter_store(to_store)
+    the_dict = dict([
+        (key, getattr(script, key))
+        for key
+        in filtered_store
+    ])
+
+    return attr.evolve(store, **the_dict)
 
 class SMScriptConfig(QDialog):
-    def __init__(self, parent, callback):
+    def __init__(self, parent, model_name, callback):
         super().__init__(parent=parent)
 
         self.callback = callback
+        self.modelName = model_name
 
         self.ui = Ui_SMScriptConfig()
         self.ui.setupUi(self)
 
         self.accepted.connect(self.onAccept)
         self.rejected.connect(self.onReject)
+
+        self.ui.resetButton.clicked.connect(self.reset)
+        self.ui.resetButton.hide()
 
         self.ui.saveButton.clicked.connect(self.tryAccept)
         self.ui.saveButton.setDefault(True)
@@ -35,6 +59,7 @@ class SMScriptConfig(QDialog):
         self.ui.validateButton.clicked.connect(self.validateConditions)
         self.ui.importButton.clicked.connect(self.importDialog)
 
+        self.ui.metaLabel.setText('')
         self.ui.enableScriptCheckBox.stateChanged.connect(self.enableChangeGui)
         self.initEditor(self.ui.codeTextEdit)
 
@@ -51,16 +76,41 @@ class SMScriptConfig(QDialog):
         self.highlighter = JSHighlighter(editor.document())
 
     def setupUi(self, script):
-        self.ui.nameLineEdit.setText(script.name)
-        self.ui.versionLineEdit.setText(script.version)
-        self.ui.descriptionTextEdit.setPlainText(script.description)
+        if type(script) == SMScript:
+            self.setupUiConcr(script)
+        else:
+            self.setupUiMeta(script)
 
-        self.ui.enableScriptCheckBox.setChecked(script.enabled)
-
-        self.ui.conditionsTextEdit.setPlainText(json.dumps(script.conditions))
-        self.ui.codeTextEdit.setPlainText(script.code)
+    def setupUiConcr(self, concr_script):
+        self.ui.nameLineEdit.setText(concr_script.name)
+        self.ui.versionLineEdit.setText(concr_script.version)
+        self.ui.descriptionTextEdit.setPlainText(concr_script.description)
+        self.ui.enableScriptCheckBox.setChecked(concr_script.enabled)
+        self.ui.conditionsTextEdit.setPlainText(json.dumps(concr_script.conditions))
+        self.ui.codeTextEdit.setPlainText(concr_script.code)
 
         self.enableChangeGui()
+
+    def setupUiMeta(self, meta_script):
+        self.meta = meta_script
+        self.iface = get_interface(meta_script.tag)
+
+        self.setupUiConcr(self.iface.getter(self.meta.id, self.meta.storage))
+        self.ui.metaLabel.setText(self.iface.label(self.meta.id, self.iface.getter(self.meta.id, self.meta.storage)))
+
+        if self.iface.reset:
+            self.ui.resetButton.show()
+
+    def reset(self):
+        # only available for meta scripts
+        self.setupUiConcr(self.iface.reset(self.meta.id, self.iface.getter(self.meta.id, self.meta.storage)))
+
+        self.ui.nameLineEdit.repaint()
+        self.ui.versionLineEdit.repaint()
+        self.ui.descriptionTextEdit.repaint()
+        self.ui.enableScriptCheckBox.repaint()
+        self.ui.conditionsTextEdit.repaint()
+        self.ui.codeTextEdit.repaint()
 
     def tryAccept(self):
         try:
@@ -77,15 +127,20 @@ class SMScriptConfig(QDialog):
         pass
 
     def enableChangeGui(self):
-        self.enableChange(self.ui.enableScriptCheckBox.isChecked())
+        try:
+            self.enableChange(self.ui.enableScriptCheckBox.isChecked(), self.iface.readonly)
+        except AttributeError:
+            self.enableChange(self.ui.enableScriptCheckBox.isChecked())
 
-    def enableChange(self, state=True):
-        self.ui.conditionsTextEdit.setReadOnly(not state)
-        self.ui.codeTextEdit.setReadOnly(not state)
-        self.ui.descriptionTextEdit.setReadOnly(not state)
+    def enableChange(self, state=True, readonly=SMScriptBool()):
+        def get_state(newstate, readonlystate):
+            return newstate or readonlystate
 
-        self.ui.nameLineEdit.setReadOnly(not state)
-        self.ui.versionLineEdit.setReadOnly(not state)
+        self.ui.conditionsTextEdit.setReadOnly(get_state(not state, readonly.conditions))
+        self.ui.codeTextEdit.setReadOnly(get_state(not state, readonly.code))
+        self.ui.descriptionTextEdit.setReadOnly(get_state(not state, readonly.description))
+        self.ui.nameLineEdit.setReadOnly(get_state(not state, readonly.name))
+        self.ui.versionLineEdit.setReadOnly(get_state(not state, readonly.version))
 
     def getConditions(self): # can throw
         return json.loads(self.ui.conditionsTextEdit.toPlainText())
@@ -117,10 +172,8 @@ class SMScriptConfig(QDialog):
         else:
             showInfo('Valid Conditions.')
 
-    def exportData(self):
-        from aqt.utils import showInfo
-
-        result = deserialize_script({
+    def exportData(self) -> SMScript or SMMetaScript:
+        result = deserialize_script(self.modelName, {
             'name': self.ui.nameLineEdit.text(),
             'version': self.ui.versionLineEdit.text(),
 
@@ -129,11 +182,20 @@ class SMScriptConfig(QDialog):
             'conditions': self.getConditions(),
             'code': self.ui.codeTextEdit.toPlainText(),
         })
-        return result
+
+        try:
+            self.iface.setter(self.meta.id, result)
+            return attr.evolve(
+                self.meta,
+                storage = fix_storage(self.meta.storage, result, self.iface.store),
+            )
+
+        except AttributeError:
+            return result
 
     def importDialog(self):
         def updateAfterImport(new_script):
-            self.setupUi(deserialize_script(new_script))
+            self.setupUi(deserialize_script(self.modelName, new_script))
 
         dirpath = Path(f'{os.path.dirname(os.path.realpath(__file__))}', '../../json_schemas/scr.json')
         schema_path = dirpath.absolute().as_uri()

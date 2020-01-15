@@ -13,9 +13,10 @@ from .types import (
     SMSetting,
     SMScript,
     SMMetaScript,
+    SMScriptStorage,
 )
 
-from .interface import has_interface
+from .interface import has_interface, get_meta_scripts, meta_script_is_registered
 
 # initialize default type
 SCRIPTNAME = path.dirname(path.realpath(__file__))
@@ -27,25 +28,42 @@ with open(path.join(SCRIPTNAME, '../../config.json'), encoding='utf-8') as confi
     model_default = SETTINGS_DEFAULT
 
     safenav_setting = safenav_preset(model_default)
-    safenav_script = safenav_preset(model_default['scripts'][0])
+    safenav_concr_script = safenav_preset(model_default['scripts'][0])
+    safenav_meta_script = safenav_preset(model_default['scripts'][1])
 
 def deserialize_setting(model_name, model_setting, access_func = safenav_setting) -> SMSetting:
     return model_setting if type(model_setting) == SMSetting else SMSetting(
         model_name,
-        [deserialize_script(script)
+        access_func([model_setting], ['enabled']),
+        access_func([model_setting], ['indentSize']),
+        add_other_metas(model_name, [s for s in [deserialize_script(model_name, script)
          for script
-         in access_func([model_setting], ['scripts'])],
+         in access_func([model_setting], ['scripts'])] if s]),
     )
 
-def deserialize_script(script_data) -> SMScript or SMScript:
+def add_other_metas(model_name, scripts):
+    meta_scripts = get_meta_scripts(model_name)
+
+    for ms in meta_scripts:
+        try:
+            found = next(filter(lambda v: type(v) == SMMetaScript and v.tag == ms.tag and v.id == ms.id, scripts))
+        except StopIteration:
+            scripts.append(SMMetaScript(
+                ms.tag,
+                ms.id,
+            ))
+
+    return scripts
+
+def deserialize_script(model_name, script_data) -> SMScript or SMScript:
     return script_data if type(script_data) in [SMScript, SMMetaScript] else (
         deserialize_concr_script(script_data)
         if 'name' in script_data
-        else deserialize_meta_script(script_data)
+        else deserialize_meta_script(model_name, script_data)
     )
 
-def deserialize_concr_script(script_data, access_func = safenav_script) -> SMScript:
-    return script_data if type(script_data) == SMScript else SMScript(
+def deserialize_concr_script(script_data, access_func = safenav_concr_script) -> SMScript:
+    result = script_data if type(script_data) == SMScript else SMScript(
         access_func([script_data], ['enabled']),
         access_func([script_data], ['name']),
         access_func([script_data], ['version']),
@@ -54,23 +72,42 @@ def deserialize_concr_script(script_data, access_func = safenav_script) -> SMScr
         access_func([script_data], ['code']),
     )
 
-def deserialize_meta_script(script_data, access_func = safenav_script) -> SMMetaScript or None:
+    return result
+
+def deserialize_meta_script(model_name, script_data, access_func = safenav_meta_script) -> SMMetaScript or None:
     result = script_data if type(script_data) == SMMetaScript else SMMetaScript(
         access_func([script_data], ['tag']),
         access_func([script_data], ['id']),
         SMScriptStorage(**access_func([script_data], ['storage'])),
     )
 
-    return result if has_interface(result.tag) else None
+    return result if has_interface(result.tag) and meta_script_is_registered(
+        model_name,
+        result.tag,
+        result.id,
+    ) else None
 
 def serialize_setting(setting: SMSetting) -> dict:
     return {
         'modelName': setting.model_name,
+        'enabled': setting.enabled,
+        'indentSize': setting.indent_size,
         'scripts': [serialize_script(script) for script in setting.scripts],
     }
 
 def serialize_script(script: SMScript or SMMetaScript) -> dict:
-    return attr.asdict(script)
+    if type(script) == SMScript:
+        return attr.asdict(script)
+    else:
+        preresult = attr.asdict(script)
+
+        return {
+            'tag': preresult['tag'],
+            'id': preresult['id'],
+            'storage': {
+                k: v for k, v in preresult['storage'].items() if v is not None
+            }
+        }
 
 def deserialize_setting_with_default(model_name, settings):
     found = filter(lambda v: v['modelName'] == model_name, settings)
@@ -78,17 +115,13 @@ def deserialize_setting_with_default(model_name, settings):
     try:
         model_deserialized = deserialize_setting(model_name, next(found))
 
-    except StopIteration as e:
+    except StopIteration:
         model_deserialized = deserialize_setting(model_name, model_default)
 
     return model_deserialized
 
 def get_settings():
     config = mw.addonManager.getConfig(__name__)
-    # sr_config = mw.addonManager.getConfig(sr) if sr else None
-
-    from aqt.utils import showInfo
-    # showInfo(str(model))
 
     def get_setting(model_name):
         return filter(lambda v: v['modelName'] == model_name, safenav([config], ['settings'], default=None))

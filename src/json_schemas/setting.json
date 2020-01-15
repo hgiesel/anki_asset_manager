@@ -4,16 +4,22 @@
     "modelName": {
       "type": "string"
     },
+    "enabled": {
+      "type": "boolean"
+    },
+    "indentSize": {
+      "type": "integer",
+      "minimum": 0
+    },
     "scripts": {
       "$ref": "scripts.json#/definitions/scripts"
-    },
-    "meta": {
-      "type": "object"
     }
   },
   "additionalProperties": false,
   "required": [
     "modelName",
+    "enabled",
+    "indentSize",
     "scripts"
   ]
 }

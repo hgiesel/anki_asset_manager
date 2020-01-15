@@ -6,24 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1045</width>
-    <height>516</height>
+    <width>619</width>
+    <height>441</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
-   <item row="2" column="6">
-    <widget class="QPushButton" name="saveButton">
-     <property name="text">
-      <string>Save</string>
-     </property>
-     <property name="autoDefault">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
    <item row="0" column="3" rowspan="2" colspan="4">
     <widget class="QGroupBox" name="statementsForInsertion">
      <property name="toolTip">
@@ -38,67 +28,6 @@
       </item>
      </layout>
     </widget>
-   </item>
-   <item row="2" column="5">
-    <widget class="QPushButton" name="cancelButton">
-     <property name="text">
-      <string>Cancel</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0" colspan="3">
-    <widget class="QGroupBox" name="scriptConditions">
-     <property name="toolTip">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The input syntax of the iteration. This will be used to detect sets in the card content.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-     <property name="title">
-      <string>Script Conditions</string>
-     </property>
-     <layout class="QGridLayout" name="gridLayout_3">
-      <item row="0" column="1" colspan="2">
-       <widget class="QPlainTextEdit" name="conditionsTextEdit">
-        <property name="plainText">
-         <string>['&amp;',
- ['card', 'includes', 'FrontBack'],
- ['|', ['tag', 'endsWith', 'context'], ['tag', 'endsWith', 'xxx']]]</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QPushButton" name="validateButton">
-        <property name="text">
-         <string>Validate Conditions</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="2">
-       <spacer name="horizontalSpacer_3">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="2" column="0" colspan="5">
-    <spacer name="horizontalSpacer">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>40</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
    </item>
    <item row="0" column="0" colspan="3">
     <widget class="QGroupBox" name="generalOptions">
@@ -162,6 +91,93 @@
        </widget>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item row="5" column="6">
+    <widget class="QPushButton" name="saveButton">
+     <property name="text">
+      <string>Save</string>
+     </property>
+     <property name="autoDefault">
+      <bool>true</bool>
+     </property>
+     <property name="default">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="5">
+    <widget class="QPushButton" name="cancelButton">
+     <property name="text">
+      <string>Cancel</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0" colspan="4">
+    <widget class="QLabel" name="metaLabel">
+     <property name="text">
+      <string>This is an example meta label</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="3">
+    <widget class="QGroupBox" name="scriptConditions">
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The input syntax of the iteration. This will be used to detect sets in the card content.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="title">
+      <string>Script Conditions</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_3">
+      <item row="0" column="1" colspan="2">
+       <widget class="QPlainTextEdit" name="conditionsTextEdit">
+        <property name="plainText">
+         <string>['&amp;',
+ ['card', 'includes', 'FrontBack'],
+ ['|', ['tag', 'endsWith', 'context'], ['tag', 'endsWith', 'xxx']]]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QPushButton" name="validateButton">
+        <property name="text">
+         <string>Validate Conditions</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <spacer name="horizontalSpacer_3">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="5" column="4">
+    <widget class="QPushButton" name="resetButton">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="text">
+      <string>Reset</string>
+     </property>
+     <property name="default">
+      <bool>false</bool>
+     </property>
+     <property name="flat">
+      <bool>false</bool>
+     </property>
     </widget>
    </item>
   </layout>

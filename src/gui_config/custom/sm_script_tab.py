@@ -8,6 +8,8 @@ from aqt import mw
 from aqt.qt import QWidget, QLabel, Qt
 
 from ...lib.config import deserialize_script, serialize_script, deserialize_setting, serialize_setting
+from ...lib.types import SMScript
+from ...lib.interface import get_interface
 from ..sm_script_tab_ui import Ui_SMScriptTab
 
 from .sm_setting_add_replace import SMSettingAddReplace
@@ -35,6 +37,7 @@ class SMScriptTab(QWidget):
 
     def setupUi(self, setting):
         self.modelName = setting.model_name
+        self.ui.enableCheckBox.setChecked(setting.enabled),
         self.scr = setting.scripts
 
         self.drawScripts()
@@ -50,13 +53,26 @@ class SMScriptTab(QWidget):
         for idx, scr in enumerate(self.scr):
             headerLabels.append(f'Script {idx}')
 
-            self.setRowMod(
-                idx,
-                scr.name,
-                scr.version,
-                mapTruthValueToIcon(scr.enabled),
-                json.dumps(scr.conditions),
-            )
+            if type(scr) == SMScript:
+                self.setRowMod(
+                    idx,
+                    scr.name,
+                    scr.version,
+                    mapTruthValueToIcon(scr.enabled),
+                    json.dumps(scr.conditions),
+                )
+
+            else:
+                iface = get_interface(scr.tag)
+                script = iface.getter(scr.id, scr.storage)
+
+                self.setRowMod(
+                    idx,
+                    script.name,
+                    script.version,
+                    mapTruthValueToIcon(script.enabled),
+                    json.dumps(script.conditions),
+                )
 
         self.ui.scriptsTable.setVerticalHeaderLabels(headerLabels)
 
@@ -73,7 +89,7 @@ class SMScriptTab(QWidget):
             self.scr[row] = newScript
             self.drawScripts()
 
-        a = SMScriptConfig(mw, saveScript)
+        a = SMScriptConfig(mw, self.modelName, saveScript)
         a.setupUi(self.scr[row])
         a.exec_()
 
@@ -88,7 +104,7 @@ class SMScriptTab(QWidget):
         self.ui.upPushButton.setEnabled(state)
 
     def addScript(self):
-        newScript = deserialize_script({
+        newScript = deserialize_script(self.modelName, {
             'name': 'New Script',
             'description': '',
             'enabled': True,
@@ -100,7 +116,18 @@ class SMScriptTab(QWidget):
         self.drawScripts()
 
     def deleteScript(self):
-        del self.scr[self.ui.scriptsTable.currentRow()]
+        current_scr = self.scr[self.ui.scriptsTable.currentRow()]
+        if type(current_scr) == SMScript:
+            del self.scr[self.ui.scriptsTable.currentRow()] # gotta delete within dict
+        else:
+            iface = get_interface(current_scr.tag)
+
+            if iface.deleteable:
+                script = iface.getter(current_scr.id, current_scr.storage)
+                iface.deleteable(current_scr.id, script)
+            else:
+                from aqt.utils import showInfo # not to be deleted!
+                showInfo('This script cannot be deleted')
 
         self.drawScripts()
         self.updateButtons(False)
@@ -125,16 +152,17 @@ class SMScriptTab(QWidget):
 
     def exportData(self):
         result = deserialize_setting(self.modelName, {
+            "enabled": self.ui.enableCheckBox.isChecked(),
             "scripts": self.scr,
         })
         return result
 
     def importDialog(self):
         def addAfterImport(scripts_new):
-            self.setupUi(self.scr + [deserialize_script(scr) for scr in scripts_new])
+            self.setupUi(self.scr + [deserialize_script(self.modelName, scr) for scr in scripts_new])
 
         def replaceAfterImport(scripts_new):
-            self.setupUi([deserialize_script(scr) for scr in scripts_new])
+            self.setupUi([deserialize_script(self.modelName, scr) for scr in scripts_new])
 
         dirpath = Path(f'{os.path.dirname(os.path.realpath(__file__))}', '../../json_schemas/scripts.json')
         schema_path = dirpath.absolute().as_uri()

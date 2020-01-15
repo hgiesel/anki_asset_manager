@@ -3,6 +3,8 @@ import attr
 @attr.s(slots=True, frozen=True)
 class SMSetting:
     model_name: str = attr.ib()
+    enabled: bool = attr.ib()
+    indent_size: int = attr.ib()
     scripts: list = attr.ib()
 
 @attr.s(slots=True, frozen=True)
@@ -42,12 +44,40 @@ class SMMetaScript:
 
 ################################
 
+def list_to_sm_script_bool(vals):
+    return (
+        vals
+        if type(vals) == SMScriptBool
+        else attr.evolve(SMScriptBool(), **dict([(key, True) for key in vals]))
+    )
+
 @attr.s(slots=True, frozen=True)
 class SMInterface:
+    # name for the type of the interface
     tag: str = attr.ib()
-    generator = attr.ib()
-    getter = attr.ib()
-    setter = attr.ib()
-    deleteable: bool or 'function' = attr.ib()
-    readonly: SMScriptBool = attr.ib(default = SMScriptBool())
-    store: SMScriptBool = attr.ib(default = SMScriptBool())
+    getter: 'Callable[[id, SMScriptStorage] -> SMScript]' = attr.ib()
+    # setting a SMScript with id
+    setter: 'Callable[[id, SMScript] -> None]' = attr.ib()
+
+    # function (id, note type, e.g. 'Standard', card type, e.g. 'FromQuestion', 'qfmt' | 'afmt')
+    generator: 'Callable[[id, SMScriptStorage, model, tmpl, fmt]] -> str or False]' = attr.ib()
+    @generator.default
+    def __generator_default(self):
+        return lambda id, storage, _model, _tmpl, _fmt: self.getter(id, storage).code
+
+    label: False or 'Callable[[id, SMScript] -> None]' = attr.ib()
+    @label.default
+    def __label_default(self):
+        return lambda id, _: f"{self.tag}: {id}"
+
+    reset: False or 'Callable[[id, SMScript] -> SMScript]' = attr.ib()
+    @reset.default
+    def __reset_default(self):
+        return lambda id, _: self.getter(id, SMScriptBool())
+
+    deleteable: False or 'Callable[[id, SMScript] -> None]' = attr.ib(default = False)
+
+    # list of values that are readonly; or stored in `storage` field
+    # can contain: 'enabled', 'name', 'version', 'description', 'conditions', 'code'
+    readonly: SMScriptBool = attr.ib(converter=list_to_sm_script_bool, default = SMScriptBool())
+    store: SMScriptBool = attr.ib(converter=list_to_sm_script_bool, default = SMScriptBool())
