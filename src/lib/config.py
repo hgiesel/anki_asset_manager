@@ -73,7 +73,7 @@ def deserialize_meta_script(model_name, script_data, access_func = safenav_meta_
     result = script_data if isinstance(script_data, SMMetaScript) else make_meta_script(
         access_func([script_data], ['tag']),
         access_func([script_data], ['id']),
-        make_script_storage(**access_func([script_data], ['storage'])),
+        make_script_storage(**access_func([script_data], ['storage'], default = {})),
     )
 
     return result if has_interface(result.tag) and meta_script_is_registered(
