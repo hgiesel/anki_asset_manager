@@ -1,8 +1,6 @@
 declare DIR=${BASH_SOURCE%/*}
 declare name='anki_script_manager'
 
-npm run --prefix "${DIR}/js" build
-
 if [[ "$1" == '-a' ]]; then
   # for uploading to AnkiWeb
   declare addon_id='???'
@@ -20,7 +18,6 @@ zip -r "${DIR}/${addon_id}.ankiaddon" \
   "${DIR}/src/lib/"*".py" \
   "${DIR}/src/gui_config/"*".py" \
   "${DIR}/src/gui_config/custom/"*".py" \
-  "${DIR}/src/gui_config/icons/"* \
   "${DIR}/src/json_schemas/"* \
   "${DIR}/config."{json,md} "${DIR}/manifest.json"
 
