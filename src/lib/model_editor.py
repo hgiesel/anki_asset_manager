@@ -58,11 +58,10 @@ def update_model_template(template, qfmt_scripts, afmt_scripts) -> None:
 
     def insert_scripts(slice, fmt, scripts):
         if slice:
-            template[fmt] = (
-                template[fmt][0 : slice[0]] +
-                scripts +
-                template[fmt][slice[1] : len(template[fmt])]
-            )
+            template[fmt] = scripts.join([
+                template[fmt][:slice[0]],
+                template[fmt][slice[1]:]
+            ])
             return True
 
         elif len(scripts) > 0:
@@ -339,12 +338,15 @@ def get_model_template(template, setting) -> (str, str):
 
                     back_scripts.append(bs)
 
-    front_string = encapsulate_scripts([
-        turn_script_to_string(qscr, setting.indent_size) for qscr in front_scripts
-    ], version_string, setting.indent_size)
+        front_string = encapsulate_scripts([
+            turn_script_to_string(qscr, setting.indent_size) for qscr in front_scripts
+        ], version_string, setting.indent_size)
 
-    back_string = encapsulate_scripts([
-        turn_script_to_string(ascr, setting.indent_size) for ascr in back_scripts
-    ], version_string, setting.indent_size)
+        back_string = encapsulate_scripts([
+            turn_script_to_string(ascr, setting.indent_size) for ascr in back_scripts
+        ], version_string, setting.indent_size)
 
-    return (front_string, back_string)
+        return (front_string, back_string)
+
+    else:
+        return ('', '')

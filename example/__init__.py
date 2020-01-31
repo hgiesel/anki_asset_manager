@@ -33,12 +33,12 @@ if sm:
                 # the code is not necessarily the code that is actually inserted into the template: for that, see `generator`
                 # however the conditions are used for calculating whether to insert
                 getter = lambda id, storage: smi.make_script(
-                    storage.enabled if storage.enabled else True,
+                    storage.enabled if storage.enabled is not None else True,
                     script_name,
                     version,
                     description,
-                    storage.conditions if storage.conditions else [],
-                    storage.code if storage.code else script,
+                    storage.conditions if storage.conditions is not None else [],
+                    storage.code if storage.code is not None else script,
                 ),
 
                 # What happens when the user commits new changes to the script
@@ -70,7 +70,7 @@ if sm:
                     script_name,
                     version,
                     description,
-                    storage.conditions if storage.conditions else [],
+                    storage.conditions if storage.conditions is not None else [],
                     script,
                 ),
                 # ...or...
