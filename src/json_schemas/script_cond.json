@@ -57,8 +57,10 @@
           "enum": [
             "front",
             "quest",
+            "qfmt",
             "back",
-            "answer"
+            "answer",
+            "afmt"
           ]
         }
       ]

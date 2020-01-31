@@ -9,12 +9,14 @@ from .types import (
 def make_setting(
     model_name: str,
     enabled: bool,
+    insert_stub: bool,
     indent_size: int,
     scripts: list,
 ) -> SMSetting:
     return SMSetting(
         model_name,
         enabled,
+        insert_stub,
         indent_size,
         scripts,
     )

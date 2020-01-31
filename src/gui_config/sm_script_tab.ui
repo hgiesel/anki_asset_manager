@@ -14,62 +14,14 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="4" column="4">
-    <widget class="QPushButton" name="downPushButton">
-     <property name="text">
-      <string>▼ Down</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="3">
-    <spacer name="horizontalSpacer">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>40</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="4" column="1">
-    <widget class="QPushButton" name="addPushButton">
-     <property name="text">
-      <string>⊕ Add</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="2">
-    <widget class="QPushButton" name="deletePushButton">
-     <property name="text">
-      <string>⌫ Delete</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="0">
+   <item row="9" column="0">
     <widget class="QPushButton" name="importButton">
      <property name="text">
       <string>⎈ Import / Export</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="5">
-    <widget class="QPushButton" name="upPushButton">
-     <property name="text">
-      <string>▲ Up</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QCheckBox" name="enableCheckBox">
-     <property name="text">
-      <string>Enable Script Insertion</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0" colspan="6">
+   <item row="8" column="0" colspan="6">
     <widget class="QTableWidget" name="scriptsTable">
      <property name="editTriggers">
       <set>QAbstractItemView::NoEditTriggers</set>
@@ -198,6 +150,78 @@
       </property>
      </item>
     </widget>
+   </item>
+   <item row="9" column="1">
+    <widget class="QPushButton" name="addPushButton">
+     <property name="text">
+      <string>⊕ Add</string>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="5">
+    <widget class="QPushButton" name="upPushButton">
+     <property name="text">
+      <string>▲ Up</string>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="3">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="9" column="4">
+    <widget class="QPushButton" name="downPushButton">
+     <property name="text">
+      <string>▼ Down</string>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="2">
+    <widget class="QPushButton" name="deletePushButton">
+     <property name="text">
+      <string>⌫ Delete</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0" rowspan="4" colspan="6">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QCheckBox" name="enableCheckBox">
+       <property name="text">
+        <string>Enable Script Insertion</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="insertStubCheckBox">
+       <property name="text">
+        <string>Insert Stub Only</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_inHl">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

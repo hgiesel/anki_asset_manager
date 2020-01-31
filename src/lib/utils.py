@@ -46,3 +46,8 @@ def safenav(records, props=[], preds=[], default=None):
 
     result = reduce(find_record, records, nothing)
     return default if result is nothing else result
+
+def show(x):
+    from aqt.utils import showInfo
+    import html
+    showInfo(repr(html.escape(x)))

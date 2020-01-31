@@ -5,6 +5,7 @@ from dataclasses import dataclass, replace
 class SMSetting:
     model_name: str
     enabled: bool
+    insert_stub: bool
     indent_size: int
     scripts: list
 

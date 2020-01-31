@@ -3,6 +3,7 @@
     {
       "modelName": "Default",
       "enabled": false,
+      "insertStub": false,
       "indentSize": 2,
       "scripts": [
         {

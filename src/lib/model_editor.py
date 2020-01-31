@@ -23,12 +23,13 @@ def setup_model(model, setting):
     needs_saving = False
 
     for template in model['tmpls']:
-        did_insert = update_model_template(
-            template,
-            *get_model_template(template, setting),
-        )
+        for fmt in ['qfmt', 'afmt']:
+            did_insert = update_model_template(
+                template, fmt,
+                get_model_template(setting, template['name'], fmt),
+            )
 
-        needs_saving = needs_saving or did_insert
+            needs_saving = needs_saving or did_insert
 
     # notify anki that models changed (for synchronization e.g.)
     if needs_saving:
@@ -37,45 +38,45 @@ def setup_model(model, setting):
 def gen_data_attributes(name, version):
     return f'data-name="{name}" data-version="{version}"'
 
-from bs4 import BeautifulSoup
-
 def get_template_slice(t):
     try:
-        startpos_regex = re.compile(r'^.*?<div.*?id="anki\-sm".*?>', re.MULTILINE)
-        endpos_regex = re.compile(r'^.*?</div.*?>.*?$', re.MULTILINE)
+        startpos_regex = re.compile(r'\n?\n? *?<div.*?id="anki\-sm".*?>', re.MULTILINE)
+        endpos_regex = re.compile(r'</div> *?$', re.MULTILINE)
 
         startpos = re.search(startpos_regex, t)
         endpos = re.search(endpos_regex, t[startpos.end():])
 
-        return (startpos.start(), startpos.end() + endpos.end())
+        startpos_actual = startpos.start()
+        endpos_actual = startpos.end() + endpos.end()
+
+        return (startpos_actual, endpos_actual)
 
     except AttributeError:
         return None
 
-def update_model_template(template, qfmt_scripts, afmt_scripts) -> None:
-    qslice = get_template_slice(template['qfmt'])
-    aslice = get_template_slice(template['afmt'])
+def get_new_template(slice, old_template: str, scripts: str) -> str:
+    sep_scripts = '\n\n' + scripts
 
-    def insert_scripts(slice, fmt, scripts):
-        if slice:
-            template[fmt] = scripts.join([
-                template[fmt][:slice[0]],
-                template[fmt][slice[1]:]
-            ])
-            return True
+    return (
+        sep_scripts.join([
+            old_template[:slice[0]],
+            old_template[slice[1]:],
+        ]) if slice
+        else f'{old_template}{sep_scripts}' if len(scripts) > 0
+        else None
+    )
 
-        elif len(scripts) > 0:
-            template[fmt] = f"{template[fmt]}\n\n{scripts}"
-            return True
+def update_model_template(template: object, fmt: str, scripts: str) -> bool:
+    slice = get_template_slice(template[fmt])
+    new_template = get_new_template(slice, template[fmt], scripts)
 
-        return False
+    if new_template:
+        template[fmt] = new_template
+        return True
 
-    qdid_insert = insert_scripts(qslice, 'qfmt', qfmt_scripts)
-    adid_insert = insert_scripts(aslice, 'afmt', afmt_scripts)
+    return False
 
-    return qdid_insert or adid_insert
-
-def get_condition_parser(card, frontside):
+def get_condition_parser(card, side):
     is_true = lambda v: isinstance(v, bool) and v == True
     is_false = lambda v: isinstance(v, bool) and v == False
 
@@ -155,8 +156,8 @@ def get_condition_parser(card, frontside):
         elif cond[0] == 'side':
             if cond[1] == '=':
                 if (
-                    frontside and cond[2] in ['front', 'question'] or
-                    not frontside and cond[2] in ['back', 'answer']
+                    side == 'qfmt' and cond[2] in ['front', 'question', 'qfmt'] or
+                    side == 'afmt' and cond[2] in ['back', 'answer', 'afmt']
                 ):
                     return True, True
 
@@ -165,8 +166,8 @@ def get_condition_parser(card, frontside):
 
             elif cond[1] == '!=':
                 if (
-                    frontside and cond[2] in ['back', 'answer'] or
-                    not frontside and cond[2] in ['front', 'question']
+                    side == 'qfmt' and cond[2] in ['back', 'answer', 'afmt'] or
+                    side == 'afmt' and cond[2] in ['front', 'question', 'qfmt']
                 ):
                     return True, True
 
@@ -291,62 +292,51 @@ def turn_script_to_string(scr, indent_size):
     )
 
 def encapsulate_scripts(scripts, version, indent_size) -> str:
-    if len(scripts) == 0:
-        return ''
-
     pretext = "<div id=\"anki-sm\" data-name=\"SCRIPTS managed by SCRIPT MANAGER\""
     version_text = f" data-version=\"{version}\"" if len(version) > 0 else ''
 
     top_delim = f"{pretext}{version_text}>"
     bottom_delim = '</div>'
 
-    return top_delim + '\n' + '\n\n'.join([indent_lines(scc, indent_size) for scc in scripts]) + '\n' + bottom_delim
+    indented_scripts = [indent_lines(scc, indent_size) for scc in scripts]
+    combined = [
+        item
+        for sublist
+        in [[top_delim], indented_scripts, [bottom_delim]]
+        for item
+        in sublist
+    ]
 
-def get_model_template(template, setting) -> (str, str):
-    cardtype_name = template['name']
+    return '\n'.join(combined)
 
-    front_scripts = []
-    back_scripts = []
+def get_model_template(setting, cardtype_name, fmt) -> (str, str):
+    the_scripts = []
+    the_parser = get_condition_parser(cardtype_name, fmt)
 
-    front_parser = get_condition_parser(cardtype_name, True)
-    back_parser = get_condition_parser(cardtype_name, False)
-
-    if setting.enabled:
+    if setting.enabled and not setting.insert_stub:
         for scr in setting.scripts:
             the_scr = scr if isinstance(scr, SMConcrScript) else get_interface(scr.tag).getter(scr.id, scr.storage)
 
             if the_scr.enabled:
-                needs_front_inject, simplified_conditions_front = front_parser(the_scr.conditions)
+                needs_inject, simplified_conditions = the_parser(the_scr.conditions)
 
-                if needs_front_inject:
+                if needs_inject:
                     fs = {
                         'tag': gen_data_attributes(the_scr.name, the_scr.version),
-                        'code': the_scr.code if isinstance(scr, SMConcrScript) else get_interface(scr.tag).generator(scr.id, scr.storage, setting.model_name, cardtype_name, 'qfmt'),
-                        'conditions': simplified_conditions_front,
+                        'code': (
+                            the_scr.code
+                            if isinstance(scr, SMConcrScript)
+                            else get_interface(scr.tag).generator(scr.id, scr.storage, setting.model_name, cardtype_name, fmt)
+                        ),
+                        'conditions': simplified_conditions,
                     }
 
-                    front_scripts.append(fs)
+                    the_scripts.append(fs)
 
-                needs_back_inject, simplified_conditions_back = back_parser(the_scr.conditions)
+    code_string = encapsulate_scripts(
+        [turn_script_to_string(scr, setting.indent_size) for scr in the_scripts],
+        version_string,
+        setting.indent_size,
+    ) if setting.enabled else ''
 
-                if needs_back_inject:
-                    bs = {
-                        'tag': gen_data_attributes(the_scr.name, the_scr.version),
-                        'code': the_scr.code if isinstance(scr, SMConcrScript) else get_interface(scr.tag).generator(scr.id, scr.storage, setting.model_name, cardtype_name, 'afmt'),
-                        'conditions': simplified_conditions_back,
-                    }
-
-                    back_scripts.append(bs)
-
-        front_string = encapsulate_scripts([
-            turn_script_to_string(qscr, setting.indent_size) for qscr in front_scripts
-        ], version_string, setting.indent_size)
-
-        back_string = encapsulate_scripts([
-            turn_script_to_string(ascr, setting.indent_size) for ascr in back_scripts
-        ], version_string, setting.indent_size)
-
-        return (front_string, back_string)
-
-    else:
-        return ('', '')
+    return code_string

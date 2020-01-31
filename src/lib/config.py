@@ -29,6 +29,7 @@ def deserialize_setting(model_name, model_setting, access_func = safenav_setting
     return model_setting if isinstance(model_setting, SMSetting) else make_setting(
         model_name,
         access_func([model_setting], ['enabled']),
+        access_func([model_setting], ['insertStub']),
         access_func([model_setting], ['indentSize']),
         add_other_metas(model_name, [s for s in [deserialize_script(model_name, script)
          for script
@@ -85,6 +86,7 @@ def serialize_setting(setting: SMSetting) -> dict:
     return {
         'modelName': setting.model_name,
         'enabled': setting.enabled,
+        'insertStub': setting.insert_stub,
         'indentSize': setting.indent_size,
         'scripts': [serialize_script(script) for script in setting.scripts],
     }

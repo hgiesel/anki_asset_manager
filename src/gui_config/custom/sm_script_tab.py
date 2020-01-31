@@ -42,6 +42,7 @@ class SMScriptTab(QWidget):
     def setupUi(self, setting):
         self.modelName = setting.model_name
         self.ui.enableCheckBox.setChecked(setting.enabled),
+        self.ui.insertStubCheckBox.setChecked(setting.insert_stub),
         self.scr = setting.scripts
 
         self.drawScripts()
@@ -172,6 +173,7 @@ class SMScriptTab(QWidget):
     def exportData(self):
         result = deserialize_setting(self.modelName, {
             "enabled": self.ui.enableCheckBox.isChecked(),
+            "insertStub": self.ui.insertStubCheckBox.isChecked(),
             "scripts": self.scr,
         })
         return result

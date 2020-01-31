@@ -7,6 +7,9 @@
     "enabled": {
       "type": "boolean"
     },
+    "insertStub": {
+      "type": "boolean"
+    },
     "indentSize": {
       "type": "integer",
       "minimum": 0
@@ -19,6 +22,7 @@
   "required": [
     "modelName",
     "enabled",
+    "insertStub",
     "indentSize",
     "scripts"
   ]
