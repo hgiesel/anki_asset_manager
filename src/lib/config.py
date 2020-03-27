@@ -8,7 +8,7 @@ from aqt import mw
 
 from .utils import safenav, safenav_preset
 
-from .types import SMSetting, SMScript, SMConcrScript, SMMetaScript, SMScriptStorage
+from .config_types import SMSetting, SMScript, SMConcrScript, SMMetaScript, SMScriptStorage
 from .interface import make_setting, make_script, make_meta_script, make_script_storage
 from .registrar import has_interface, get_meta_scripts, meta_script_is_registered
 
@@ -116,23 +116,67 @@ def deserialize_setting_with_default(model_name, settings):
 
     return model_deserialized
 
-def get_settings():
-    config = mw.addonManager.getConfig(__name__)
+def get_setting(col, model_name='Default') -> Optional[SMSetting]:
+    all_config = mw.addonManager.getConfig(__name__)
+    setting = safenav(
+        [all_config],
+        ['settings', str(col.crt)],
+        default=[],
+    )
 
-    def get_setting(model_name):
-        return filter(lambda v: v['modelName'] == model_name, safenav([config], ['settings'], default=None))
+    return deserialize_setting_with_default(
+        model_name,
+        setting,
+    )
 
-    model_settings = []
+def get_settings(col) -> List[SMSetting]:
+    all_config = mw.addonManager.getConfig(__name__)
+    setting = safenav([all_config], ['settings', str(col.crt)], default=[])
 
-    for model in mw.col.models.models.values():
-        model_name = model['name']
-        model_deserialized = deserialize_setting_with_default(model_name, get_setting(model_name))
-
-        model_settings.append(model_deserialized)
+    model_settings = [
+        get_setting(col, model['name'], setting)
+        for model
+        in col.models.models.values()
+    ]
 
     return model_settings
 
-def write_settings(serializedSettings):
+def write_setting(col, setting: SMSetting) -> None:
+    serialized_setting = serialize_setting(setting)
+
+    all_config = mw.addonManager.getConfig(__name__)
+    current_config = safenav(
+        [all_config],
+        ['settings', str(col.crt)],
+        default=[],
+    )
+
+    try:
+        idx = next(i for i,v in enumerate(current_config) if v['modelName'] == setting.model_name)
+        current_config[idx] = serialized_setting
+
+    except StopIteration:
+        current_config.append(serialized_setting)
+
+    new_config = safenav([all_config], ['settings'], default={})
+    new_config[str(col.crt)] = current_config
+
     mw.addonManager.writeConfig(__name__, {
-        'settings': serializedSettings,
+        'settings': new_config,
+    })
+
+def write_settings(col, settings: List[SMSetting]):
+    serialized_settings = [
+        serialize_setting(setting)
+        for setting
+        in settings
+    ]
+
+    all_config = mw.addonManager.getConfig(__name__)
+
+    new_config = safenav([all_config], ['settings'], default={})
+    new_config[str(col.crt)] = serialized_settings
+
+    mw.addonManager.writeConfig(__name__, {
+        'settings': new_config,
     })

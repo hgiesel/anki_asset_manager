@@ -50,11 +50,12 @@ class SMMetaScript(SMScript):
 
 ################################
 
-anki_model = str
-anki_tmpl = str
-anki_fmt = Literal['qfmt', 'afmt']
-script_text = str
-label_text = str
+AnkiModel = str
+AnkiTmpl = str
+AnkiFmt = Literal['qfmt', 'afmt']
+ScriptText = str
+LabelText = str
+Falsifiable = lambda t: Union[Literal[False], t]
 
 @dataclass(frozen=True)
 class SMInterface:
@@ -63,10 +64,10 @@ class SMInterface:
     getter: Callable[[str, SMScriptStorage], SMConcrScript]
     # result is used for storing
     setter: Callable[[str, SMConcrScript], Union[bool, SMConcrScript]]
-    generator: Callable[[str, SMScriptStorage, anki_model, anki_tmpl, anki_fmt], Union[script_text, Literal[False]]]
-    label: Union[Literal[False], Callable[[str, SMScriptStorage], label_text]]
-    reset: Union[Literal[False], Callable[[str, SMScriptStorage], SMConcrScript]]
-    deletable: Union[Literal[False], Callable[[str, SMScriptStorage], bool]]
+    generator: Callable[[str, SMScriptStorage, AnkiModel, AnkiTmpl, AnkiFmt], Falsifiable(ScriptText)]
+    label: Falsifiable(Callable[[str, SMScriptStorage], LabelText])
+    reset: Falsifiable(Callable[[str, SMScriptStorage], SMConcrScript])
+    deletable: Falsifiable(Callable[[str, SMScriptStorage], bool])
 
     # list of values that are readonly
     readonly: SMScriptBool

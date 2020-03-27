@@ -10,7 +10,7 @@ from anki import media
 from aqt import mw
 
 from .registrar import get_interface
-from .types import SMConcrScript
+from .config_types import SMConcrScript
 from .config import serialize_setting
 from .utils import version_string
 

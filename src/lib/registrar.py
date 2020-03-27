@@ -1,6 +1,6 @@
 from typing import Optional, List, Tuple
 
-from .types import SMInterface, SMMetaScript
+from .config_types import SMInterface, SMMetaScript
 from .interface import make_meta_script
 
 _meta_interfaces: List[SMInterface] = []

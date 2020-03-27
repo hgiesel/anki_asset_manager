@@ -19,7 +19,7 @@ from ..sm_script_config_ui import Ui_SMScriptConfig
 
 from ...lib.config import deserialize_script, serialize_script
 
-from ...lib.types import SMConcrScript, SMMetaScript, SMScriptStorage, SMScriptBool
+from ...lib.config_types import SMConcrScript, SMMetaScript, SMScriptStorage, SMScriptBool
 from ...lib.interface import make_script_bool
 from ...lib.registrar import get_interface
 

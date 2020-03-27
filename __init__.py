@@ -9,6 +9,7 @@ License: GNU AGPLv3 <https://www.gnu.org/licenses/agpl.html>
 
 from aqt import mw
 import os.path as path
+
 if mw.addonManager.addonName(path.dirname(__file__)) != 'Script Manager':
     dir_path = path.dirname(path.realpath(__file__))
 

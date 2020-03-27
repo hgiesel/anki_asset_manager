@@ -1,9 +1,9 @@
 from typing import Optional, Callable, Union, List, Literal
 from dataclasses import dataclass, replace
 
-from .types import (
+from .config_types import (
     SMInterface, SMSetting, SMConcrScript, SMMetaScript, SMScriptBool, SMScriptStorage,
-    anki_model, anki_tmpl, anki_fmt, script_text, label_text,
+    AnkiModel, AnkiTmpl, AnkiFmt, ScriptText, LabelText, Falsifiable,
 )
 
 def make_setting(
@@ -95,10 +95,10 @@ def make_interface(
     tag: str,
     getter: Callable[[str, SMScriptStorage], SMConcrScript],
     setter: Callable[[str, SMConcrScript], Union[bool, SMConcrScript]],
-    generator: Optional[Callable[[str, SMScriptStorage, anki_model, anki_tmpl, anki_fmt], Union[script_text, Literal[False]]]] = None,
-    label: Optional[Union[Literal[False], Callable[[str, SMScriptStorage], label_text]]] = None,
-    reset: Optional[Union[Literal[False], Callable[[str, SMScriptStorage], SMConcrScript]]] = None,
-    deletable: Optional[Union[Literal[False], Callable[[str, SMScriptStorage], bool]]] = None,
+    generator: Optional[Callable[[str, SMScriptStorage, AnkiModel, AnkiTmpl, AnkiFmt], Falsifiable(ScriptText)]] = None,
+    label: Optional[Falsifiable(Callable[[str, SMScriptStorage], LabelText])] = None,
+    reset: Optional[Falsifiable(Callable[[str, SMScriptStorage], SMConcrScript])] = None,
+    deletable: Optional[Falsifiable(Callable[[str, SMScriptStorage], bool])] = None,
     readonly: Optional[Union[List[ScriptKeys], SMScriptStorage]] = None,
     store: Optional[Union[List[ScriptKeys], SMScriptStorage]] = None,
 ) -> SMInterface:
