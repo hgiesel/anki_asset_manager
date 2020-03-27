@@ -134,7 +134,7 @@ def get_settings(col) -> List[SMSetting]:
     setting = safenav([all_config], ['settings', str(col.crt)], default=[])
 
     model_settings = [
-        get_setting(col, model['name'], setting)
+        get_setting(col, model['name'])
         for model
         in col.models.models.values()
     ]
@@ -175,6 +175,11 @@ def write_settings(col, settings: List[SMSetting]):
     all_config = mw.addonManager.getConfig(__name__)
 
     new_config = safenav([all_config], ['settings'], default={})
+
+    # save setting from old version of addon
+    if type(new_config) == list:
+        new_config = {"saved": new_config}
+
     new_config[str(col.crt)] = serialized_settings
 
     mw.addonManager.writeConfig(__name__, {

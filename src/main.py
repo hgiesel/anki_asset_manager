@@ -1,9 +1,15 @@
-from anki.hooks import addHook
+from aqt import QAction, mw
 
-from .setup import setup_menu_option, setup_addon_manager
+from .gui_config.custom.sm_config import SMConfigDialog
+from .lib.config import get_settings
 
-def init():
-    addHook('profileLoaded', setup_menu_option)
-    addHook('profileLoaded', setup_addon_manager)
+from .utils import find_addon_by_name
 
-init()
+def invoke_options():
+    dialog = SMConfigDialog(mw)
+    dialog.setupUi(get_settings(mw.col))
+
+    return dialog.exec_()
+
+def setup_addon_manager():
+    mw.addonManager.setConfigAction(__name__, invoke_options)

@@ -21,8 +21,7 @@ def sort_negative_first(v):
     return abs(int(v.name)) * 2 if int(v.name) < 0 else abs(int(v.name)) * 2 + 1
 
 def save_settings(settings):
-    serializedSettings = [serialize_setting(setting) for setting in settings]
-    write_settings(serializedSettings)
+    write_settings(mw.col, settings)
 
 class SMConfigDialog(QDialog):
     def __init__(self, parent):

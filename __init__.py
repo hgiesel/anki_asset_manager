@@ -7,8 +7,10 @@ Copyright: (c) 2019 Henrik Giesel <https://github.com/hgiesel>
 License: GNU AGPLv3 <https://www.gnu.org/licenses/agpl.html>
 """
 
-from aqt import mw
 import os.path as path
+from aqt import mw
+
+from .src.main import setup_addon_manager
 
 if mw.addonManager.addonName(path.dirname(__file__)) != 'Script Manager':
     dir_path = path.dirname(path.realpath(__file__))
@@ -20,4 +22,4 @@ if mw.addonManager.addonName(path.dirname(__file__)) != 'Script Manager':
                 'config': json.load(f_old)['config']
             }))
 
-from .src import main
+setup_addon_manager()
