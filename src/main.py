@@ -11,5 +11,10 @@ def invoke_options():
 
     return dialog.exec_()
 
+def setup_menu_option():
+    action = QAction('Script Manager Settings...', mw)
+    action.triggered.connect(invoke_options)
+    mw.form.menuTools.addAction(action)
+
 def setup_addon_manager():
     mw.addonManager.setConfigAction(__name__, invoke_options)

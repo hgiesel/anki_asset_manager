@@ -10,7 +10,7 @@ License: GNU AGPLv3 <https://www.gnu.org/licenses/agpl.html>
 import os.path as path
 from aqt import mw
 
-from .src.main import setup_addon_manager
+from .src.main import setup_addon_manager, setup_menu_option
 
 if mw.addonManager.addonName(path.dirname(__file__)) != 'Script Manager':
     dir_path = path.dirname(path.realpath(__file__))
@@ -23,3 +23,4 @@ if mw.addonManager.addonName(path.dirname(__file__)) != 'Script Manager':
             }))
 
 setup_addon_manager()
+setup_menu_option()
