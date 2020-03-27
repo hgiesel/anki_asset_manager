@@ -12,7 +12,7 @@ from aqt import mw
 from .registrar import get_interface
 from .config_types import SMConcrScript
 from .config import serialize_setting
-from .utils import version_string
+from ..utils import version
 
 def setup_models(settings):
     for st in settings:
@@ -335,7 +335,7 @@ def get_model_template(setting, cardtype_name, fmt) -> (str, str):
 
     code_string = encapsulate_scripts(
         [turn_script_to_string(scr, setting.indent_size) for scr in the_scripts],
-        version_string,
+        version,
         setting.indent_size,
     ) if setting.enabled else ''
 

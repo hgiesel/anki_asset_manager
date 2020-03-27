@@ -1,7 +1,5 @@
 from functools import reduce
 
-version_string = '1.0'
-
 def safenav_preset(preset):
     ensure_value = lambda v: v is not None
 
