@@ -10,7 +10,7 @@ from anki import media
 from aqt import mw
 
 from .registrar import get_interface
-from .config_types import SMConcrScript
+from .config_types import AMConcrScript
 from .config import serialize_setting
 from ..utils import version
 
@@ -40,7 +40,7 @@ def gen_data_attributes(name, version):
 
 def get_template_slice(t):
     try:
-        startpos_regex = re.compile(r'\n?\n? *?<div.*?id="anki\-sm".*?>', re.MULTILINE)
+        startpos_regex = re.compile(r'\n?\n? *?<div.*?id="anki\-am".*?>', re.MULTILINE)
         endpos_regex = re.compile(r'</div> *?$', re.MULTILINE)
 
         startpos = re.search(startpos_regex, t)
@@ -292,7 +292,7 @@ def turn_script_to_string(scr, indent_size):
     )
 
 def encapsulate_scripts(scripts, version, indent_size) -> str:
-    pretext = "<div id=\"anki-sm\" data-name=\"SCRIPTS managed by SCRIPT MANAGER\""
+    pretext = "<div id=\"anki-am\" data-name=\"SCRIPTS managed by SCRIPT MANAGER\""
     version_text = f" data-version=\"{version}\"" if len(version) > 0 else ''
 
     top_delim = f"{pretext}{version_text}>"
@@ -315,7 +315,7 @@ def get_model_template(setting, cardtype_name, fmt) -> (str, str):
 
     if setting.enabled and not setting.insert_stub:
         for scr in setting.scripts:
-            the_scr = scr if isinstance(scr, SMConcrScript) else get_interface(scr.tag).getter(scr.id, scr.storage)
+            the_scr = scr if isinstance(scr, AMConcrScript) else get_interface(scr.tag).getter(scr.id, scr.storage)
 
             if the_scr.enabled:
                 needs_inject, simplified_conditions = the_parser(the_scr.conditions)
@@ -325,7 +325,7 @@ def get_model_template(setting, cardtype_name, fmt) -> (str, str):
                         'tag': gen_data_attributes(the_scr.name, the_scr.version),
                         'code': (
                             the_scr.code
-                            if isinstance(scr, SMConcrScript)
+                            if isinstance(scr, AMConcrScript)
                             else get_interface(scr.tag).generator(scr.id, scr.storage, setting.model_name, cardtype_name, fmt)
                         ),
                         'conditions': simplified_conditions,

@@ -2,7 +2,7 @@ from typing import Optional, Callable, Union, List, Literal
 from dataclasses import dataclass, replace
 
 from .config_types import (
-    SMInterface, SMSetting, SMConcrScript, SMMetaScript, SMScriptBool, SMScriptStorage,
+    AMInterface, AMSetting, AMConcrScript, AMMetaScript, AMScriptBool, AMScriptStorage,
     AnkiModel, AnkiTmpl, AnkiFmt, ScriptText, LabelText, Falsifiable,
 )
 
@@ -12,8 +12,8 @@ def make_setting(
     insert_stub: bool,
     indent_size: int,
     scripts: list,
-) -> SMSetting:
-    return SMSetting(
+) -> AMSetting:
+    return AMSetting(
         model_name,
         enabled,
         insert_stub,
@@ -28,8 +28,8 @@ def make_script(
     description: str,
     conditions: list,
     code: str,
-) -> SMConcrScript:
-    return SMConcrScript(
+) -> AMConcrScript:
+    return AMConcrScript(
         enabled,
         name,
         version,
@@ -41,9 +41,9 @@ def make_script(
 def make_meta_script(
     tag: str,
     id: str,
-    storage: Optional[SMScriptStorage] = None
-) -> SMMetaScript:
-    return SMMetaScript(
+    storage: Optional[AMScriptStorage] = None
+) -> AMMetaScript:
+    return AMMetaScript(
         tag,
         id,
         storage if storage is not None else make_script_storage()
@@ -56,8 +56,8 @@ def make_script_bool(
     description: Optional[bool] = None,
     conditions: Optional[bool] = None,
     code: Optional[bool] = None,
-) -> SMScriptBool:
-    return SMScriptBool(
+) -> AMScriptBool:
+    return AMScriptBool(
         enabled if enabled is not None else False,
         name if name is not None else False,
         version if version is not None else False,
@@ -73,8 +73,8 @@ def make_script_storage(
     description: Optional[str] = None,
     conditions: Optional[list] = None,
     code: Optional[str] = None,
-) -> SMScriptStorage:
-    return SMScriptStorage(
+) -> AMScriptStorage:
+    return AMScriptStorage(
         enabled,
         name,
         version,
@@ -85,7 +85,7 @@ def make_script_storage(
 
 ScriptKeys = Literal['enabled', 'name', 'version', 'description', 'conditions', 'code']
 
-def __list_to_sm_script_bool(vals: List[ScriptKeys]) -> SMScriptBool:
+def __list_to_am_script_bool(vals: List[ScriptKeys]) -> AMScriptBool:
     return replace(
         make_script_bool(),
         **dict([(key, True) for key in vals])
@@ -93,16 +93,16 @@ def __list_to_sm_script_bool(vals: List[ScriptKeys]) -> SMScriptBool:
 
 def make_interface(
     tag: str,
-    getter: Callable[[str, SMScriptStorage], SMConcrScript],
-    setter: Callable[[str, SMConcrScript], Union[bool, SMConcrScript]],
-    generator: Optional[Callable[[str, SMScriptStorage, AnkiModel, AnkiTmpl, AnkiFmt], Falsifiable(ScriptText)]] = None,
-    label: Optional[Falsifiable(Callable[[str, SMScriptStorage], LabelText])] = None,
-    reset: Optional[Falsifiable(Callable[[str, SMScriptStorage], SMConcrScript])] = None,
-    deletable: Optional[Falsifiable(Callable[[str, SMScriptStorage], bool])] = None,
-    readonly: Optional[Union[List[ScriptKeys], SMScriptStorage]] = None,
-    store: Optional[Union[List[ScriptKeys], SMScriptStorage]] = None,
-) -> SMInterface:
-    return SMInterface(
+    getter: Callable[[str, AMScriptStorage], AMConcrScript],
+    setter: Callable[[str, AMConcrScript], Union[bool, AMConcrScript]],
+    generator: Optional[Callable[[str, AMScriptStorage, AnkiModel, AnkiTmpl, AnkiFmt], Falsifiable(ScriptText)]] = None,
+    label: Optional[Falsifiable(Callable[[str, AMScriptStorage], LabelText])] = None,
+    reset: Optional[Falsifiable(Callable[[str, AMScriptStorage], AMConcrScript])] = None,
+    deletable: Optional[Falsifiable(Callable[[str, AMScriptStorage], bool])] = None,
+    readonly: Optional[Union[List[ScriptKeys], AMScriptStorage]] = None,
+    store: Optional[Union[List[ScriptKeys], AMScriptStorage]] = None,
+) -> AMInterface:
+    return AMInterface(
         tag,
         getter,
         setter,
@@ -110,10 +110,10 @@ def make_interface(
         label if label is not None else lambda id, _storage: f"{tag}: {id}",
         reset if reset is not None else lambda id, _storage: getter(id, make_script_storage()),
         deletable if deletable is not None else lambda _id, _storage: False,
-        readonly if isinstance(readonly, SMScriptStorage) else (
-            __list_to_sm_script_bool(readonly) if readonly is not None else make_script_bool()
+        readonly if isinstance(readonly, AMScriptStorage) else (
+            __list_to_am_script_bool(readonly) if readonly is not None else make_script_bool()
         ),
-        store if isinstance(store, SMScriptStorage) else (
-            __list_to_sm_script_bool(store) if store is not None else make_script_bool()
+        store if isinstance(store, AMScriptStorage) else (
+            __list_to_am_script_bool(store) if store is not None else make_script_bool()
         ),
     )

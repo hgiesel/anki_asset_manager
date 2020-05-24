@@ -1,12 +1,12 @@
-declare DIR=${BASH_SOURCE%/*}
-declare name='anki_script_manager'
+declare DIR="$(cd "$(dirname "$0")/.." && pwd -P)"
+declare name='anki_asset_manager'
 
 if [[ "$1" == '-a' ]]; then
   # for uploading to AnkiWeb
-  declare addon_id='667831375'
+  declare addon_id=''
 else
   # for installing myself
-  declare addon_id='script_manager'
+  declare addon_id='asset_manager'
 fi
 
 rm -f "${DIR}/${addon_id}.ankiaddon"

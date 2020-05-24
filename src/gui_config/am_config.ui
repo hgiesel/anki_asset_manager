@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <author>Henrik Giesel</author>
- <class>SMConfig</class>
- <widget class="QDialog" name="SMConfig">
+ <class>AMConfig</class>
+ <widget class="QDialog" name="AMConfig">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -36,7 +36,7 @@
     </widget>
    </item>
    <item row="0" column="2" colspan="2">
-    <widget class="SMConfigModelchooser" name="modelChooser"/>
+    <widget class="AMConfigModelchooser" name="modelChooser"/>
    </item>
    <item row="0" column="4">
     <widget class="QPushButton" name="importButton">
@@ -89,20 +89,20 @@
     </spacer>
    </item>
    <item row="1" column="0" colspan="9">
-    <widget class="SMScriptTab" name="configWidget" native="true"/>
+    <widget class="AMScriptTab" name="configWidget" native="true"/>
    </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>SMConfigModelchooser</class>
+   <class>AMConfigModelchooser</class>
    <extends>QComboBox</extends>
-   <header>anki_script_manager/src/gui_config/custom/sm_config_modelchooser</header>
+   <header>anki_asset_manager/src/gui_config/custom/am_config_modelchooser</header>
   </customwidget>
   <customwidget>
-   <class>SMScriptTab</class>
+   <class>AMScriptTab</class>
    <extends>QWidget</extends>
-   <header>anki_script_manager/src/gui_config/custom/sm_script_tab</header>
+   <header>anki_asset_manager/src/gui_config/custom/am_script_tab</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -1,12 +1,12 @@
 from aqt import QAction, mw
 
-from .gui_config.custom.sm_config import SMConfigDialog
+from .gui_config.custom.am_config import AMConfigDialog
 from .lib.config import get_settings
 
 from .utils import find_addon_by_name
 
 def invoke_options():
-    dialog = SMConfigDialog(mw)
+    dialog = AMConfigDialog(mw)
     dialog.setupUi(get_settings(mw.col))
 
     return dialog.exec_()

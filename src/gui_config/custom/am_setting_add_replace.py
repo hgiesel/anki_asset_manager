@@ -1,35 +1,48 @@
 import json
 import jsonschema
 
+from aqt.utils import  showWarning, showInfo
 from aqt.qt import QDialog
-from aqt.utils import showWarning, showInfo
 
-from ..sm_setting_update_ui import Ui_SMSettingUpdate
+from ..am_setting_add_replace_ui import Ui_AMSettingAddReplace
 
-class SMSettingUpdate(QDialog):
+class AMSettingAddReplace(QDialog):
     def __init__(self, parent):
         super().__init__(parent=parent)
 
-        self.ui = Ui_SMSettingUpdate()
+        self.ui = Ui_AMSettingAddReplace()
         self.ui.setupUi(self)
 
         self.ui.cancelButton.clicked.connect(self.reject)
-        self.ui.updateButton.clicked.connect(self.update)
+        self.ui.addButton.clicked.connect(self.add)
+        self.ui.replaceButton.clicked.connect(self.replace)
+
         self.ui.validateButton.clicked.connect(self.validate)
 
-    def setupUi(self, data, validator, updater):
+    def setupUi(self, data, validator, adder, replacer):
         self.ui.textEdit.setPlainText(data)
         self.validator = validator
-        self.updater = updater
+        self.adder = adder
+        self.replacer = replacer
 
-    def update(self):
+    def add(self):
         success = self.validate(showMessages = False)
 
         if not success:
             showInfo('Invalid data. Please correct the data and verify using the "Validate" button, or just cancel the dialog if you want to abort.')
         else:
-            self.updater(json.loads(self.ui.textEdit.toPlainText()))
+            self.adder(json.loads(self.ui.textEdit.toPlainText()))
             self.accept()
+
+    def replace(self):
+        success = self.validate(showMessages = False)
+
+        if not success:
+            showInfo('Invalid data. Please correct the data and verify using the "Validate" button, or just cancel the dialog if you want to abort.')
+        else:
+            self.replacer(json.loads(self.ui.textEdit.toPlainText()))
+            self.accept()
+        pass
 
     def validate(self, checked = False, showMessages = True):
         showFail = showWarning if showMessages else lambda _: None

@@ -12,10 +12,10 @@ from aqt.utils import getText, showWarning, showInfo
 from ...lib.config import deserialize_setting, serialize_setting, write_settings
 from ...lib.model_editor import setup_models
 
-from ..sm_config_ui import Ui_SMConfig
+from ..am_config_ui import Ui_AMConfig
 
-from .sm_setting_update import SMSettingUpdate
-from .sm_script_tab import SMScriptTab
+from .am_setting_update import AMSettingUpdate
+from .am_script_tab import AMScriptTab
 
 def sort_negative_first(v):
     return abs(int(v.name)) * 2 if int(v.name) < 0 else abs(int(v.name)) * 2 + 1
@@ -23,11 +23,11 @@ def sort_negative_first(v):
 def save_settings(settings):
     write_settings(mw.col, settings)
 
-class SMConfigDialog(QDialog):
+class AMConfigDialog(QDialog):
     def __init__(self, parent):
         super().__init__(parent=parent)
 
-        self.ui = Ui_SMConfig()
+        self.ui = Ui_AMConfig()
         self.ui.setupUi(self)
 
         self.ui.cancelButton.clicked.connect(self.reject)
@@ -107,7 +107,7 @@ class SMConfigDialog(QDialog):
 
             validator = Draft7Validator(schema, resolver=resolver, format_checker=None)
 
-            dial = SMSettingUpdate(mw)
+            dial = AMSettingUpdate(mw)
             dial.setupUi(
                 json.dumps(serialize_setting(self.settings[old_sid]), sort_keys=True, indent=4),
                 validator,

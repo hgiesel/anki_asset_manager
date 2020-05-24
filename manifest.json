@@ -1,6 +1,6 @@
 {
-    "name": "Script Manager",
-    "package": "anki_script_manager",
+    "name": "Asset Manager",
+    "package": "anki_asset_manager",
     "conflicts": [],
-    "mod": 667831375
+    "mod": 0
 }

@@ -8,7 +8,7 @@ from aqt import mw
 
 from .utils import safenav, safenav_preset
 
-from .config_types import SMSetting, SMScript, SMConcrScript, SMMetaScript, SMScriptStorage
+from .config_types import AMSetting, AMScript, AMConcrScript, AMMetaScript, AMScriptStorage
 from .interface import make_setting, make_script, make_meta_script, make_script_storage
 from .registrar import has_interface, get_meta_scripts, meta_script_is_registered
 
@@ -25,8 +25,8 @@ with open(path.join(SCRIPTNAME, '../../config.json'), encoding='utf-8') as confi
     safenav_concr_script = safenav_preset(model_default['scripts'][0])
     safenav_meta_script = safenav_preset(model_default['scripts'][1])
 
-def deserialize_setting(model_name, model_setting, access_func = safenav_setting) -> SMSetting:
-    return model_setting if isinstance(model_setting, SMSetting) else make_setting(
+def deserialize_setting(model_name, model_setting, access_func = safenav_setting) -> AMSetting:
+    return model_setting if isinstance(model_setting, AMSetting) else make_setting(
         model_name,
         access_func([model_setting], ['enabled']),
         access_func([model_setting], ['insertStub']),
@@ -36,12 +36,12 @@ def deserialize_setting(model_name, model_setting, access_func = safenav_setting
          in access_func([model_setting], ['scripts'])] if s]),
     )
 
-def add_other_metas(model_name, scripts: List[SMScript]) -> List[SMScript]:
+def add_other_metas(model_name, scripts: List[AMScript]) -> List[AMScript]:
     meta_scripts = get_meta_scripts(model_name)
 
     for ms in meta_scripts:
         try:
-            found = next(filter(lambda v: isinstance(v, SMMetaScript) and v.tag == ms.tag and v.id == ms.id, scripts))
+            found = next(filter(lambda v: isinstance(v, AMMetaScript) and v.tag == ms.tag and v.id == ms.id, scripts))
         except StopIteration:
             scripts.append(make_meta_script(
                 ms.tag,
@@ -50,15 +50,15 @@ def add_other_metas(model_name, scripts: List[SMScript]) -> List[SMScript]:
 
     return scripts
 
-def deserialize_script(model_name, script_data) -> Union[SMConcrScript, SMMetaScript]:
-    return script_data if isinstance(script_data, SMScript) else (
+def deserialize_script(model_name, script_data) -> Union[AMConcrScript, AMMetaScript]:
+    return script_data if isinstance(script_data, AMScript) else (
         deserialize_concr_script(script_data)
         if 'name' in script_data
         else deserialize_meta_script(model_name, script_data)
     )
 
-def deserialize_concr_script(script_data, access_func = safenav_concr_script) -> SMConcrScript:
-    result = script_data if isinstance(script_data, SMConcrScript) else make_script(
+def deserialize_concr_script(script_data, access_func = safenav_concr_script) -> AMConcrScript:
+    result = script_data if isinstance(script_data, AMConcrScript) else make_script(
         access_func([script_data], ['enabled']),
         access_func([script_data], ['name']),
         access_func([script_data], ['version']),
@@ -69,8 +69,8 @@ def deserialize_concr_script(script_data, access_func = safenav_concr_script) ->
 
     return result
 
-def deserialize_meta_script(model_name, script_data, access_func = safenav_meta_script) -> Optional[SMMetaScript]:
-    result = script_data if isinstance(script_data, SMMetaScript) else make_meta_script(
+def deserialize_meta_script(model_name, script_data, access_func = safenav_meta_script) -> Optional[AMMetaScript]:
+    result = script_data if isinstance(script_data, AMMetaScript) else make_meta_script(
         access_func([script_data], ['tag']),
         access_func([script_data], ['id']),
         make_script_storage(**access_func([script_data], ['storage'], default = {})),
@@ -82,7 +82,7 @@ def deserialize_meta_script(model_name, script_data, access_func = safenav_meta_
         result.id,
     ) else None
 
-def serialize_setting(setting: SMSetting) -> dict:
+def serialize_setting(setting: AMSetting) -> dict:
     return {
         'modelName': setting.model_name,
         'enabled': setting.enabled,
@@ -91,8 +91,8 @@ def serialize_setting(setting: SMSetting) -> dict:
         'scripts': [serialize_script(script) for script in setting.scripts],
     }
 
-def serialize_script(script: Union[SMConcrScript, SMMetaScript]) -> dict:
-    if isinstance(script, SMConcrScript):
+def serialize_script(script: Union[AMConcrScript, AMMetaScript]) -> dict:
+    if isinstance(script, AMConcrScript):
         return asdict(script)
     else:
         preresult = asdict(script)
@@ -116,7 +116,7 @@ def deserialize_setting_with_default(model_name, settings):
 
     return model_deserialized
 
-def get_setting(col, model_name='Default') -> Optional[SMSetting]:
+def get_setting(col, model_name='Default') -> Optional[AMSetting]:
     all_config = mw.addonManager.getConfig(__name__)
     setting = safenav(
         [all_config],
@@ -129,7 +129,7 @@ def get_setting(col, model_name='Default') -> Optional[SMSetting]:
         setting,
     )
 
-def get_settings(col) -> List[SMSetting]:
+def get_settings(col) -> List[AMSetting]:
     all_config = mw.addonManager.getConfig(__name__)
     setting = safenav([all_config], ['settings', str(col.crt)], default=[])
 
@@ -141,7 +141,7 @@ def get_settings(col) -> List[SMSetting]:
 
     return model_settings
 
-def write_setting(col, setting: SMSetting) -> None:
+def write_setting(col, setting: AMSetting) -> None:
     serialized_setting = serialize_setting(setting)
 
     all_config = mw.addonManager.getConfig(__name__)
@@ -165,7 +165,7 @@ def write_setting(col, setting: SMSetting) -> None:
         'settings': new_config,
     })
 
-def write_settings(col, settings: List[SMSetting]):
+def write_settings(col, settings: List[AMSetting]):
     serialized_settings = [
         serialize_setting(setting)
         for setting

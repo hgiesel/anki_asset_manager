@@ -2,7 +2,7 @@ from typing import Optional, Callable, Union, List, Literal
 from dataclasses import dataclass, replace
 
 @dataclass(frozen=True)
-class SMSetting:
+class AMSetting:
     model_name: str
     enabled: bool
     insert_stub: bool
@@ -10,11 +10,11 @@ class SMSetting:
     scripts: list
 
 dataclass(frozen=True)
-class SMScript:
+class AMScript:
     pass
 
 @dataclass(frozen=True)
-class SMConcrScript(SMScript):
+class AMConcrScript(AMScript):
     enabled: bool
     name: str
     version: str
@@ -25,7 +25,7 @@ class SMConcrScript(SMScript):
 ################################
 
 @dataclass(frozen=True)
-class SMScriptBool:
+class AMScriptBool:
     enabled: bool
     name: bool
     version: bool
@@ -34,7 +34,7 @@ class SMScriptBool:
     code: bool
 
 @dataclass(frozen=True)
-class SMScriptStorage:
+class AMScriptStorage:
     enabled: Optional[bool]
     name: Optional[str]
     version: Optional[str]
@@ -43,10 +43,10 @@ class SMScriptStorage:
     code: Optional[str]
 
 @dataclass(frozen=True)
-class SMMetaScript(SMScript):
+class AMMetaScript(AMScript):
     tag: str
     id: str
-    storage: SMScriptStorage
+    storage: AMScriptStorage
 
 ################################
 
@@ -58,18 +58,18 @@ LabelText = str
 Falsifiable = lambda t: Union[Literal[False], t]
 
 @dataclass(frozen=True)
-class SMInterface:
+class AMInterface:
     # name for the type of the interface
     tag: str
-    getter: Callable[[str, SMScriptStorage], SMConcrScript]
+    getter: Callable[[str, AMScriptStorage], AMConcrScript]
     # result is used for storing
-    setter: Callable[[str, SMConcrScript], Union[bool, SMConcrScript]]
-    generator: Callable[[str, SMScriptStorage, AnkiModel, AnkiTmpl, AnkiFmt], Falsifiable(ScriptText)]
-    label: Falsifiable(Callable[[str, SMScriptStorage], LabelText])
-    reset: Falsifiable(Callable[[str, SMScriptStorage], SMConcrScript])
-    deletable: Falsifiable(Callable[[str, SMScriptStorage], bool])
+    setter: Callable[[str, AMConcrScript], Union[bool, AMConcrScript]]
+    generator: Callable[[str, AMScriptStorage, AnkiModel, AnkiTmpl, AnkiFmt], Falsifiable(ScriptText)]
+    label: Falsifiable(Callable[[str, AMScriptStorage], LabelText])
+    reset: Falsifiable(Callable[[str, AMScriptStorage], AMConcrScript])
+    deletable: Falsifiable(Callable[[str, AMScriptStorage], bool])
 
     # list of values that are readonly
-    readonly: SMScriptBool
+    readonly: AMScriptBool
     # list of values or stored in `storage` field
-    store: SMScriptBool
+    store: AMScriptBool
