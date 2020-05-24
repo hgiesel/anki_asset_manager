@@ -1,23 +1,14 @@
-from aqt import QAction, mw
+from aqt import mw
+from aqt.utils import showInfo
 
 from .gui_config.custom.config import ConfigDialog
-from .utils import find_addon_by_name
-
 from .config import get_setting_from_notetype
 
-def invoke_options():
-    dialog = ConfigDialog(mw)
-    # dialog.setupUi(get_settings(mw.col))
-
-    return dialog.exec_()
-
-def setup_menu_option():
-    action = QAction('Script Manager Settings...', mw)
-    action.triggered.connect(invoke_options)
-    mw.form.menuTools.addAction(action)
+def show_info():
+    showInfo('To configure the functionality of this add-on, go to "Tools > Manage Note Types", select your note type, and click "Assets...".')
 
 def setup_addon_manager():
-    mw.addonManager.setConfigAction(__name__, invoke_options)
+    mw.addonManager.setConfigAction(__name__, show_info)
 
 from anki.hooks import wrap
 from aqt.qt import QDialogButtonBox, qconnect

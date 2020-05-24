@@ -12,7 +12,7 @@ import json
 
 from aqt import mw
 
-from .src.main import setup_models_dialog
+from .src.main import setup_models_dialog, setup_addon_manager
 
 if mw.addonManager.addonName(path.dirname(__file__)) != 'Asset Manager':
     dir_path = path.dirname(path.realpath(__file__))
@@ -35,3 +35,4 @@ if mw.addonManager.addonName(path.dirname(__file__)) != 'Asset Manager':
         mw.addonManager.writeAddonMeta(dir_path, meta)
 
 setup_models_dialog()
+setup_addon_manager()
