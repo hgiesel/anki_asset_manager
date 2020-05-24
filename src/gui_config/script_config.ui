@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>AMScriptConfig</class>
- <widget class="QWidget" name="AMScriptConfig">
+ <class>ScriptConfig</class>
+ <widget class="QWidget" name="ScriptConfig">
   <property name="geometry">
    <rect>
     <x>0</x>

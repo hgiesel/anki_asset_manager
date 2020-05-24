@@ -1,6 +1,6 @@
 from aqt.qt import QComboBox
 
-class AMConfigModelchooser(QComboBox):
+class ConfigModelchooser(QComboBox):
     def __init__(self, mw):
         super().__init__(parent=mw)
 

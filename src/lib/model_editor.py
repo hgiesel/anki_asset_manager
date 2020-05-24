@@ -9,10 +9,10 @@ from string import Template
 from anki import media
 from aqt import mw
 
-from .registrar import get_interface
-from .config_types import AMConcrScript
-from .config import serialize_setting
+from ..config_types import ConcreteScript
 from ..utils import version
+
+from .registrar import get_interface
 
 def setup_models(settings):
     for st in settings:
@@ -315,7 +315,7 @@ def get_model_template(setting, cardtype_name, fmt) -> (str, str):
 
     if setting.enabled and not setting.insert_stub:
         for scr in setting.scripts:
-            the_scr = scr if isinstance(scr, AMConcrScript) else get_interface(scr.tag).getter(scr.id, scr.storage)
+            the_scr = scr if isinstance(scr, ConcreteScript) else get_interface(scr.tag).getter(scr.id, scr.storage)
 
             if the_scr.enabled:
                 needs_inject, simplified_conditions = the_parser(the_scr.conditions)
@@ -325,8 +325,14 @@ def get_model_template(setting, cardtype_name, fmt) -> (str, str):
                         'tag': gen_data_attributes(the_scr.name, the_scr.version),
                         'code': (
                             the_scr.code
-                            if isinstance(scr, AMConcrScript)
-                            else get_interface(scr.tag).generator(scr.id, scr.storage, setting.model_name, cardtype_name, fmt)
+                            if isinstance(scr, ConcreteScript)
+                            else get_interface(scr.tag).generator(
+                                scr.id,
+                                scr.storage,
+                                setting.model_name,
+                                cardtype_name,
+                                fmt,
+                            )
                         ),
                         'conditions': simplified_conditions,
                     }

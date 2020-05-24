@@ -9,22 +9,28 @@ from jsonschema import RefResolver, Draft7Validator
 from aqt import mw
 from aqt.qt import QWidget, QLabel, Qt
 
-from ...lib.config import deserialize_script, serialize_script, deserialize_setting, serialize_setting
-from ...lib.config_types import AMConcrScript, AMMetaScript
+from ...config import (
+    serialize_script,
+    deserialize_script,
+    serialize_setting,
+    deserialize_setting,
+)
+
+from ...config_types import ConcreteScript, MetaScript
 from ...lib.registrar import get_interface
 
-from ..am_script_tab_ui import Ui_AMScriptTab
+from ..script_tab_ui import Ui_ScriptTab
 
-from .am_setting_add_replace import AMSettingAddReplace
-from .am_script_config import AMScriptConfig
+from .setting_add_replace import SettingAddReplace
+from .script_config import ScriptConfig
 
 from .utils import mapTruthValueToIcon
 
-class AMScriptTab(QWidget):
+class ScriptTab(QWidget):
     def __init__(self, main):
         super().__init__()
 
-        self.ui = Ui_AMScriptTab()
+        self.ui = Ui_ScriptTab()
         self.ui.setupUi(self)
 
         self.ui.addPushButton.clicked.connect(self.addScript)
@@ -58,7 +64,7 @@ class AMScriptTab(QWidget):
         for idx, scr in enumerate(self.scr):
             headerLabels.append(f'Script {idx}')
 
-            if isinstance(scr, AMConcrScript):
+            if isinstance(scr, ConcreteScript):
                 self.setRowMod(
                     idx,
                     scr.name,
@@ -123,7 +129,7 @@ class AMScriptTab(QWidget):
         self.drawScripts()
 
     def deleteScript(self):
-        current_scr: Union[AMConcrScript, AMMetaScript] = self.scr[self.ui.scriptsTable.currentRow()]
+        current_scr: Union[ConcreteScript, MetaScript] = self.scr[self.ui.scriptsTable.currentRow()]
 
         def show_nondeletable():
             from aqt.utils import showInfo # not to be deleted!
@@ -132,7 +138,7 @@ class AMScriptTab(QWidget):
                 'You might have to uninstall the add-on which inserted this script.'
             )
 
-        if isinstance(current_scr, AMConcrScript):
+        if isinstance(current_scr, ConcreteScript):
             del self.scr[self.ui.scriptsTable.currentRow()] # gotta delete within dict
         else:
             iface = get_interface(current_scr.tag)
@@ -197,7 +203,7 @@ class AMScriptTab(QWidget):
 
             validator = Draft7Validator(schema, resolver=resolver, format_checker=None)
 
-            dial = AMSettingAddReplace(mw)
+            dial = SettingAddReplace(mw)
             dial.setupUi(
                 json.dumps([serialize_script(scr) for scr in self.scr], sort_keys=True, indent=4),
                 validator,

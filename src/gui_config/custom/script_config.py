@@ -13,17 +13,17 @@ from aqt.qt import QDialog, QWidget, QFont, Qt
 from aqt.utils import showInfo # actually needed!
 
 from .js_highlighter import JSHighlighter
-from .am_setting_update import AMSettingUpdate
+from .setting_update import SettingUpdate
 
-from ..am_script_config_ui import Ui_AMScriptConfig
+from ..script_config_ui import Ui_ScriptConfig
 
-from ...lib.config import deserialize_script, serialize_script
+from ...config import serialize_script, deserialize_script
+from ...config_types import ConcreteScript, MetaScript, ScriptStorage, ScriptBool
 
-from ...lib.config_types import AMConcrScript, AMMetaScript, AMScriptStorage, AMScriptBool
 from ...lib.interface import make_script_bool
 from ...lib.registrar import get_interface
 
-def fix_storage(store: AMScriptStorage, script: AMConcrScript, to_store: AMScriptBool) -> AMScriptStorage:
+def fix_storage(store: ScriptStorage, script: ConcreteScript, to_store: ScriptBool) -> ScriptStorage:
     def filter_store(tost):
         return [
             storekey[0]
@@ -40,14 +40,14 @@ def fix_storage(store: AMScriptStorage, script: AMConcrScript, to_store: AMScrip
 
     return replace(store, **the_dict)
 
-class AMScriptConfig(QDialog):
+class ScriptConfig(QDialog):
     def __init__(self, parent, model_name, callback):
         super().__init__(parent=parent)
 
         self.callback = callback
         self.modelName = model_name
 
-        self.ui = Ui_AMScriptConfig()
+        self.ui = Ui_ScriptConfig()
         self.ui.setupUi(self)
 
         self.accepted.connect(self.onAccept)
@@ -80,7 +80,7 @@ class AMScriptConfig(QDialog):
         self.highlighter = JSHighlighter(editor.document())
 
     def setupUi(self, script):
-        if isinstance(script, AMConcrScript):
+        if isinstance(script, ConcreteScript):
             self.setupUiConcr(script)
         else:
             self.setupUiMeta(script)
@@ -183,7 +183,7 @@ class AMScriptConfig(QDialog):
         else:
             showInfo('Valid Conditions.')
 
-    def exportData(self) -> Union[AMConcrScript, AMMetaScript]:
+    def exportData(self) -> Union[ConcreteScript, MetaScript]:
         result = deserialize_script(self.modelName, {
             'name': self.ui.nameLineEdit.text(),
             'version': self.ui.versionLineEdit.text(),
@@ -197,7 +197,7 @@ class AMScriptConfig(QDialog):
         try:
             user_result = self.iface.setter(self.meta.id, result)
 
-            if isinstance(user_result, AMConcrScript):
+            if isinstance(user_result, ConcreteScript):
                 return replace(
                     self.meta,
                     storage = fix_storage(self.meta.storage, user_result, self.iface.store),
@@ -231,7 +231,7 @@ class AMScriptConfig(QDialog):
 
             validator = Draft7Validator(schema, resolver=resolver, format_checker=None)
 
-            dial = AMSettingUpdate(mw)
+            dial = SettingUpdate(mw)
             dial.setupUi(
                 json.dumps(serialize_script(self.exportData()), sort_keys=True, indent=4),
                 validator,

@@ -1,18 +1,19 @@
 from typing import Optional, List, Tuple
 
-from .config_types import AMInterface, AMMetaScript
+from ..config_types import Interface, MetaScript
+
 from .interface import make_meta_script
 
-_meta_interfaces: List[AMInterface] = []
-_meta_scripts: List[Tuple[str, AMMetaScript]] = []
+_meta_interfaces: List[Interface] = []
+_meta_scripts: List[Tuple[str, MetaScript]] = []
 
-class AMInterfaceIsNotRegistered(Exception):
+class InterfaceIsNotRegistered(Exception):
     pass
 
-def register_interface(iface: AMInterface) -> None:
+def register_interface(iface: Interface) -> None:
     _meta_interfaces.append(iface)
 
-def get_interface(tag: str) -> Optional[AMInterface]:
+def get_interface(tag: str) -> Optional[Interface]:
     try:
         return next(filter(lambda v: v.tag == tag, _meta_interfaces))
     except StopIteration:
@@ -23,16 +24,16 @@ def has_interface(tag: str) -> bool:
 
 ##############
 
-def register_meta_script(model_name: str, meta_script: AMMetaScript) -> None:
+def register_meta_script(model_name: str, meta_script: MetaScript) -> None:
     if has_interface(meta_script.tag):
         _meta_scripts.append((model_name, meta_script,))
     else:
-        raise AMInterfaceIsNotRegistered(
+        raise InterfaceIsNotRegistered(
             'You tried to register a meta script for a non existing interface. '
             'Make sure to register the interface first.'
         )
 
-def deregister_meta_script(model_name: str, meta_script: AMMetaScript) -> bool:
+def deregister_meta_script(model_name: str, meta_script: MetaScript) -> bool:
     if has_interface(meta_script.tag):
         try:
             found = next(filter(lambda v: (
@@ -48,13 +49,13 @@ def deregister_meta_script(model_name: str, meta_script: AMMetaScript) -> bool:
             return False
 
     else:
-        raise AMInterfaceIsNotRegistered(
+        raise InterfaceIsNotRegistered(
             'You tried to register a meta script for a non existing interface. '
             'Make sure to register the interface first.'
         )
 
-def get_meta_scripts(model_name: Optional[str] = None) -> List[AMMetaScript]:
-    return [ms[1] for ms in _meta_scripts if ms[0] == model_name or model_name is None]
+def get_meta_scripts(model_id: Optional[id] = None) -> List[MetaScript]:
+    return [ms[1] for ms in _meta_scripts if ms[0] == model_id or model_id is None]
 
 def meta_script_is_registered(model_name: str, tag: str, id: str) -> bool:
     try:

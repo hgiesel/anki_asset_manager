@@ -9,25 +9,25 @@ from aqt import mw
 from aqt.qt import QDialog, QWidget, QAction
 from aqt.utils import getText, showWarning, showInfo
 
-from ...lib.config import deserialize_setting, serialize_setting, write_settings
+from ...config import deserialize_setting, serialize_setting
 from ...lib.model_editor import setup_models
 
-from ..am_config_ui import Ui_AMConfig
+from ..config_ui import Ui_Config
 
-from .am_setting_update import AMSettingUpdate
-from .am_script_tab import AMScriptTab
+from .setting_update import SettingUpdate
+from .script_tab import ScriptTab
 
 def sort_negative_first(v):
     return abs(int(v.name)) * 2 if int(v.name) < 0 else abs(int(v.name)) * 2 + 1
 
 def save_settings(settings):
-    write_settings(mw.col, settings)
+    pass
 
-class AMConfigDialog(QDialog):
+class ConfigDialog(QDialog):
     def __init__(self, parent):
         super().__init__(parent=parent)
 
-        self.ui = Ui_AMConfig()
+        self.ui = Ui_Config()
         self.ui.setupUi(self)
 
         self.ui.cancelButton.clicked.connect(self.reject)
@@ -107,7 +107,7 @@ class AMConfigDialog(QDialog):
 
             validator = Draft7Validator(schema, resolver=resolver, format_checker=None)
 
-            dial = AMSettingUpdate(mw)
+            dial = SettingUpdate(mw)
             dial.setupUi(
                 json.dumps(serialize_setting(self.settings[old_sid]), sort_keys=True, indent=4),
                 validator,

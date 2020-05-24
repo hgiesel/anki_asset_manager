@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>AMSettingUpdate</class>
- <widget class="QDialog" name="AMSettingUpdate">
+ <class>SettingAddReplace</class>
+ <widget class="QDialog" name="SettingAddReplace">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>637</width>
-    <height>478</height>
+    <width>641</width>
+    <height>489</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Update Dialog</string>
+   <string>Add / Replace Dialog</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -48,9 +48,16 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="updateButton">
+       <widget class="QPushButton" name="replaceButton">
         <property name="text">
-         <string>Update</string>
+         <string>Replace</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="addButton">
+        <property name="text">
+         <string>Add</string>
         </property>
        </widget>
       </item>
