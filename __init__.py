@@ -7,20 +7,32 @@ Copyright: (c) 2019 Henrik Giesel <https://github.com/hgiesel>
 License: GNU AGPLv3 <https://www.gnu.org/licenses/agpl.html>
 """
 
-import os.path as path
+from os import path
+import json
+
 from aqt import mw
 
 from .src.main import setup_addon_manager, setup_menu_option
 
-if mw.addonManager.addonName(path.dirname(__file__)) != 'Script Manager':
+if mw.addonManager.addonName(path.dirname(__file__)) != 'Asset Manager':
     dir_path = path.dirname(path.realpath(__file__))
 
     with open(path.join(dir_path, 'manifest.json')) as f:
-        with open(path.join(dir_path, 'meta.json')) as f_old:
-            import json
-            mw.addonManager.writeAddonMeta(dir_path, json.load(f).update({
-                'config': json.load(f_old)['config']
-            }))
+        config_data = {}
+
+        try:
+            with open(path.join(dir_path, 'meta.json')) as f_old:
+                config_data = json.load(f_old)['config']
+
+        except FileNotFoundError:
+            pass
+
+        meta = json.load(f)
+        meta.update({
+            'config': config_data,
+        })
+
+        mw.addonManager.writeAddonMeta(dir_path, meta)
 
 setup_addon_manager()
 setup_menu_option()

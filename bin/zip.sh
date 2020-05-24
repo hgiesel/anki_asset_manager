@@ -9,7 +9,6 @@ else
   declare addon_id='asset_manager'
 fi
 
-rm -f "${DIR}/${addon_id}.ankiaddon"
 sed -i "s/${name}.src.gui_config//" "${DIR}/src/gui_config/"*".py"
 
 zip -r "${DIR}/${addon_id}.ankiaddon" \
