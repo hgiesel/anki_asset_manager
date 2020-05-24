@@ -17,9 +17,11 @@ def deserialize_setting(model_id: int, model_setting: dict) -> Setting:
         model_setting['enabled'] if 'enabled' in model_setting else DEFAULT_SETTING.enabled,
         model_setting['insertStub'] if 'insertStub' in model_setting else DEFAULT_SETTING.insert_stub,
         model_setting['indentSize'] if 'indentSize' in model_setting else DEFAULT_SETTING.indent_size,
-        add_other_metas(model_id, [s for s in [deserialize_script(model_id, script)
-         for script
-         in (model_setting['scripts'] if 'scripts' in model_setting else DEFAULT_SETTING.scripts)] if s]),
+        add_other_metas(model_id, [s for s in [
+            deserialize_script(model_id, script)
+            for script
+            in (model_setting['scripts'] if 'scripts' in model_setting else DEFAULT_SETTING.scripts)
+        ] if s]),
     )
 
 def add_other_metas(model_id: int, scripts: List[Script]) -> List[Script]:
@@ -37,7 +39,7 @@ def add_other_metas(model_id: int, scripts: List[Script]) -> List[Script]:
     return scripts
 
 def deserialize_script(model_id: int, script_data: dict) -> Union[ConcreteScript, MetaScript]:
-    return (
+    return script_data if isinstance(script_data, Script) else (
         deserialize_concrete_script(script_data)
         if 'name' in script_data
         else deserialize_meta_script(model_id, script_data)
@@ -50,6 +52,7 @@ def deserialize_concrete_script(script_data: dict) -> ConcreteScript:
         script_data['name'] if 'name' in script_data else DEFAULT_CONCRETE_SCRIPT.name,
         script_data['version'] if 'version' in script_data else DEFAULT_CONCRETE_SCRIPT.version,
         script_data['description'] if 'description' in script_data else DEFAULT_CONCRETE_SCRIPT.description,
+        script_data['position'] if 'position' in script_data else DEFAULT_CONCRETE_SCRIPT.position,
         script_data['conditions'] if 'conditions' in script_data else DEFAULT_CONCRETE_SCRIPT.conditions,
         script_data['code'] if 'code' in script_data else DEFAULT_CONCRETE_SCRIPT.code,
     )
@@ -69,7 +72,6 @@ def deserialize_meta_script(model_id: int, script_data: dict) -> Optional[MetaSc
 
 def serialize_setting(setting: Setting) -> dict:
     return {
-        'modelName': setting.model_id,
         'enabled': setting.enabled,
         'insertStub': setting.insert_stub,
         'indentSize': setting.indent_size,
@@ -98,15 +100,7 @@ def get_setting_from_notetype(notetype) -> Setting:
          else {}),
     )
 
-def get_settings(col) -> List[Setting]:
-    all_config = mw.addonManager.getConfig(__name__)
-    setting = safenav([all_config], ['settings', str(col.crt)], default=[])
+from aqt import mw
 
-    model_settings = [
-        get_setting(col, model['name'])
-        for model
-        in col.models.models.values()
-    ]
-
-    return model_settings
-
+def write_setting(model_id, sett: Setting):
+    mw.col.models.get(model_id)['assetManager'] = serialize_setting(sett)

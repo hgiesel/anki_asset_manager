@@ -7,15 +7,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>899</width>
-    <height>577</height>
+    <width>861</width>
+    <height>486</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Script Manager Settings</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="2" column="0">
+   <item row="1" column="0">
     <widget class="QPushButton" name="helpButton">
      <property name="text">
       <string>Help</string>
@@ -25,27 +25,10 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="7">
-    <widget class="QPushButton" name="saveButton">
-     <property name="text">
-      <string>Save</string>
-     </property>
-     <property name="autoDefault">
-      <bool>false</bool>
-     </property>
-    </widget>
+   <item row="0" column="0" colspan="7">
+    <widget class="ScriptTab" name="configWidget" native="true"/>
    </item>
-   <item row="0" column="2" colspan="2">
-    <widget class="ConfigModelchooser" name="modelChooser"/>
-   </item>
-   <item row="0" column="4">
-    <widget class="QPushButton" name="importButton">
-     <property name="text">
-      <string>⎈ Import / Export Setting</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="1">
+   <item row="1" column="1">
     <widget class="QPushButton" name="aboutButton">
      <property name="text">
       <string>About</string>
@@ -55,27 +38,7 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="8">
-    <widget class="QPushButton" name="wbButton">
-     <property name="text">
-      <string>Write To Templates</string>
-     </property>
-     <property name="default">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="6">
-    <widget class="QPushButton" name="cancelButton">
-     <property name="text">
-      <string>Cancel</string>
-     </property>
-     <property name="autoDefault">
-      <bool>false</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="2" colspan="4">
+   <item row="1" column="2" colspan="2">
     <spacer name="horizontalSpacer">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -88,17 +51,39 @@
      </property>
     </spacer>
    </item>
-   <item row="1" column="0" colspan="9">
-    <widget class="ScriptTab" name="configWidget" native="true"/>
+   <item row="1" column="4">
+    <widget class="QPushButton" name="cancelButton">
+     <property name="text">
+      <string>Cancel</string>
+     </property>
+     <property name="autoDefault">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="5">
+    <widget class="QPushButton" name="saveButton">
+     <property name="text">
+      <string>Save</string>
+     </property>
+     <property name="autoDefault">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="6">
+    <widget class="QPushButton" name="wbButton">
+     <property name="text">
+      <string>Write To Templates</string>
+     </property>
+     <property name="default">
+      <bool>true</bool>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>ConfigModelchooser</class>
-   <extends>QComboBox</extends>
-   <header>anki_asset_manager/src/gui_config/custom/config_modelchooser</header>
-  </customwidget>
   <customwidget>
    <class>ScriptTab</class>
    <extends>QWidget</extends>

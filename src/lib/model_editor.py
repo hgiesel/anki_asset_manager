@@ -14,11 +14,6 @@ from ..utils import version
 
 from .registrar import get_interface
 
-def setup_models(settings):
-    for st in settings:
-        model = mw.col.models.byName(st.model_name)
-        setup_model(model, st)
-
 def setup_model(model, setting):
     needs_saving = False
 

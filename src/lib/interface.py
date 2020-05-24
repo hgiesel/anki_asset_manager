@@ -3,8 +3,9 @@ from dataclasses import dataclass, replace
 
 from ..config_types import (
     Interface, Setting, ConcreteScript, MetaScript,
-    ScriptBool, ScriptStorage, ScriptType,
+    ScriptBool, ScriptStorage, ScriptPosition, ScriptType,
     AnkiModel, AnkiTmpl, AnkiFmt, ScriptText, LabelText, Falsifiable,
+    DEFAULT_CONCRETE_SCRIPT,
 )
 
 def make_setting(
@@ -26,15 +27,20 @@ def make_script(
     name: str,
     version: str,
     description: str,
+    position: ScriptPosition,
     conditions: list,
     code: str,
 ) -> ConcreteScript:
+    possible_types = ['js', 'css']
+    possible_positions = ['external', 'head', 'body']
+
     return ConcreteScript(
         enabled,
-        type,
+        type if type in possible_types else DEFAULT_CONCRETE_SCRIPT.type,
         name,
         version,
         description,
+        position if position in possible_positions else DEFAULT_CONCRETE_SCRIPT.position,
         conditions,
         code,
     )
@@ -56,6 +62,7 @@ def make_script_bool(
     name: Optional[bool] = None,
     version: Optional[bool] = None,
     description: Optional[bool] = None,
+    position: Optional[bool] = None,
     conditions: Optional[bool] = None,
     code: Optional[bool] = None,
 ) -> ScriptBool:
@@ -65,6 +72,7 @@ def make_script_bool(
         name if name is not None else False,
         version if version is not None else False,
         description if description is not None else False,
+        position if position is not None else False,
         conditions if conditions is not None else False,
         code if code is not None else False,
     )
@@ -75,6 +83,7 @@ def make_script_storage(
     name: Optional[str] = None,
     version: Optional[str] = None,
     description: Optional[str] = None,
+    position: Optional[list] = None,
     conditions: Optional[list] = None,
     code: Optional[str] = None,
 ) -> ScriptStorage:
@@ -84,6 +93,7 @@ def make_script_storage(
         name,
         version,
         description,
+        position,
         conditions,
         code,
     )

@@ -28,7 +28,7 @@ def onAssets(self):
     current_setting = get_setting_from_notetype(current_notetype)
 
     dialog = ConfigDialog(self.mw)
-    dialog.setupUi(current_setting)
+    dialog.setupUi(current_notetype['id'], current_setting)
     dialog.exec_()
 
 def init_asset_button(self):

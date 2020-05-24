@@ -61,7 +61,6 @@ class ScriptConfig(QDialog):
 
         self.ui.cancelButton.clicked.connect(self.reject)
         self.ui.validateButton.clicked.connect(self.validateConditions)
-        self.ui.importButton.clicked.connect(self.importDialog)
 
         self.ui.metaLabel.setText('')
         self.ui.enableScriptCheckBox.stateChanged.connect(self.enableChangeGui)
@@ -214,27 +213,3 @@ class ScriptConfig(QDialog):
 
         except AttributeError:
             return result
-
-    def importDialog(self):
-        def updateAfterImport(new_script):
-            self.setupUi(deserialize_script(self.modelName, new_script))
-
-        dirpath = Path(f'{os.path.dirname(os.path.realpath(__file__))}', '../../json_schemas/scr.json')
-        schema_path = dirpath.absolute().as_uri()
-
-        with dirpath.open('r') as jsonfile:
-            schema = json.load(jsonfile)
-            resolver = RefResolver(
-                schema_path,
-                schema,
-            )
-
-            validator = Draft7Validator(schema, resolver=resolver, format_checker=None)
-
-            dial = SettingUpdate(mw)
-            dial.setupUi(
-                json.dumps(serialize_script(self.exportData()), sort_keys=True, indent=4),
-                validator,
-                updateAfterImport,
-            )
-            dial.exec_()

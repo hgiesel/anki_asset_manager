@@ -9,8 +9,8 @@ from aqt import mw
 from aqt.qt import QDialog, QWidget, QAction
 from aqt.utils import getText, showWarning, showInfo
 
-from ...config import deserialize_setting, serialize_setting
-from ...lib.model_editor import setup_models
+from ...config import deserialize_setting, serialize_setting, write_setting
+from ...lib.model_editor import setup_model
 
 from ..config_ui import Ui_Config
 
@@ -19,9 +19,6 @@ from .script_tab import ScriptTab
 
 def sort_negative_first(v):
     return abs(int(v.name)) * 2 if int(v.name) < 0 else abs(int(v.name)) * 2 + 1
-
-def save_settings(settings):
-    pass
 
 class ConfigDialog(QDialog):
     def __init__(self, parent):
@@ -32,88 +29,31 @@ class ConfigDialog(QDialog):
 
         self.ui.cancelButton.clicked.connect(self.reject)
 
-    def setupUi(self, settings, startId=0):
-        self.settings = settings
+    def saveCurrentSetting(self, isClicked):
+        setting_data = self.ui.configWidget.exportData()
 
-        def saveCurrentSetting(isClicked):
-            nonlocal self
-            nonlocal settings
+        write_setting(self.modelId, setting_data)
 
-            setting_data = self.ui.configWidget.exportData()
-            oldSid = self.ui.modelChooser.findText(setting_data.model_name)
-            settings[oldSid] = setting_data
+        self.accept()
 
-            save_settings(settings)
-            self.accept()
+    def wbCurrentSetting(self, isClicked):
+        setting_data = self.ui.configWidget.exportData()
 
-        def wbCurrentSetting(isClicked):
-            nonlocal self
-            nonlocal settings
+        write_setting(self.modelId, setting_data)
+        setup_model(setting_data)
 
-            setting_data = self.ui.configWidget.exportData()
-            oldSid = self.ui.modelChooser.findText(setting_data.model_name)
-            settings[oldSid] = setting_data
+        self.accept()
 
-            save_settings(settings)
-            setup_models(settings)
-            self.accept()
+    def setupUi(self, modelId, setting):
+        self.modelId = modelId
 
-        self.ui.saveButton.clicked.connect(saveCurrentSetting)
-        self.ui.wbButton.clicked.connect(wbCurrentSetting)
+        self.ui.saveButton.clicked.connect(self.saveCurrentSetting)
+        self.ui.wbButton.clicked.connect(self.wbCurrentSetting)
 
         self.ui.helpButton.clicked.connect(self.showHelp)
         self.ui.aboutButton.clicked.connect(self.showAbout)
-        self.ui.importButton.clicked.connect(self.importDialog)
 
-        def updateConfigWidgetFromModelchooser(newSid):
-            nonlocal self
-            nonlocal settings
-
-            setting_data = self.ui.configWidget.exportData()
-            oldSid = self.ui.modelChooser.findText(setting_data.model_name)
-            settings[oldSid] = setting_data
-
-            self.updateConfigWidget(settings[newSid])
-
-        self.ui.modelChooser.setupUi(
-            map(lambda v: v.model_name, settings),
-            updateConfigWidgetFromModelchooser,
-        )
-
-        self.updateConfigWidget(settings[startId])
-
-    def updateConfigWidget(self, setting):
-        self.ui.configWidget.setupUi(setting)
-
-    def importDialog(self):
-        setting_data = self.ui.configWidget.exportData()
-        old_sid = self.ui.modelChooser.findText(setting_data.model_name)
-
-        def updateAfterImport(new_data):
-            nonlocal old_sid
-            # name of new_data is not actually used
-            self.settings[old_sid] = deserialize_setting(setting_data.model_name, new_data)
-            self.updateConfigWidget(self.settings[old_sid])
-
-        dirpath = Path(f'{os.path.dirname(os.path.realpath(__file__))}', '../../json_schemas/setting.json')
-        schema_path = dirpath.absolute().as_uri()
-
-        with dirpath.open('r') as jsonfile:
-            schema = json.load(jsonfile)
-            resolver = RefResolver(
-                schema_path,
-                schema,
-            )
-
-            validator = Draft7Validator(schema, resolver=resolver, format_checker=None)
-
-            dial = SettingUpdate(mw)
-            dial.setupUi(
-                json.dumps(serialize_setting(self.settings[old_sid]), sort_keys=True, indent=4),
-                validator,
-                updateAfterImport,
-            )
-            dial.exec_()
+        self.ui.configWidget.setupUi(self.modelId, setting)
 
     def showHelp(self):
         pass

@@ -4,11 +4,14 @@ from dataclasses import dataclass, replace
 ################################ simple types
 
 ScriptType = Literal['js', 'css']
+ScriptPosition = Literal['external', 'head', 'body']
+ScriptText = str
+LabelText = str
+
 AnkiModel = str
 AnkiTmpl = str
 AnkiFmt = Literal['qfmt', 'afmt']
-ScriptText = str
-LabelText = str
+
 Falsifiable = lambda t: Union[Literal[False], t]
 
 ################################ for concr scripts
@@ -31,6 +34,7 @@ class ConcreteScript(Script):
     name: str
     version: str
     description: str
+    position: ScriptPosition
     conditions: list
     code: str
 
@@ -43,6 +47,7 @@ class ScriptStorage:
     name: Optional[str]
     version: Optional[str]
     description: Optional[str]
+    position: Optional[ScriptPosition]
     conditions: Optional[list]
     code: Optional[str]
 
@@ -61,6 +66,7 @@ class ScriptBool:
     name: bool
     version: bool
     description: bool
+    position: bool
     conditions: bool
     code: bool
 
@@ -91,6 +97,7 @@ DEFAULT_CONCRETE_SCRIPT = ConcreteScript(
     'Example Script',
     'v0.1',
     'This is an example script',
+    'body',
     [],
     'console.log(\'Hello, World\')',
 )
@@ -98,5 +105,5 @@ DEFAULT_CONCRETE_SCRIPT = ConcreteScript(
 DEFAULT_META_SCRIPT = MetaScript(
     'I_DONT_EXIST',
     'I_DONT_EXIST',
-    ScriptStorage(False, False, False, False, False, False, False),
+    ScriptStorage(False, False, False, False, False, False, False, False),
 )

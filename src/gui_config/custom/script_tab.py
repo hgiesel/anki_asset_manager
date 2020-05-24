@@ -11,7 +11,7 @@ from aqt.qt import QWidget, QLabel, Qt
 
 from ...config import (
     serialize_script,
-    deserialize_script,
+    deserialize_concrete_script,
     serialize_setting,
     deserialize_setting,
 )
@@ -27,8 +27,8 @@ from .script_config import ScriptConfig
 from .utils import mapTruthValueToIcon
 
 class ScriptTab(QWidget):
-    def __init__(self, main):
-        super().__init__()
+    def __init__(self, parent):
+        super().__init__(parent)
 
         self.ui = Ui_ScriptTab()
         self.ui.setupUi(self)
@@ -37,7 +37,6 @@ class ScriptTab(QWidget):
         self.ui.deletePushButton.clicked.connect(self.deleteScript)
         self.ui.downPushButton.clicked.connect(self.moveDown)
         self.ui.upPushButton.clicked.connect(self.moveUp)
-        self.ui.importButton.clicked.connect(self.importDialog)
 
         self.ui.scriptsTable.currentCellChanged.connect(self.updateButtonsForCurrentCell)
         self.ui.scriptsTable.cellDoubleClicked.connect(self.editScript)
@@ -45,14 +44,13 @@ class ScriptTab(QWidget):
         self.ui.scriptsTable.setColumnWidth(2, 55)
         self.ui.scriptsTable.setColumnWidth(3, 55)
 
-    def setupUi(self, setting):
-        self.modelName = setting.model_name
+    def setupUi(self, modelId, setting):
+        self.modelId = modelId
         self.ui.enableCheckBox.setChecked(setting.enabled),
         self.ui.insertStubCheckBox.setChecked(setting.insert_stub),
         self.scr = setting.scripts
 
         self.drawScripts()
-
         self.updateButtons(False)
 
     def drawScripts(self):
@@ -102,7 +100,7 @@ class ScriptTab(QWidget):
             self.scr[row] = newScript
             self.drawScripts()
 
-        a = AMScriptConfig(mw, self.modelName, saveScript)
+        a = ScriptConfig(mw, self.modelId, saveScript)
         a.setupUi(self.scr[row])
         a.exec_()
 
@@ -117,8 +115,9 @@ class ScriptTab(QWidget):
         self.ui.upPushButton.setEnabled(state)
 
     def addScript(self):
-        newScript = deserialize_script(self.modelName, {
+        newScript = deserialize_concrete_script({
             'name': 'New Script',
+            'type': 'js',
             'description': '',
             'enabled': True,
             'conditions': [],
@@ -177,37 +176,9 @@ class ScriptTab(QWidget):
     ###########
 
     def exportData(self):
-        result = deserialize_setting(self.modelName, {
+        result = deserialize_setting(self.modelId, {
             "enabled": self.ui.enableCheckBox.isChecked(),
             "insertStub": self.ui.insertStubCheckBox.isChecked(),
             "scripts": self.scr,
         })
         return result
-
-    def importDialog(self):
-        def addAfterImport(scripts_new):
-            self.setupUi(self.scr + [deserialize_script(self.modelName, scr) for scr in scripts_new])
-
-        def replaceAfterImport(scripts_new):
-            self.setupUi([deserialize_script(self.modelName, scr) for scr in scripts_new])
-
-        dirpath = Path(f'{os.path.dirname(os.path.realpath(__file__))}', '../../json_schemas/scripts.json')
-        schema_path = dirpath.absolute().as_uri()
-
-        with dirpath.open('r') as jsonfile:
-            schema = json.load(jsonfile)
-            resolver = RefResolver(
-                schema_path,
-                schema,
-            )
-
-            validator = Draft7Validator(schema, resolver=resolver, format_checker=None)
-
-            dial = SettingAddReplace(mw)
-            dial.setupUi(
-                json.dumps([serialize_script(scr) for scr in self.scr], sort_keys=True, indent=4),
-                validator,
-                addAfterImport,
-                replaceAfterImport,
-            )
-            dial.exec_()
