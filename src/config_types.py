@@ -7,9 +7,9 @@ ScriptType = Literal['js', 'css']
 ScriptPosition = Literal['external', 'head', 'body']
 ScriptText = str
 ScriptKeys = Literal[
+    'name',
     'enabled',
     'type',
-    'name',
     'version',
     'description',
     'position',
@@ -39,9 +39,9 @@ class Script:
 
 @dataclass(frozen=True)
 class ConcreteScript(Script):
+    name: str
     enabled: bool
     type: ScriptType
-    name: str
     version: str
     description: str
     position: ScriptPosition
@@ -52,9 +52,9 @@ class ConcreteScript(Script):
 
 @dataclass(frozen=True)
 class ScriptStorage:
+    name: Optional[str]
     enabled: Optional[bool]
     type: Optional[ScriptType]
-    name: Optional[str]
     version: Optional[str]
     description: Optional[str]
     position: Optional[ScriptPosition]
@@ -71,9 +71,9 @@ class MetaScript(Script):
 
 @dataclass(frozen=True)
 class ScriptBool:
+    name: bool
     enabled: bool
     type: bool
-    name: bool
     version: bool
     description: bool
     position: bool

@@ -12,6 +12,10 @@ from aqt import mw
 from aqt.qt import QDialog, QWidget, QFont, Qt
 from aqt.utils import showInfo # actually needed!
 
+from .utils import (
+    script_type_to_gui_text, script_position_to_gui_text,
+    pos_to_script_type, pos_to_script_position,
+)
 from .js_highlighter import JSHighlighter
 
 from ..script_config_ui import Ui_ScriptConfig
@@ -79,17 +83,23 @@ class ScriptConfig(QDialog):
 
     def setupUi(self, script):
         if isinstance(script, ConcreteScript):
-            self.setupUiConcr(script)
+            self.setupUiConcrete(script)
         else:
             self.setupUiMeta(script)
 
-    def setupUiConcr(self, concr_script):
-        self.ui.nameLineEdit.setText(concr_script.name)
-        self.ui.versionLineEdit.setText(concr_script.version)
-        self.ui.descriptionTextEdit.setPlainText(concr_script.description)
-        self.ui.enableScriptCheckBox.setChecked(concr_script.enabled)
-        self.ui.conditionsTextEdit.setPlainText(json.dumps(concr_script.conditions))
-        self.ui.codeTextEdit.setPlainText(concr_script.code)
+    def setupUiConcrete(self, concrete_script):
+        self.ui.nameLineEdit.setText(concrete_script.name)
+
+        self.ui.enableScriptCheckBox.setChecked(concrete_script.enabled)
+        self.ui.typeComboBox.setCurrentText(script_type_to_gui_text(concrete_script.type))
+
+        self.ui.versionLineEdit.setText(concrete_script.version)
+        self.ui.descriptionTextEdit.setPlainText(concrete_script.description)
+
+        self.ui.positionComboBox.setCurrentText(script_position_to_gui_text(concrete_script.position))
+        self.ui.conditionsTextEdit.setPlainText(json.dumps(concrete_script.conditions))
+
+        self.ui.codeTextEdit.setPlainText(concrete_script.code)
 
         self.enableChangeGui()
 
@@ -97,7 +107,7 @@ class ScriptConfig(QDialog):
         self.meta = meta_script
         self.iface = get_interface(meta_script.tag)
 
-        self.setupUiConcr(self.iface.getter(self.meta.id, self.meta.storage))
+        self.setupUiConcrete(self.iface.getter(self.meta.id, self.meta.storage))
         self.ui.metaLabel.setText(self.iface.label(self.meta.id, self.meta.storage))
 
         if self.iface.reset:
@@ -112,13 +122,19 @@ class ScriptConfig(QDialog):
             showInfo('Invalid Conditions. Please fix the conditions before resetting.')
         else:
             self.setupUi(self.exportData())
-            self.setupUiConcr(self.iface.reset(self.meta.id, self.meta.storage))
+            self.setupUiConcrete(self.iface.reset(self.meta.id, self.meta.storage))
 
             self.ui.nameLineEdit.repaint()
+
+            self.ui.enableScriptCheckBox.repaint()
+            self.ui.typeComboBox.repaint()
+
             self.ui.versionLineEdit.repaint()
             self.ui.descriptionTextEdit.repaint()
-            self.ui.enableScriptCheckBox.repaint()
+
+            self.ui.positionComboBox.repaint()
             self.ui.conditionsTextEdit.repaint()
+
             self.ui.codeTextEdit.repaint()
 
     def tryAccept(self):
@@ -142,14 +158,16 @@ class ScriptConfig(QDialog):
             self.enableChange(self.ui.enableScriptCheckBox.isChecked())
 
     def enableChange(self, state=True, readonly=make_script_bool()):
-        def get_state(newstate, readonlystate):
-            return newstate or readonlystate
+        self.ui.nameLineEdit.setReadOnly(not state or readonly.name)
+        self.ui.typeComboBox.setEnabled(state and not readonly.type)
 
-        self.ui.conditionsTextEdit.setReadOnly(get_state(not state, readonly.conditions))
-        self.ui.codeTextEdit.setReadOnly(get_state(not state, readonly.code))
-        self.ui.descriptionTextEdit.setReadOnly(get_state(not state, readonly.description))
-        self.ui.nameLineEdit.setReadOnly(get_state(not state, readonly.name))
-        self.ui.versionLineEdit.setReadOnly(get_state(not state, readonly.version))
+        self.ui.versionLineEdit.setReadOnly(not state or readonly.version)
+        self.ui.descriptionTextEdit.setReadOnly(not state or readonly.description)
+
+        self.ui.positionComboBox.setEnabled(state and not readonly.position)
+        self.ui.conditionsTextEdit.setReadOnly(not state or readonly.conditions)
+
+        self.ui.codeTextEdit.setReadOnly(not state or readonly.code)
 
     def getConditions(self): # can throw
         return json.loads(self.ui.conditionsTextEdit.toPlainText())
@@ -184,11 +202,16 @@ class ScriptConfig(QDialog):
     def exportData(self) -> Union[ConcreteScript, MetaScript]:
         result = deserialize_script(self.modelName, {
             'name': self.ui.nameLineEdit.text(),
-            'version': self.ui.versionLineEdit.text(),
 
-            'description': self.ui.descriptionTextEdit.toPlainText(),
             'enabled': self.ui.enableScriptCheckBox.isChecked(),
+            'type': pos_to_script_type(self.ui.typeComboBox.currentIndex()),
+
+            'version': self.ui.versionLineEdit.text(),
+            'description': self.ui.descriptionTextEdit.toPlainText(),
+
+            'position': pos_to_script_position(self.ui.positionComboBox.currentIndex()),
             'conditions': self.getConditions(),
+
             'code': self.ui.codeTextEdit.toPlainText(),
         })
 

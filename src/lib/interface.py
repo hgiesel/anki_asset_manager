@@ -22,9 +22,9 @@ def make_setting(
     )
 
 def make_script(
+    name: str,
     enabled: bool,
     type: ScriptType,
-    name: str,
     version: str,
     description: str,
     position: ScriptPosition,
@@ -32,12 +32,12 @@ def make_script(
     code: str,
 ) -> ConcreteScript:
     possible_types = ['js', 'css']
-    possible_positions = ['external', 'head', 'body']
+    possible_positions = ['external', 'head', 'body', 'into_template']
 
     return ConcreteScript(
+        name,
         enabled,
         type if type in possible_types else DEFAULT_CONCRETE_SCRIPT.type,
-        name,
         version,
         description,
         position if position in possible_positions else DEFAULT_CONCRETE_SCRIPT.position,
@@ -57,9 +57,9 @@ def make_meta_script(
     )
 
 def make_script_bool(
+    name: Optional[bool] = None,
     enabled: Optional[bool] = None,
     type: Optional[bool] = None,
-    name: Optional[bool] = None,
     version: Optional[bool] = None,
     description: Optional[bool] = None,
     position: Optional[bool] = None,
@@ -67,9 +67,9 @@ def make_script_bool(
     code: Optional[bool] = None,
 ) -> ScriptBool:
     return ScriptBool(
+        name if name is not None else False,
         enabled if enabled is not None else False,
         type if type is not None else False,
-        name if name is not None else False,
         version if version is not None else False,
         description if description is not None else False,
         position if position is not None else False,
@@ -78,9 +78,9 @@ def make_script_bool(
     )
 
 def make_script_storage(
+    name: Optional[str] = None,
     enabled: Optional[bool] = None,
     type: Optional[ScriptType] = None,
-    name: Optional[str] = None,
     version: Optional[str] = None,
     description: Optional[str] = None,
     position: Optional[list] = None,
@@ -88,9 +88,9 @@ def make_script_storage(
     code: Optional[str] = None,
 ) -> ScriptStorage:
     return ScriptStorage(
+        name,
         enabled,
         type,
-        name,
         version,
         description,
         position,

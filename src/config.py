@@ -27,8 +27,6 @@ def deserialize_setting(model_id: int, model_setting: dict) -> Setting:
 
 def add_other_metas(model_id: int, scripts: List[Script]) -> List[Script]:
     meta_scripts = get_meta_scripts(model_id)
-    from aqt.utils import showInfo
-    showInfo(str(meta_scripts) + ' ::: ' + str(model_id))
 
     for ms in meta_scripts:
         try:
@@ -50,9 +48,9 @@ def deserialize_script(model_id: int, script_data: dict) -> Union[ConcreteScript
 
 def deserialize_concrete_script(script_data: dict) -> ConcreteScript:
     return make_script(
+        script_data['name'] if 'name' in script_data else DEFAULT_CONCRETE_SCRIPT.name,
         script_data['enabled'] if 'enabled' in script_data else DEFAULT_CONCRETE_SCRIPT.enabled,
         script_data['type'] if 'type' in script_data else DEFAULT_CONCRETE_SCRIPT.type,
-        script_data['name'] if 'name' in script_data else DEFAULT_CONCRETE_SCRIPT.name,
         script_data['version'] if 'version' in script_data else DEFAULT_CONCRETE_SCRIPT.version,
         script_data['description'] if 'description' in script_data else DEFAULT_CONCRETE_SCRIPT.description,
         script_data['position'] if 'position' in script_data else DEFAULT_CONCRETE_SCRIPT.position,

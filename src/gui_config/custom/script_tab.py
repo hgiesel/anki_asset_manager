@@ -23,7 +23,10 @@ from ..script_tab_ui import Ui_ScriptTab
 
 from .script_config import ScriptConfig
 
-from .utils import mapTruthValueToIcon
+from .utils import (
+    map_truth_value_to_icon,
+    script_position_to_gui_text,
+)
 
 class ScriptTab(QWidget):
     def __init__(self, parent):
@@ -39,9 +42,8 @@ class ScriptTab(QWidget):
 
         self.ui.scriptsTable.currentCellChanged.connect(self.updateButtonsForCurrentCell)
         self.ui.scriptsTable.cellDoubleClicked.connect(self.editScript)
-        self.ui.scriptsTable.setColumnWidth(1, 75)
+        self.ui.scriptsTable.setColumnWidth(1, 55)
         self.ui.scriptsTable.setColumnWidth(2, 55)
-        self.ui.scriptsTable.setColumnWidth(3, 55)
 
     def setupUi(self, modelId, setting):
         self.modelId = modelId
@@ -58,33 +60,29 @@ class ScriptTab(QWidget):
 
         headerLabels = []
 
-        for idx, scr in enumerate(self.scr):
+        for idx, script in enumerate(self.scr):
             headerLabels.append(f'Script {idx}')
 
-            if isinstance(scr, ConcreteScript):
-                self.setRowMod(
-                    idx,
-                    scr.name,
-                    scr.version,
-                    mapTruthValueToIcon(scr.enabled),
-                    mapTruthValueToIcon(False),
-                    json.dumps(scr.conditions),
-                )
+            if isinstance(script, ConcreteScript):
+                self.setRowModFromScript(idx, script, False)
 
             else:
-                iface = get_interface(scr.tag)
-                script = iface.getter(scr.id, scr.storage)
+                iface = get_interface(script.tag)
+                script_gotten = iface.getter(script.id, script.storage)
 
-                self.setRowMod(
-                    idx,
-                    script.name,
-                    script.version,
-                    mapTruthValueToIcon(script.enabled),
-                    mapTruthValueToIcon(True),
-                    json.dumps(script.conditions),
-                )
+                self.setRowModFromScript(idx, script_gotten, True)
 
         self.ui.scriptsTable.setVerticalHeaderLabels(headerLabels)
+
+    def setRowModFromScript(self, idx, script, isMeta: bool):
+        self.setRowMod(
+            idx,
+            script.name,
+            map_truth_value_to_icon(script.enabled),
+            map_truth_value_to_icon(isMeta),
+            script_position_to_gui_text(script.position),
+            json.dumps(script.conditions),
+        )
 
     def setRowMod(self, row, *args):
         for i, text in enumerate(args):
