@@ -12,7 +12,7 @@ import json
 
 from aqt import mw
 
-from .src.main import setup_models_dialog, setup_addon_manager
+from .src.main import setup_models_dialog, setup_addon_manager, setup_webview_hook
 
 if mw.addonManager.addonName(path.dirname(__file__)) != 'Asset Manager':
     dir_path = path.dirname(path.realpath(__file__))
@@ -36,3 +36,4 @@ if mw.addonManager.addonName(path.dirname(__file__)) != 'Asset Manager':
 
 setup_models_dialog()
 setup_addon_manager()
+setup_webview_hook()

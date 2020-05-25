@@ -40,12 +40,14 @@ class ConfigDialog(QDialog):
         setting_data = self.ui.configWidget.exportData()
 
         write_setting(self.modelId, setting_data)
-        setup_model(setting_data)
+        setup_model(self.modelId)
 
         self.accept()
 
-    def setupUi(self, modelId, setting):
+    def setupUi(self, modelId, modelName, setting):
         self.modelId = modelId
+
+        self.setWindowTitle(f'Assets for {modelName}')
 
         self.ui.saveButton.clicked.connect(self.saveCurrentSetting)
         self.ui.wbButton.clicked.connect(self.wbCurrentSetting)

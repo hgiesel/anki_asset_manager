@@ -1,8 +1,9 @@
-import json
-import os.path as path
-
+from os import path
 from dataclasses import asdict
 from typing import Union, Optional, List
+
+from anki.cards import Card
+from aqt import mw
 
 from .config_types import (
     Setting, Script, ConcreteScript, MetaScript, ScriptStorage,
@@ -100,7 +101,11 @@ def get_setting_from_notetype(notetype) -> Setting:
          else {}),
     )
 
-from aqt import mw
+def maybe_get_setting_from_card(card) -> Optional[Setting]:
+    the_note = Card(mw.col, card.id).note()
+    maybe_model = the_note.model()
+
+    return get_setting_from_notetype(maybe_model) if maybe_model else None
 
 def write_setting(model_id, sett: Setting):
     mw.col.models.get(model_id)['assetManager'] = serialize_setting(sett)
