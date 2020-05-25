@@ -1,6 +1,4 @@
 {
     "name": "Asset Manager",
-    "package": "anki_asset_manager",
-    "conflicts": [],
-    "mod": 0
+    "package": "anki_asset_manager"
 }

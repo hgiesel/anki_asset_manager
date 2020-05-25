@@ -34,6 +34,6 @@ if mw.addonManager.addonName(path.dirname(__file__)) != 'Asset Manager':
 
         mw.addonManager.writeAddonMeta(dir_path, meta)
 
-setup_models_dialog()
 setup_addon_manager()
+setup_models_dialog()
 setup_webview_hook()

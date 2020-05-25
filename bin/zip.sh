@@ -18,6 +18,7 @@ zip -r "${DIR}/${addon_id}.ankiaddon" \
   "${DIR}/src/gui_config/"*".py" \
   "${DIR}/src/gui_config/custom/"*".py" \
   "${DIR}/src/json_schemas/"* \
-  "${DIR}/config."{json,md} "${DIR}/manifest.json"
+  "${DIR}/config."{json,md} \
+  "${DIR}/manifest.json"
 
 sed -i "s/.custom/${name}.src.gui_config.custom/" "${DIR}/src/gui_config/"*".py"
