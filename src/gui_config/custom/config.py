@@ -14,7 +14,6 @@ from ...lib.model_editor import setup_model
 
 from ..config_ui import Ui_Config
 
-from .setting_update import SettingUpdate
 from .script_tab import ScriptTab
 
 def sort_negative_first(v):

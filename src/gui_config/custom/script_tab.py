@@ -21,7 +21,6 @@ from ...lib.registrar import get_interface
 
 from ..script_tab_ui import Ui_ScriptTab
 
-from .setting_add_replace import SettingAddReplace
 from .script_config import ScriptConfig
 
 from .utils import mapTruthValueToIcon

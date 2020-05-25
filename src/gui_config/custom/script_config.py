@@ -13,7 +13,6 @@ from aqt.qt import QDialog, QWidget, QFont, Qt
 from aqt.utils import showInfo # actually needed!
 
 from .js_highlighter import JSHighlighter
-from .setting_update import SettingUpdate
 
 from ..script_config_ui import Ui_ScriptConfig
 

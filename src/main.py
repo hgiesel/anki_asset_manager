@@ -66,13 +66,6 @@ def append_scripts(web_content: WebContent, context):
     web_content.head += "<script>console.log('my-addon')</script>"
     web_content.body += "<div id='my-addon'></div>"
 
-    from aqt.utils import showInfo
-
-    showInfo(str(dir(web_content)))
-    showInfo(str(dir(context)))
-
-    showInfo(str(context.card))
-
 webview_will_set_content.append(append_scripts)
 
 mw.addonManager.setWebExports(__name__, r"web/.*(css|js)")
