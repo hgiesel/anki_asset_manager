@@ -3,7 +3,7 @@ from dataclasses import dataclass, replace
 
 from ..config_types import (
     Interface, Setting, ConcreteScript, MetaScript,
-    ScriptBool, ScriptStorage, ScriptPosition, ScriptType,
+    ScriptBool, ScriptStorage, ScriptPosition, ScriptType, ScriptKeys,
     AnkiModel, AnkiTmpl, AnkiFmt, ScriptText, LabelText, Falsifiable,
     DEFAULT_CONCRETE_SCRIPT,
 )
@@ -97,8 +97,6 @@ def make_script_storage(
         conditions,
         code,
     )
-
-ScriptKeys = Literal['enabled', 'type', 'name', 'version', 'description', 'conditions', 'code']
 
 def __list_to_script_bool(vals: List[ScriptKeys]) -> ScriptBool:
     return replace(

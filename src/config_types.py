@@ -6,8 +6,18 @@ from dataclasses import dataclass, replace
 ScriptType = Literal['js', 'css']
 ScriptPosition = Literal['external', 'head', 'body']
 ScriptText = str
-LabelText = str
+ScriptKeys = Literal[
+    'enabled',
+    'type',
+    'name',
+    'version',
+    'description',
+    'position',
+    'conditions',
+    'code',
+]
 
+LabelText = str
 AnkiModel = str
 AnkiTmpl = str
 AnkiFmt = Literal['qfmt', 'afmt']

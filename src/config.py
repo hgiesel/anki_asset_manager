@@ -11,7 +11,7 @@ from .config_types import (
 )
 
 from .lib.interface import make_setting, make_script, make_meta_script, make_script_storage
-from .lib.registrar import has_interface, get_meta_scripts, meta_script_is_registered
+from .lib.registrar import has_interface, get_meta_scripts, has_meta_script
 
 def deserialize_setting(model_id: int, model_setting: dict) -> Setting:
     return make_setting(
@@ -27,6 +27,8 @@ def deserialize_setting(model_id: int, model_setting: dict) -> Setting:
 
 def add_other_metas(model_id: int, scripts: List[Script]) -> List[Script]:
     meta_scripts = get_meta_scripts(model_id)
+    from aqt.utils import showInfo
+    showInfo(str(meta_scripts) + ' ::: ' + str(model_id))
 
     for ms in meta_scripts:
         try:
@@ -65,7 +67,7 @@ def deserialize_meta_script(model_id: int, script_data: dict) -> Optional[MetaSc
         make_script_storage(**script_data['storage'] if 'storage' in script_data else DEFAULT_META_SCRIPT.storage),
     )
 
-    return result if has_interface(result.tag) and meta_script_is_registered(
+    return result if has_interface(result.tag) and has_meta_script(
         model_id,
         result.tag,
         result.id,

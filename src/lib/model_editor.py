@@ -24,7 +24,12 @@ def setup_model(modelId: int):
             did_insert = update_model_template(
                 template,
                 fmt,
-                stringify_setting(setting, template['name'], fmt),
+                stringify_setting(
+                    setting,
+                    model['name'],
+                    template['name'],
+                    fmt,
+                ),
             )
 
             needs_saving = needs_saving or did_insert

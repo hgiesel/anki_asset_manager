@@ -39,15 +39,15 @@ def setup_models_dialog():
     Models.onAssets = onAssets
     Models.setupModels = wrap(Models.setupModels, init_asset_button, pos='after')
 
-def setup_webview_hook():
-    pass
-
 from aqt.reviewer import Reviewer
 from aqt.webview import WebContent
 
 from aqt.gui_hooks import webview_will_set_content
 
 addon_package = mw.addonManager.addonFromModule(__name__)
+
+def setup_webview_hook():
+    pass
 
 def append_scripts(web_content: WebContent, context):
     if not isinstance(context, Reviewer):
@@ -76,4 +76,3 @@ def append_scripts(web_content: WebContent, context):
 webview_will_set_content.append(append_scripts)
 
 mw.addonManager.setWebExports(__name__, r"web/.*(css|js)")
-

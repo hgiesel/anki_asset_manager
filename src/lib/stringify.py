@@ -247,12 +247,13 @@ def gen_data_attributes(name: str, version: str):
 
 def stringify_setting(
     setting: Setting,
+    model_name: str,
     cardtype_name: str,
-    position: Union[AnkiFmt, ScriptPosition],
+    fmt_or_position: Union[AnkiFmt, ScriptPosition],
     tags: Optional[str] = None,
 ) -> str:
     script_data = []
-    the_parser = get_condition_parser(cardtype_name, position)
+    the_parser = get_condition_parser(cardtype_name, fmt_or_position)
 
     if setting.enabled and not setting.insert_stub:
         for script in setting.scripts:
@@ -282,9 +283,9 @@ def stringify_setting(
                             else get_interface(script.tag).generator(
                                 script.id,
                                 script.storage,
-                                setting.model_name,
+                                model_name,
                                 cardtype_name,
-                                position,
+                                fmt_or_position,
                             )
                         ),
                         'conditions': conditions_simplified,
