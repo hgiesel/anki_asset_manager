@@ -1,11 +1,14 @@
 from aqt import QRegExp, QColor, QTextCharFormat, QFont, QSyntaxHighlighter, Qt
+from aqt import mw
 
 class JSHighlighter(QSyntaxHighlighter):
     def __init__(self, parent=None):
         super(JSHighlighter, self).__init__(parent)
 
+        is_night_mode = mw.pm.night_mode()
+
         keywordFormat = QTextCharFormat()
-        keywordFormat.setForeground(Qt.darkBlue)
+        keywordFormat.setForeground(Qt.cyan if is_night_mode else Qt.blue)
         keywordFormat.setFontStyleHint(QFont.Monospace)
         keywordFormat.setFontWeight(QFont.Bold)
 
@@ -64,26 +67,26 @@ class JSHighlighter(QSyntaxHighlighter):
         classFormat = QTextCharFormat()
         classFormat.setFontWeight(QFont.Bold)
         classFormat.setFontStyleHint(QFont.Monospace)
-        classFormat.setForeground(Qt.darkMagenta)
+        classFormat.setForeground(Qt.magenta if is_night_mode else Qt.darkMagenta)
         self.highlightingRules.append((QRegExp("\\bQ[A-Za-z]+\\b"), classFormat))
 
         singleLineCommentFormat = QTextCharFormat()
         singleLineCommentFormat.setFontStyleHint(QFont.Monospace)
-        singleLineCommentFormat.setForeground(Qt.red)
+        singleLineCommentFormat.setForeground(Qt.red if is_night_mode else Qt.darkRed)
         self.highlightingRules.append((QRegExp("//[^\n]*"), singleLineCommentFormat))
 
         multiLineCommentFormat = QTextCharFormat()
         multiLineCommentFormat.setFontStyleHint(QFont.Monospace)
-        multiLineCommentFormat.setForeground(Qt.red)
+        multiLineCommentFormat.setForeground(Qt.red if is_night_mode else Qt.darkRed)
         self.multiLineCommentFormat = multiLineCommentFormat
 
         numberFormat = QTextCharFormat()
         numberFormat.setFontStyleHint(QFont.Monospace)
-        numberFormat.setForeground(Qt.cyan)
+        numberFormat.setForeground(Qt.yellow if is_night_mode else Qt.darkYellow)
         self.highlightingRules.append((QRegExp("\\b\\d+\\b"), numberFormat))
 
         quotationFormat = QTextCharFormat()
-        quotationFormat.setForeground(Qt.darkGreen)
+        quotationFormat.setForeground(Qt.green if is_night_mode else Qt.darkGreen)
         quotationFormat.setFontStyleHint(QFont.Monospace)
         self.highlightingRules.append((QRegExp('".*"'), quotationFormat))
         self.highlightingRules.append((QRegExp("'.*'"), quotationFormat))
@@ -92,7 +95,7 @@ class JSHighlighter(QSyntaxHighlighter):
         functionFormat = QTextCharFormat()
         functionFormat.setFontItalic(True)
         functionFormat.setFontStyleHint(QFont.Monospace)
-        functionFormat.setForeground(Qt.blue)
+        functionFormat.setForeground(Qt.lightGray if is_night_mode else Qt.gray)
         self.highlightingRules.append((QRegExp("\\b[A-Za-z0-9_]+(?=\\()"), functionFormat))
 
         self.commentStartExpression = QRegExp("/\\*")

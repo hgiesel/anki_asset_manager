@@ -60,7 +60,7 @@ loose_interface = make_interface(
     store = ['name', 'type', 'version', 'description', 'enabled', 'conditions', 'position', 'code'],
     readonly = [],
     reset = False,
-    deletable = True,
+    deletable = lambda id, storage: True,
     generator = lambda id, storage, model, tmpl, pos: '',
 )
 

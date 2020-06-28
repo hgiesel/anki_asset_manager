@@ -130,9 +130,3 @@ def make_interface(
             __list_to_script_bool(store) if store is not None else make_script_bool()
         ),
     )
-
-# return result if has_interface(result.tag) and has_meta_script(
-#     model_id,
-#     result.tag,
-#     result.id,
-# ) else None
