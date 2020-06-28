@@ -32,10 +32,10 @@ def script_position_to_gui_text(txt: str) -> str:
 
 def pos_to_script_position(pos: int) -> str:
     if pos == 0:
-        return 'External'
+        return 'external'
     elif pos == 1:
-        return 'Head'
+        return 'head'
     elif pos == 2:
-        return 'Body'
+        return 'body'
     elif pos == 3:
-        return 'Into Template'
+        return 'into_template'
