@@ -3,7 +3,7 @@ from functools import reduce
 
 from .registrar import get_interface
 
-from ..config_types import Setting, ConcreteScript, ScriptInsertion, ScriptPosition
+from ..config_types import Setting, ConcreteScript, ScriptInsertion, ScriptPosition, Fmt
 from ..utils import version
 
 def get_condition_parser(card, position):
@@ -239,27 +239,13 @@ def encapsulate_scripts(scripts, version, indent_size) -> str:
 def gen_data_attributes(name: str, version: str):
     return f'data-name="{name}" data-version="{version}"'
 
-def get_prevent_reinclusion():
-    return {
-        'tag': gen_data_attributes('Prevent reinclusion', 'v0.1'),
-        'code': """
-const ankiAms = document.querySelectorAll('#anki-am')
-  if (ankiAms.length > 1) {
-    for (const am of Array.from(ankiAms).slice(0, -1)) {
-      am.outerHTML = ''
-  }
-}
-""".strip(),
-        'conditions': [],
-    }
-
 def stringify_setting(
     setting: Setting,
     model_name: str,
     cardtype_name: str,
     position: ScriptInsertion,
 ) -> str:
-    script_data = [get_prevent_reinclusion()] if position == 'into_template' else []
+    script_data = []
     the_parser = get_condition_parser(cardtype_name, position)
 
     if setting.enabled and not setting.insert_stub:
@@ -273,7 +259,7 @@ def stringify_setting(
                 )
             )
 
-            if script_gotten.enabled and script_gotten.position == position:
+            if script_gotten.enabled and script_gotten.position == ('into_template' if position in ['question', 'answer'] else position):
                 needs_inject, conditions_simplified = the_parser(script_gotten.conditions)
 
                 if needs_inject:
@@ -300,11 +286,32 @@ def stringify_setting(
 
     stringified_scripts = [
         stringify_script_data(sd, setting.indent_size, True)
-        for sd in script_data
+        for sd
+        in script_data
     ]
 
-    if position != 'into_template':
-        return '\n'.join(stringified_scripts)
+    return stringified_scripts
+
+prevent_reinclusion = {
+    'tag': gen_data_attributes('Prevent reinclusion', 'v0.1'),
+    'code': """
+const ankiAms = document.querySelectorAll('#anki-am')
+  if (ankiAms.length > 1) {
+    for (const am of Array.from(ankiAms).slice(0, -1)) {
+      am.outerHTML = ''
+  }
+}""".strip(),
+    'conditions': [],
+}
+
+def stringify_setting_for_template(
+    setting: Setting,
+    model_name: str,
+    cardtype_name: str,
+    fmt: Fmt,
+) -> str:
+    stringified_scripts = stringify_setting(setting, model_name, cardtype_name, fmt)
+    stringified_scripts.insert(0, stringify_script_data(prevent_reinclusion, setting.indent_size, True))
 
     code_string = encapsulate_scripts(
         stringified_scripts,
@@ -313,6 +320,22 @@ def stringify_setting(
     ) if setting.enabled else ''
 
     return code_string
+
+def stringify_setting_for_head(
+    setting: Setting,
+    model_name: str,
+    cardtype_name: str,
+) -> str:
+    stringified_scripts = stringify_setting(setting, model_name, cardtype_name, 'head')
+    return '\n'.join(stringified_scripts)
+
+def stringify_setting_for_body(
+    setting: Setting,
+    model_name: str,
+    cardtype_name: str,
+) -> str:
+    stringified_scripts = stringify_setting(setting, model_name, cardtype_name, 'body')
+    return '\n'.join(stringified_scripts)
 
 def write_external_scripts():
     pass

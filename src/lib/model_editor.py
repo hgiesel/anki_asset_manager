@@ -10,8 +10,9 @@ from anki import media
 from aqt import mw
 
 from ..config import get_setting_from_notetype
+from ..config_types import AnkiFmt, Fmt
 
-from .stringify import stringify_setting
+from .stringify import stringify_setting_for_template
 
 def setup_model(modelId: int):
     needs_saving = False
@@ -20,16 +21,17 @@ def setup_model(modelId: int):
     for template in model['tmpls']:
         setting = get_setting_from_notetype(model)
 
+        # anki uses qfmt and afmt in model objects
+        # I use question and answer
         for fmt in ['qfmt', 'afmt']:
             did_insert = update_model_template(
                 template,
                 fmt,
-                stringify_setting(
+                stringify_setting_for_template(
                     setting,
                     model['name'],
                     template['name'],
-                    fmt,
-                    'into_template',
+                    'question' if fmt == 'qfmt' else 'answer',
                 ),
             )
 
@@ -55,21 +57,21 @@ def get_template_slice(t):
     except AttributeError:
         return None
 
-def get_new_template(slice, old_template: str, scripts: str) -> str:
-    sep_scripts = '\n\n' + scripts
+def get_new_template(slice, old_template: str, script_string: str) -> str:
+    sep_scripts = '\n\n' + script_string
 
     return (
         sep_scripts.join([
             old_template[:slice[0]],
             old_template[slice[1]:],
         ]) if slice
-        else f'{old_template}{sep_scripts}' if len(scripts) > 0
+        else f'{old_template}{sep_scripts}' if len(script_string) > 0
         else None
     )
 
-def update_model_template(template: object, fmt: str, scripts: str) -> bool:
+def update_model_template(template: object, fmt: AnkiFmt, script_string: str) -> bool:
     slice = get_template_slice(template[fmt])
-    new_template = get_new_template(slice, template[fmt], scripts)
+    new_template = get_new_template(slice, template[fmt], script_string)
 
     if new_template:
         template[fmt] = new_template

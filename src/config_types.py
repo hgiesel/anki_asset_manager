@@ -5,8 +5,12 @@ from dataclasses import dataclass, replace
 
 ScriptType = Literal['js', 'css']
 
-ScriptPosition = Literal['external', 'head', 'body', 'into_template']
-ScriptInsertion = Literal['external', 'head', 'body', 'question', 'answer']
+Position = Literal['external', 'head', 'body']
+ScriptPosition = Union[Position, Literal['into_template']]
+
+AnkiFmt = Literal['qfmt', 'afmt']
+Fmt = Literal['question', 'answer']
+ScriptInsertion = Union[Position, Fmt]
 
 ScriptText = str
 ScriptKeys = Literal[
