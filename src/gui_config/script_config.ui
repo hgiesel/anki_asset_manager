@@ -75,17 +75,17 @@
        <widget class="QComboBox" name="positionComboBox">
         <item>
          <property name="text">
-          <string>External</string>
+          <string>As External Document</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Head</string>
+          <string>Document Head</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Body</string>
+          <string>Document Body</string>
          </property>
         </item>
         <item>

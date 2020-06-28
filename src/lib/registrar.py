@@ -6,7 +6,7 @@ from ..config_types import (
     Falsifiable, AnkiModel, AnkiTmpl, ScriptInsertion, LabelText,
 )
 
-from .interface import make_interface
+from .interface import make_interface, make_script
 
 _meta_interfaces: List[Interface] = []
 _meta_scripts: List[Tuple[str, MetaScript]] = []
@@ -43,11 +43,32 @@ def make_and_register_interface(
 def register_interface(iface: Interface) -> None:
     _meta_interfaces.append(iface)
 
-def get_interface(tag: str) -> Optional[Interface]:
+
+loose_interface = make_interface(
+    tag = '__loose',
+    getter = lambda id, storage: make_script(
+        storage.name if storage.name is not None else '',
+        storage.enabled if storage.enabled is not None else True,
+        storage.type if storage.type is not None else 'js',
+        storage.version if storage.version is not None else '',
+        storage.description if storage.description is not None else '',
+        storage.position if storage.position is not None else 'into_template',
+        storage.conditions if storage.conditions is not None else [],
+        storage.code if storage.code is not None else '',
+    ),
+    setter = lambda id, script: True,
+    store = ['name', 'type', 'version', 'description', 'enabled', 'conditions', 'position', 'code'],
+    readonly = [],
+    reset = False,
+    deletable = True,
+    generator = lambda id, storage, model, tmpl, pos: '',
+)
+
+def get_interface(tag: str) -> Interface:
     try:
         return next(filter(lambda v: v.tag == tag, _meta_interfaces))
     except StopIteration:
-        return None
+        return loose_interface
 
 def has_interface(tag: str) -> bool:
     return True if get_interface(tag) else False

@@ -1,8 +1,12 @@
-def map_truth_value_to_icon(b: bool) -> str:
-    if b:
+from typing import Union
+
+def map_truth_value_to_icon(b: Union[bool, str]) -> str:
+    if b == True:
         return 'yes'
-    else:
+    elif b == False:
         return 'no'
+    else:
+        return b
 
 def script_type_to_gui_text(txt: str) -> str:
     if txt == 'js':
@@ -28,10 +32,10 @@ def script_position_to_gui_text(txt: str) -> str:
 
 def pos_to_script_position(pos: int) -> str:
     if pos == 0:
-        return 'external'
+        return 'External'
     elif pos == 1:
-        return 'head'
+        return 'Head'
     elif pos == 2:
-        return 'body'
+        return 'Body'
     elif pos == 3:
-        return 'into_template'
+        return 'Into Template'

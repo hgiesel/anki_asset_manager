@@ -70,7 +70,10 @@ class ScriptTab(QWidget):
                 iface = get_interface(script.tag)
                 script_gotten = iface.getter(script.id, script.storage)
 
-                self.setRowModFromScript(idx, script_gotten, True)
+                if iface.tag == '__loose':
+                    self.setRowModFromScript(idx, script_gotten, 'loose')
+                else:
+                    self.setRowModFromScript(idx, script_gotten, True)
 
         self.ui.scriptsTable.setVerticalHeaderLabels(headerLabels)
 

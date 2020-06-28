@@ -19,7 +19,7 @@ def deserialize_setting(model_id: int, model_setting: dict) -> Setting:
         model_setting['insertStub'] if 'insertStub' in model_setting else DEFAULT_SETTING.insert_stub,
         model_setting['indentSize'] if 'indentSize' in model_setting else DEFAULT_SETTING.indent_size,
         add_other_metas(model_id, [s for s in [
-            deserialize_script(model_id, script)
+            deserialize_script(script)
             for script
             in (model_setting['scripts'] if 'scripts' in model_setting else DEFAULT_SETTING.scripts)
         ] if s]),
@@ -39,11 +39,11 @@ def add_other_metas(model_id: int, scripts: List[Script]) -> List[Script]:
 
     return scripts
 
-def deserialize_script(model_id: int, script_data: dict) -> Union[ConcreteScript, MetaScript]:
+def deserialize_script(script_data: dict) -> Union[ConcreteScript, MetaScript]:
     return script_data if isinstance(script_data, Script) else (
         deserialize_concrete_script(script_data)
         if 'name' in script_data
-        else deserialize_meta_script(model_id, script_data)
+        else deserialize_meta_script(script_data)
     )
 
 def deserialize_concrete_script(script_data: dict) -> ConcreteScript:
@@ -58,18 +58,14 @@ def deserialize_concrete_script(script_data: dict) -> ConcreteScript:
         script_data['code'] if 'code' in script_data else DEFAULT_CONCRETE_SCRIPT.code,
     )
 
-def deserialize_meta_script(model_id: int, script_data: dict) -> Optional[MetaScript]:
+def deserialize_meta_script(script_data: dict) -> MetaScript:
     result = make_meta_script(
         script_data['tag'] if 'tag' in script_data else DEFAULT_META_SCRIPT.tag,
         script_data['id'] if 'id' in script_data else DEFAULT_META_SCRIPT.id,
         make_script_storage(**script_data['storage'] if 'storage' in script_data else DEFAULT_META_SCRIPT.storage),
     )
 
-    return result if has_interface(result.tag) and has_meta_script(
-        model_id,
-        result.tag,
-        result.id,
-    ) else None
+    return result
 
 def serialize_setting(setting: Setting) -> dict:
     return {

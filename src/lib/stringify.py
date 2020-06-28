@@ -282,7 +282,8 @@ def stringify_setting(
                         'conditions': conditions_simplified,
                     }
 
-                    script_data.append(sd)
+                    if len(sd['code']) > 0:
+                        script_data.append(sd)
 
     stringified_scripts = [
         stringify_script_data(sd, setting.indent_size, True)

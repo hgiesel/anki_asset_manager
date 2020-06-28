@@ -27,6 +27,8 @@ from ...lib.interface import make_script_bool
 from ...lib.registrar import get_interface
 
 def fix_storage(store: ScriptStorage, script: ConcreteScript, to_store: ScriptBool) -> ScriptStorage:
+    """save to store from script according to to_store"""
+
     def filter_store(tost):
         return [
             storekey[0]
@@ -200,7 +202,7 @@ class ScriptConfig(QDialog):
             showInfo('Valid Conditions.')
 
     def exportData(self) -> Union[ConcreteScript, MetaScript]:
-        result = deserialize_script(self.modelName, {
+        result = deserialize_script({
             'name': self.ui.nameLineEdit.text(),
 
             'enabled': self.ui.enableScriptCheckBox.isChecked(),
