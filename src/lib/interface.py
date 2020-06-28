@@ -4,7 +4,7 @@ from dataclasses import dataclass, replace
 from ..config_types import (
     Interface, Setting, ConcreteScript, MetaScript,
     ScriptBool, ScriptStorage, ScriptPosition, ScriptType, ScriptKeys,
-    AnkiModel, AnkiTmpl, AnkiFmt, ScriptText, LabelText, Falsifiable,
+    AnkiModel, AnkiTmpl, ScriptInsertion, ScriptText, LabelText, Falsifiable,
     DEFAULT_CONCRETE_SCRIPT,
 )
 
@@ -108,7 +108,7 @@ def make_interface(
     tag: str,
     getter: Callable[[str, ScriptStorage], ConcreteScript],
     setter: Callable[[str, ConcreteScript], Union[bool, ConcreteScript]],
-    generator: Optional[Callable[[str, ScriptStorage, AnkiModel, AnkiTmpl, AnkiFmt], Falsifiable(ScriptText)]] = None,
+    generator: Optional[Callable[[str, ScriptStorage, AnkiModel, AnkiTmpl, ScriptInsertion], Falsifiable(ScriptText)]] = None,
     label: Optional[Falsifiable(Callable[[str, ScriptStorage], LabelText])] = None,
     reset: Optional[Falsifiable(Callable[[str, ScriptStorage], ConcreteScript])] = None,
     deletable: Optional[Falsifiable(Callable[[str, ScriptStorage], bool])] = None,
@@ -119,7 +119,7 @@ def make_interface(
         tag,
         getter,
         setter,
-        generator if generator is not None else lambda id, storage, _model, _tmpl, _fmt: getter(id, storage).code,
+        generator if generator is not None else lambda id, storage, _model, _tmpl, _pos: getter(id, storage).code,
         label if label is not None else lambda id, _storage: f"{tag}: {id}",
         reset if reset is not None else lambda id, _storage: getter(id, make_script_storage()),
         deletable if deletable is not None else lambda _id, _storage: False,

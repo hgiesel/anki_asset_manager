@@ -1,12 +1,12 @@
-from typing import Optional, Union
+from typing import Optional, Union, Literal
 from functools import reduce
 
 from .registrar import get_interface
 
-from ..config_types import Setting, ConcreteScript, AnkiFmt, ScriptPosition
+from ..config_types import Setting, ConcreteScript, ScriptInsertion, ScriptPosition
 from ..utils import version
 
-def get_condition_parser(card, side):
+def get_condition_parser(card, position):
     is_true = lambda v: isinstance(v, bool) and v == True
     is_false = lambda v: isinstance(v, bool) and v == False
 
@@ -83,22 +83,16 @@ def get_condition_parser(card, side):
 
             return val, val
 
-        elif cond[0] == 'side':
+        elif cond[0] == 'pos':
             if cond[1] == '=':
-                if (
-                    side == 'qfmt' and cond[2] in ['front', 'question', 'qfmt'] or
-                    side == 'afmt' and cond[2] in ['back', 'answer', 'afmt']
-                ):
+                if (position == cond[2]):
                     return True, True
 
                 else:
                     return False, False
 
             elif cond[1] == '!=':
-                if (
-                    side == 'qfmt' and cond[2] in ['back', 'answer', 'afmt'] or
-                    side == 'afmt' and cond[2] in ['front', 'question', 'qfmt']
-                ):
+                if (position != cond[2]):
                     return True, True
 
                 else:
@@ -245,15 +239,28 @@ def encapsulate_scripts(scripts, version, indent_size) -> str:
 def gen_data_attributes(name: str, version: str):
     return f'data-name="{name}" data-version="{version}"'
 
+def get_prevent_reinclusion():
+    return {
+        'tag': gen_data_attributes('Prevent reinclusion', 'v0.1'),
+        'code': """
+const ankiAms = document.querySelectorAll('#anki-am')
+  if (ankiAms.length > 1) {
+    for (const am of Array.from(ankiAms).slice(0, -1)) {
+      am.outerHTML = ''
+  }
+}
+""".strip(),
+        'conditions': [],
+    }
+
 def stringify_setting(
     setting: Setting,
     model_name: str,
     cardtype_name: str,
-    fmt_or_position: Union[AnkiFmt, ScriptPosition],
-    tags: Optional[str] = None,
+    position: ScriptInsertion,
 ) -> str:
-    script_data = []
-    the_parser = get_condition_parser(cardtype_name, fmt_or_position)
+    script_data = [get_prevent_reinclusion()] if position == 'into_template' else []
+    the_parser = get_condition_parser(cardtype_name, position)
 
     if setting.enabled and not setting.insert_stub:
         for script in setting.scripts:
@@ -266,10 +273,8 @@ def stringify_setting(
                 )
             )
 
-            if script_gotten.enabled:
-                needs_inject, conditions_simplified = the_parser(
-                    script_gotten.conditions,
-                )
+            if script_gotten.enabled and script_gotten.position == position:
+                needs_inject, conditions_simplified = the_parser(script_gotten.conditions)
 
                 if needs_inject:
                     sd = {
@@ -285,7 +290,7 @@ def stringify_setting(
                                 script.storage,
                                 model_name,
                                 cardtype_name,
-                                fmt_or_position,
+                                position,
                             )
                         ),
                         'conditions': conditions_simplified,
@@ -298,6 +303,9 @@ def stringify_setting(
         for sd in script_data
     ]
 
+    if position != 'into_template':
+        return '\n'.join(stringified_scripts)
+
     code_string = encapsulate_scripts(
         stringified_scripts,
         version,
@@ -305,3 +313,6 @@ def stringify_setting(
     ) if setting.enabled else ''
 
     return code_string
+
+def write_external_scripts():
+    pass

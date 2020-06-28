@@ -4,7 +4,10 @@ from dataclasses import dataclass, replace
 ################################ simple types
 
 ScriptType = Literal['js', 'css']
-ScriptPosition = Literal['external', 'head', 'body']
+
+ScriptPosition = Literal['external', 'head', 'body', 'into_template']
+ScriptInsertion = Literal['external', 'head', 'body', 'question', 'answer']
+
 ScriptText = str
 ScriptKeys = Literal[
     'name',
@@ -20,7 +23,6 @@ ScriptKeys = Literal[
 LabelText = str
 AnkiModel = str
 AnkiTmpl = str
-AnkiFmt = Literal['qfmt', 'afmt']
 
 Falsifiable = lambda t: Union[Literal[False], t]
 
@@ -87,7 +89,7 @@ class Interface:
     getter: Callable[[str, ScriptStorage], ConcreteScript]
     # result is used for storing
     setter: Callable[[str, ConcreteScript], Union[bool, ConcreteScript]]
-    generator: Callable[[str, ScriptStorage, AnkiModel, AnkiTmpl, AnkiFmt], Falsifiable(ScriptText)]
+    generator: Callable[[str, ScriptStorage, AnkiModel, AnkiTmpl, ScriptInsertion], Falsifiable(ScriptText)]
     label: Falsifiable(Callable[[str, ScriptStorage], LabelText])
     reset: Falsifiable(Callable[[str, ScriptStorage], ConcreteScript])
     deletable: Falsifiable(Callable[[str, ScriptStorage], bool])

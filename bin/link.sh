@@ -7,6 +7,8 @@ declare addon_dev_name="AssetManagerDev"
 declare customdir=''
 
 if [[ "$1" =~ ^-?d$ ]]; then
+  sed -i "s/$addon_dev_name/$name/" "${DIR}/src/gui_config/"*".py"
+
   if [[ -d "$customdir" ]]; then
     rm "$customdir/$addon_dev_name"
 
@@ -25,6 +27,8 @@ if [[ "$1" =~ ^-?d$ ]]; then
   fi
 
 elif [[ "$1" =~ ^-?c$ ]]; then
+  sed -i "s/$name/$addon_dev_name/" "${DIR}/src/gui_config/"*".py"
+
   if [[ -d "$customdir" ]]; then
     ln -s "$DIR" "$customdir/$addon_dev_name"
 

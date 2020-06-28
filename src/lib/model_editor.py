@@ -29,6 +29,7 @@ def setup_model(modelId: int):
                     model['name'],
                     template['name'],
                     fmt,
+                    'into_template',
                 ),
             )
 

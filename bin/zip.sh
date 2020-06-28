@@ -11,14 +11,16 @@ fi
 
 sed -i "s/${name}.src.gui_config//" "${DIR}/src/gui_config/"*".py"
 
-zip -r "${DIR}/${addon_id}.ankiaddon" \
-  "${DIR}/__init__.py" \
-  "${DIR}/src/"*".py" \
-  "${DIR}/src/lib/"*".py" \
-  "${DIR}/src/gui_config/"*".py" \
-  "${DIR}/src/gui_config/custom/"*".py" \
-  "${DIR}/src/json_schemas/"* \
-  "${DIR}/config."{json,md} \
-  "${DIR}/manifest.json"
+cd "$DIR"
+
+zip -r "${addon_id}.ankiaddon" \
+  "__init__.py" \
+  "src/"*".py" \
+  "src/lib/"*".py" \
+  "src/gui_config/"*".py" \
+  "src/gui_config/custom/"*".py" \
+  "src/json_schemas/"* \
+  "config."{json,md} \
+  "manifest.json"
 
 sed -i "s/.custom/${name}.src.gui_config.custom/" "${DIR}/src/gui_config/"*".py"

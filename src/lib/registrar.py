@@ -3,7 +3,7 @@ from typing import Optional, List, Tuple, Callable, Union
 from ..config_types import (
     Interface, MetaScript, ConcreteScript,
     ScriptStorage, ScriptKeys, ScriptText,
-    Falsifiable, AnkiModel, AnkiTmpl, AnkiFmt, LabelText,
+    Falsifiable, AnkiModel, AnkiTmpl, ScriptInsertion, LabelText,
 )
 
 from .interface import make_interface
@@ -21,7 +21,7 @@ def make_and_register_interface(
     tag: str,
     getter: Callable[[str, ScriptStorage], ConcreteScript],
     setter: Callable[[str, ConcreteScript], Union[bool, ConcreteScript]],
-    generator: Optional[Callable[[str, ScriptStorage, AnkiModel, AnkiTmpl, AnkiFmt], Falsifiable(ScriptText)]] = None,
+    generator: Optional[Callable[[str, ScriptStorage, AnkiModel, AnkiTmpl, ScriptInsertion], Falsifiable(ScriptText)]] = None,
     label: Optional[Falsifiable(Callable[[str, ScriptStorage], LabelText])] = None,
     reset: Optional[Falsifiable(Callable[[str, ScriptStorage], ConcreteScript])] = None,
     deletable: Optional[Falsifiable(Callable[[str, ScriptStorage], bool])] = None,
