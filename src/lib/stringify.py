@@ -296,7 +296,7 @@ def stringify_setting(
 prevent_reinclusion = {
     'tag': gen_data_attributes('Prevent reinclusion', 'v0.1'),
     'code': """
-const ankiAms = document.querySelectorAll('#anki-am')
+var ankiAms = document.querySelectorAll('#anki-am')
   if (ankiAms.length > 1) {
     for (const am of Array.from(ankiAms).slice(0, -1)) {
       am.outerHTML = ''
