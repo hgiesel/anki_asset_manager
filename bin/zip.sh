@@ -1,21 +1,17 @@
 declare DIR="$(cd "$(dirname "$0")/.." && pwd -P)"
-declare name='anki_asset_manager'
+mkdir -p "$DIR/build"
 
-if [[ "$1" == '-a' ]]; then
-  # for uploading to AnkiWeb
-  declare addon_id=''
-else
-  # for installing myself
-  declare addon_id='asset_manager'
-fi
-
-"$DIR/bin/link.sh" -d
-
-sed -i "s/${name}.src.gui_config//" "${DIR}/src/gui_config/"*".py"
+declare addon_id='asset_manager'
 
 cd "$DIR"
 
-zip -r "${addon_id}.ankiaddon" \
+"$DIR/bin/link.sh" -d
+
+sed -i "s/$name.src.gui_config//" "$DIR/src/gui_config/"*".py"
+
+cd "$DIR"
+
+zip -r "build/$addon_id.ankiaddon" \
   "__init__.py" \
   "src/"*".py" \
   "src/lib/"*".py" \
@@ -25,4 +21,4 @@ zip -r "${addon_id}.ankiaddon" \
   "config."{json,md} \
   "manifest.json"
 
-sed -i "s/.custom/${name}.src.gui_config.custom/" "${DIR}/src/gui_config/"*".py"
+sed -i "s/.custom/$name.src.gui_config.custom/" "$DIR/src/gui_config/"*".py"
