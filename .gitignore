@@ -11,7 +11,7 @@ tags
 
 # Specific to this repository
 meta.json
-*.ankiaddon
+build/*.ankiaddon
 
 # Compiled gui
 /src/gui_config/*.py
