@@ -312,7 +312,9 @@ def stringify_setting_for_template(
     fmt: Fmt,
 ) -> str:
     stringified_scripts = stringify_setting(setting, model_name, cardtype_name, fmt)
-    stringified_scripts.insert(0, stringify_script_data(prevent_reinclusion, setting.indent_size, True))
+
+    if not setting.insert_stub:
+        stringified_scripts.insert(0, stringify_script_data(prevent_reinclusion, setting.indent_size, True))
 
     code_string = encapsulate_scripts(
         stringified_scripts,

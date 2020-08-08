@@ -9,6 +9,8 @@ else
   declare addon_id='asset_manager'
 fi
 
+"$DIR/bin/link.sh" -d
+
 sed -i "s/${name}.src.gui_config//" "${DIR}/src/gui_config/"*".py"
 
 cd "$DIR"

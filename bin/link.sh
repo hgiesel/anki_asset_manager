@@ -10,16 +10,16 @@ if [[ "$1" =~ ^-?d$ ]]; then
   sed -i "s/$addon_dev_name/$name/" "${DIR}/src/gui_config/"*".py"
 
   if [[ -d "$customdir" ]]; then
-    rm "$customdir/$addon_dev_name"
+    rm -f "$customdir/$addon_dev_name"
 
   elif [[ -d "$HOME/.local/share/AnkiDev/addons21" ]]; then
-    rm "$HOME/.local/share/AnkiDev/addons21/$addon_dev_name"
+    rm -f "$HOME/.local/share/AnkiDev/addons21/$addon_dev_name"
 
   elif [[ $(uname) = 'Darwin' ]]; then
-    rm "$HOME/Library/Application Support/Anki2/addons21/$addon_dev_name"
+    rm -f "$HOME/Library/Application Support/Anki2/addons21/$addon_dev_name"
 
   elif [[ $(uname) = 'Linux' ]]; then
-    rm "$HOME/.local/share/Anki2/addons21/$addon_dev_name"
+    rm -f "$HOME/.local/share/Anki2/addons21/$addon_dev_name"
 
   else
     echo 'Unknown platform'
