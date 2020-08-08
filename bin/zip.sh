@@ -2,6 +2,7 @@ declare DIR="$(cd "$(dirname "$0")/.." && pwd -P)"
 mkdir -p "$DIR/build"
 
 declare addon_id='asset_manager'
+declare name='anki_asset_manager' # for finding gui files
 
 cd "$DIR"
 
