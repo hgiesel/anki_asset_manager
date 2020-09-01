@@ -15,6 +15,16 @@
    <string>Script Manager Settings</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <item row="1" column="8">
+    <widget class="QPushButton" name="cancelButton">
+     <property name="text">
+      <string>Cancel</string>
+     </property>
+     <property name="autoDefault">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
    <item row="1" column="0">
     <widget class="QPushButton" name="helpButton">
      <property name="text">
@@ -25,43 +35,7 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="0" colspan="7">
-    <widget class="ScriptTab" name="configWidget" native="true"/>
-   </item>
-   <item row="1" column="1">
-    <widget class="QPushButton" name="aboutButton">
-     <property name="text">
-      <string>About</string>
-     </property>
-     <property name="autoDefault">
-      <bool>false</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="2" colspan="2">
-    <spacer name="horizontalSpacer">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>40</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="1" column="4">
-    <widget class="QPushButton" name="cancelButton">
-     <property name="text">
-      <string>Cancel</string>
-     </property>
-     <property name="autoDefault">
-      <bool>false</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="5">
+   <item row="1" column="7">
     <widget class="QPushButton" name="saveButton">
      <property name="text">
       <string>Save</string>
@@ -80,6 +54,22 @@
       <bool>true</bool>
      </property>
     </widget>
+   </item>
+   <item row="0" column="0" colspan="9">
+    <widget class="ScriptTab" name="configWidget" native="true"/>
+   </item>
+   <item row="1" column="1" colspan="5">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
    </item>
   </layout>
  </widget>
