@@ -132,8 +132,8 @@ class ScriptConfig(QDialog):
                 reset_script = self.iface.reset(self.meta.id, self.meta.storage)
                 self.setupUiConcrete(reset_script)
             except:
-                self.setupUiMeta(current_script)
                 showInfo('Ooops, it seems like the developer responsible for this script did not setup the reset function correctly.')
+                self.setupUiMeta(current_script)
 
             self.ui.nameLineEdit.repaint()
 
