@@ -10,7 +10,7 @@ from pathlib import Path
 
 from aqt import mw
 from aqt.qt import QDialog, QWidget, QFont, Qt
-from aqt.utils import askUser, showInfo # actually needed!
+from aqt.utils import askUser, restoreGeom, saveGeom, showInfo # actually needed!
 
 from ..src.config import serialize_script, deserialize_script
 from ..src.config_types import ConcreteScript, MetaScript, ScriptStorage, ScriptBool
@@ -46,6 +46,8 @@ def fix_storage(store: ScriptStorage, script: ConcreteScript, to_store: ScriptBo
 
     return replace(store, **the_dict)
 
+geom_name = 'assetManagerScriptConfig'
+
 class ScriptConfig(QDialog):
     def __init__(self, parent, model_name, callback):
         super().__init__(parent=parent)
@@ -71,6 +73,8 @@ class ScriptConfig(QDialog):
         self.ui.metaLabel.setText('')
         self.ui.enableScriptCheckBox.stateChanged.connect(self.enableChangeGui)
         self.initEditor(self.ui.codeTextEdit)
+
+        restoreGeom(self, geom_name)
 
     def initEditor(self, editor):
         font = editor.document().defaultFont()
@@ -150,25 +154,6 @@ class ScriptConfig(QDialog):
             self.ui.conditionsTextEdit.repaint()
 
             self.ui.codeTextEdit.repaint()
-
-    def tryAccept(self):
-        try:
-            self.validateConditionsRaw()
-        except:
-            showInfo('Invalid Conditions. Please correct the conditions or just set it to `[]`.')
-        else:
-            self.accept()
-
-    def cancel(self):
-        if askUser('Discard changes?'):
-            self.reject()
-
-    def onAccept(self):
-        self.callback(self.exportData())
-
-    def onReject(self):
-        # is called before dialog is cancelled
-        pass
 
     def enableChangeGui(self):
         try:
@@ -254,3 +239,22 @@ class ScriptConfig(QDialog):
 
         except AttributeError:
             return result
+
+    def cancel(self):
+        if askUser('Discard changes?'):
+            self.reject()
+
+    def tryAccept(self):
+        try:
+            self.validateConditionsRaw()
+        except:
+            showInfo('Invalid Conditions. Please correct the conditions or just set it to `[]`.')
+        else:
+            self.accept()
+
+    def onAccept(self):
+        saveGeom(self, geom_name)
+        self.callback(self.exportData())
+
+    def onReject(self):
+        saveGeom(self, geom_name)
