@@ -113,9 +113,9 @@ DEFAULT_CONCRETE_SCRIPT = ConcreteScript(
     'Example Script',
     'v0.1',
     'This is an example script',
-    'body',
+    'into_template',
     [],
-    'console.log(\'Hello, World\')',
+    'console.log(\'Hello, World!\')',
 )
 
 DEFAULT_META_SCRIPT = MetaScript(
