@@ -14,6 +14,7 @@ def get_condition_parser(card, position):
         elif isinstance(cond, bool):
             return cond, cond
 
+        ############################### COMBINATORS
         elif cond[0] == '&':
             parsed_conds = [parse_condition(i) for i in cond[1:]]
             truth_result = reduce(lambda x, y: x and y, [res[0] for res in parsed_conds])
@@ -60,6 +61,7 @@ def get_condition_parser(card, position):
             else:
                 return True, [cond[0], parsed_cond[1]]
 
+        ############################### PREDICATES
         elif cond[0] == 'card':
             if cond[1] == '=':
                 val = card == cond[2]

@@ -84,8 +84,6 @@ def stringify_setting(
         )
 
         if script_gotten.enabled and script_gotten.position == ('into_template' if position in ['question', 'answer'] else position):
-            from aqt.utils import showText
-            showText(str(script_gotten.conditions) + '\n------------\n' + str(the_parser(script_gotten.conditions)))
             needs_inject, conditions_simplified = the_parser(script_gotten.conditions)
 
             if needs_inject:
