@@ -10,7 +10,7 @@ from pathlib import Path
 
 from aqt import mw
 from aqt.qt import QDialog, QWidget, QFont, Qt
-from aqt.utils import showInfo # actually needed!
+from aqt.utils import askUser, showInfo # actually needed!
 
 from ..src.config import serialize_script, deserialize_script
 from ..src.config_types import ConcreteScript, MetaScript, ScriptStorage, ScriptBool
@@ -65,7 +65,7 @@ class ScriptConfig(QDialog):
         self.ui.saveButton.clicked.connect(self.tryAccept)
         self.ui.saveButton.setDefault(True)
 
-        self.ui.cancelButton.clicked.connect(self.reject)
+        self.ui.cancelButton.clicked.connect(self.cancel)
         self.ui.validateButton.clicked.connect(self.validateConditions)
 
         self.ui.metaLabel.setText('')
@@ -118,6 +118,9 @@ class ScriptConfig(QDialog):
 
     def reset(self):
         # only available for meta scripts
+        if not askUser('Are you sure you want to reset this script? This will set it back to its default settings.'):
+            return
+
         try:
             self.validateConditionsRaw()
         except:
@@ -156,10 +159,15 @@ class ScriptConfig(QDialog):
         else:
             self.accept()
 
+    def cancel(self):
+        if askUser('Discard changes?'):
+            self.reject()
+
     def onAccept(self):
         self.callback(self.exportData())
 
     def onReject(self):
+        # is called before dialog is cancelled
         pass
 
     def enableChangeGui(self):

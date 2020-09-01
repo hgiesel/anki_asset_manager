@@ -7,7 +7,7 @@ from jsonschema import validate, RefResolver, Draft7Validator
 
 from aqt import mw
 from aqt.qt import QDialog, QWidget, QAction
-from aqt.utils import getText, showWarning, showInfo
+from aqt.utils import getText, showWarning, showInfo, openLink
 
 from ..src.config import deserialize_setting, serialize_setting, write_setting
 from ..src.lib.model_editor import setup_model
@@ -52,11 +52,8 @@ class ConfigDialog(QDialog):
         self.ui.wbButton.clicked.connect(self.wbCurrentSetting)
 
         self.ui.helpButton.clicked.connect(self.showHelp)
-        self.ui.aboutButton.clicked.connect(self.showAbout)
 
         self.ui.configWidget.setupUi(self.modelId, setting)
 
     def showHelp(self):
-        pass
-    def showAbout(self):
-        pass
+        openLink('https://ankiweb.net/shared/info/656021484')
