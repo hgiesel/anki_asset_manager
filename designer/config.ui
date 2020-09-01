@@ -7,8 +7,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>861</width>
-    <height>486</height>
+    <width>1183</width>
+    <height>546</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,6 +17,12 @@
   <layout class="QGridLayout" name="gridLayout">
    <item row="1" column="8">
     <widget class="QPushButton" name="cancelButton">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="text">
       <string>Cancel</string>
      </property>
@@ -27,6 +33,12 @@
    </item>
    <item row="1" column="0">
     <widget class="QPushButton" name="helpButton">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="text">
       <string>Help</string>
      </property>
@@ -37,6 +49,12 @@
    </item>
    <item row="1" column="7">
     <widget class="QPushButton" name="saveButton">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="text">
       <string>Save</string>
      </property>
@@ -47,6 +65,12 @@
    </item>
    <item row="1" column="6">
     <widget class="QPushButton" name="wbButton">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="text">
       <string>Write To Templates</string>
      </property>
