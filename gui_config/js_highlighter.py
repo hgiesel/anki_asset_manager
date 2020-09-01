@@ -1,6 +1,7 @@
 from aqt import QRegExp, QColor, QTextCharFormat, QFont, QSyntaxHighlighter, Qt
 from aqt import mw
 
+
 class JSHighlighter(QSyntaxHighlighter):
     def __init__(self, parent=None):
         super(JSHighlighter, self).__init__(parent)

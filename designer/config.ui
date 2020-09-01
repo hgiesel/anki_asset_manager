@@ -87,7 +87,7 @@
   <customwidget>
    <class>ScriptTab</class>
    <extends>QWidget</extends>
-   <header>anki_asset_manager/src/gui_config/custom/script_tab</header>
+   <header>..script_tab</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

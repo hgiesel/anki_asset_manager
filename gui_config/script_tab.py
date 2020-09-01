@@ -9,24 +9,24 @@ from jsonschema import RefResolver, Draft7Validator
 from aqt import mw
 from aqt.qt import QWidget, QLabel, Qt
 
-from ...config import (
+from ..src.config import (
     serialize_script,
     deserialize_concrete_script,
     serialize_setting,
     deserialize_setting,
 )
 
-from ...config_types import ConcreteScript, MetaScript
-from ...lib.registrar import get_interface
+from ..src.config_types import ConcreteScript, MetaScript
+from ..src.lib.registrar import get_interface
 
-from ..script_tab_ui import Ui_ScriptTab
-
+from .forms.script_tab_ui import Ui_ScriptTab
 from .script_config import ScriptConfig
 
 from .utils import (
     map_truth_value_to_icon,
     script_position_to_gui_text,
 )
+
 
 class ScriptTab(QWidget):
     def __init__(self, parent):

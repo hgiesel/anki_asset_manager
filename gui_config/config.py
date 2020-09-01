@@ -9,12 +9,12 @@ from aqt import mw
 from aqt.qt import QDialog, QWidget, QAction
 from aqt.utils import getText, showWarning, showInfo
 
-from ...config import deserialize_setting, serialize_setting, write_setting
-from ...lib.model_editor import setup_model
+from ..src.config import deserialize_setting, serialize_setting, write_setting
+from ..src.lib.model_editor import setup_model
 
-from ..config_ui import Ui_Config
-
+from .forms.config_ui import Ui_Config
 from .script_tab import ScriptTab
+
 
 def sort_negative_first(v):
     return abs(int(v.name)) * 2 if int(v.name) < 0 else abs(int(v.name)) * 2 + 1

@@ -16,9 +16,9 @@ zip -r "build/$addon_id.ankiaddon" \
   "__init__.py" \
   "src/"*".py" \
   "src/lib/"*".py" \
-  "src/gui_config/"*".py" \
-  "src/gui_config/custom/"*".py" \
-  "src/json_schemas/"* \
+  "gui_config/"*".py" \
+  "gui_config/custom/"*".py" \
+  "json_schemas/"* \
   "config."{json,md} \
   "manifest.json"
 

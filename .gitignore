@@ -5,6 +5,7 @@ _Store
 .AppleDouble
 .LSOverride
 .envrc
+__pycache__
 
 *.log
 tags

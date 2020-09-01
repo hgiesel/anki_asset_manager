@@ -1,5 +1,6 @@
 from typing import Union
 
+
 def map_truth_value_to_icon(b: Union[bool, str]) -> str:
     if b == True:
         return 'yes'

@@ -12,19 +12,20 @@ from aqt import mw
 from aqt.qt import QDialog, QWidget, QFont, Qt
 from aqt.utils import showInfo # actually needed!
 
+from ..src.config import serialize_script, deserialize_script
+from ..src.config_types import ConcreteScript, MetaScript, ScriptStorage, ScriptBool
+
+from ..src.lib.interface import make_script_bool
+from ..src.lib.registrar import get_interface
+
+from .forms.script_config_ui import Ui_ScriptConfig
+
 from .utils import (
     script_type_to_gui_text, script_position_to_gui_text,
     pos_to_script_type, pos_to_script_position,
 )
 from .js_highlighter import JSHighlighter
 
-from ..script_config_ui import Ui_ScriptConfig
-
-from ...config import serialize_script, deserialize_script
-from ...config_types import ConcreteScript, MetaScript, ScriptStorage, ScriptBool
-
-from ...lib.interface import make_script_bool
-from ...lib.registrar import get_interface
 
 def fix_storage(store: ScriptStorage, script: ConcreteScript, to_store: ScriptBool) -> ScriptStorage:
     """save to store from script according to to_store"""
@@ -89,7 +90,7 @@ class ScriptConfig(QDialog):
         else:
             self.setupUiMeta(script)
 
-    def setupUiConcrete(self, concrete_script):
+    def setupUiConcrete(self, concrete_script: ConcreteScript):
         self.ui.nameLineEdit.setText(concrete_script.name)
 
         self.ui.enableScriptCheckBox.setChecked(concrete_script.enabled)
@@ -105,7 +106,7 @@ class ScriptConfig(QDialog):
 
         self.enableChangeGui()
 
-    def setupUiMeta(self, meta_script):
+    def setupUiMeta(self, meta_script: MetaScript):
         self.meta = meta_script
         self.iface = get_interface(meta_script.tag)
 
@@ -117,14 +118,22 @@ class ScriptConfig(QDialog):
 
     def reset(self):
         # only available for meta scripts
-
         try:
             self.validateConditionsRaw()
         except:
             showInfo('Invalid Conditions. Please fix the conditions before resetting.')
         else:
-            self.setupUi(self.exportData())
-            self.setupUiConcrete(self.iface.reset(self.meta.id, self.meta.storage))
+            # this is necessary to trigger the meta hooks before resetting
+            current_script = self.exportData()
+            self.setupUiMeta(current_script)
+
+            # fall back to current script if dev setup the reset hook wrong
+            try:
+                reset_script = self.iface.reset(self.meta.id, self.meta.storage)
+                self.setupUiConcrete(reset_script)
+            except:
+                self.setupUiMeta(current_script)
+                showInfo('Ooops, it seems like the developer responsible for this script did not setup the reset function correctly.')
 
             self.ui.nameLineEdit.repaint()
 
@@ -175,7 +184,7 @@ class ScriptConfig(QDialog):
         return json.loads(self.ui.conditionsTextEdit.toPlainText())
 
     def validateConditionsRaw(self):
-        dirpath  = Path(f'{os.path.dirname(os.path.realpath(__file__))}', '../../json_schemas/script_cond.json')
+        dirpath  = Path(f'{os.path.dirname(os.path.realpath(__file__))}', '../json_schemas/script_cond.json')
         schema_path = dirpath.absolute().as_uri()
 
         with dirpath.open('r') as jsonfile:
