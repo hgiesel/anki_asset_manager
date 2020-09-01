@@ -7,7 +7,7 @@ from jsonschema import validate, RefResolver, Draft7Validator
 
 from aqt import mw
 from aqt.qt import QDialog, QWidget, QAction
-from aqt.utils import getText, showWarning, showInfo, openLink
+from aqt.utils import getText, showWarning, showInfo, askUser, openLink
 
 from ..src.config import deserialize_setting, serialize_setting, write_setting
 from ..src.lib.model_editor import setup_model
@@ -26,7 +26,26 @@ class ConfigDialog(QDialog):
         self.ui = Ui_Config()
         self.ui.setupUi(self)
 
-        self.ui.cancelButton.clicked.connect(self.reject)
+    def setupUi(self, modelId, modelName, setting):
+        self.modelId = modelId
+
+        self.setWindowTitle(f'Assets for {modelName}')
+
+        self.ui.wbButton.clicked.connect(self.writeBackCurrentSetting)
+        self.ui.saveButton.clicked.connect(self.saveCurrentSetting)
+        self.ui.cancelButton.clicked.connect(self.cancel)
+
+        self.ui.helpButton.clicked.connect(self.showHelp)
+
+        self.ui.configWidget.setupUi(self.modelId, setting)
+
+    def writeBackCurrentSetting(self, isClicked):
+        setting_data = self.ui.configWidget.exportData()
+
+        write_setting(self.modelId, setting_data)
+        setup_model(self.modelId)
+
+        self.accept()
 
     def saveCurrentSetting(self, isClicked):
         setting_data = self.ui.configWidget.exportData()
@@ -35,25 +54,9 @@ class ConfigDialog(QDialog):
 
         self.accept()
 
-    def wbCurrentSetting(self, isClicked):
-        setting_data = self.ui.configWidget.exportData()
-
-        write_setting(self.modelId, setting_data)
-        setup_model(self.modelId)
-
-        self.accept()
-
-    def setupUi(self, modelId, modelName, setting):
-        self.modelId = modelId
-
-        self.setWindowTitle(f'Assets for {modelName}')
-
-        self.ui.saveButton.clicked.connect(self.saveCurrentSetting)
-        self.ui.wbButton.clicked.connect(self.wbCurrentSetting)
-
-        self.ui.helpButton.clicked.connect(self.showHelp)
-
-        self.ui.configWidget.setupUi(self.modelId, setting)
+    def cancel(self, isClicked):
+        if askUser('Discard changes?'):
+            self.reject()
 
     def showHelp(self):
         openLink('https://ankiweb.net/shared/info/656021484')
