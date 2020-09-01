@@ -7,19 +7,14 @@ declare name='anki_asset_manager' # for finding gui files
 cd "$DIR"
 
 "$DIR/bin/link.sh" -d
-
-sed -i "s/$name.src.gui_config//" "$DIR/src/gui_config/"*".py"
-
-cd "$DIR"
+"$DIR/bin/compile.sh"
 
 zip -r "build/$addon_id.ankiaddon" \
   "__init__.py" \
   "src/"*".py" \
   "src/lib/"*".py" \
   "gui_config/"*".py" \
-  "gui_config/custom/"*".py" \
+  "gui_config/forms/"*".py" \
   "json_schemas/"* \
   "config."{json,md} \
   "manifest.json"
-
-sed -i "s/.custom/$name.src.gui_config.custom/" "$DIR/src/gui_config/"*".py"
