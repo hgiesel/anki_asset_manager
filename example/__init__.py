@@ -47,10 +47,10 @@ def setup_script():
 
                 # What happens when the user commits new changes to the script
                 # Can be used for internal computation
-                # returns a bool or ami.AMScript.
+                # returns a bool or ami.Script.
                 # if returns True all fields defined in `store` are stored
                 # if returns False no fields are stored ever
-                # if returns ami.AMScript, this AMScript is used for saving, otherwise it's the same as the argument
+                # if returns ami.Script, this Script is used for saving, otherwise it's the same as the argument
                 setter = lambda id, script: True,
 
                 # Collection of fields that are stored on the side of Script Manager
