@@ -6,7 +6,6 @@ declare name='anki_asset_manager' # for finding gui files
 
 cd "$DIR"
 
-"$DIR/bin/link.sh" -d
 "$DIR/bin/compile.sh"
 
 zip -r "build/$addon_id.ankiaddon" \
