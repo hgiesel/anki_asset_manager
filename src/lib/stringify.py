@@ -139,7 +139,7 @@ def stringify_setting_for_template(
 ) -> str:
     stringified_scripts = stringify_setting(setting, model_name, cardtype_name, fmt)
 
-    if not setting.insert_stub and not fmt == 'question':
+    if not setting.insert_stub and fmt == 'question':
         stringified_scripts.insert(0, stringify_script_data(prevent_reinclusion, setting.indent_size, True))
 
     code_string = encapsulate_scripts(
