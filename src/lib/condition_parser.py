@@ -84,14 +84,29 @@ def get_condition_parser(card, position):
             if cond[1] == '=':
                 if (position == cond[2]):
                     return True, True
-
                 else:
                     return False, False
 
             elif cond[1] == '!=':
                 if (position != cond[2]):
                     return True, True
+                else:
+                    return False, False
 
+        elif cond[0] == 'side':
+            # different to pos, this will always return true for head, body, external
+            if position in ['head', 'body', 'external']:
+                return True, True
+
+            elif cond[1] == '=':
+                if (position == cond[2]):
+                    return True, True
+                else:
+                    return False, False
+
+            elif cond[1] == '!=':
+                if (position != cond[2]):
+                    return True, True
                 else:
                     return False, False
 

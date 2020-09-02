@@ -61,6 +61,8 @@ def encapsulate_scripts(scripts, version, indent_size) -> str:
 def gen_data_attributes(name: str, version: str):
     return f'data-name="{name}" data-version="{version}"'
 
+####################### stringify functions
+
 def stringify_setting(
     setting: Setting,
     model_name: str,
@@ -164,5 +166,11 @@ def stringify_setting_for_body(
     stringified_scripts = stringify_setting(setting, model_name, cardtype_name, 'body')
     return '\n'.join(stringified_scripts)
 
-def write_external_scripts():
-    pass
+# this is never called, this is how it should look though
+def stringify_setting_for_external(
+    setting: Setting,
+    model_name: str,
+    cardtype_name: str,
+) -> str:
+    stringified_scripts = stringify_setting(setting, model_name, cardtype_name, 'external')
+    return '\n'.join(stringified_scripts)
