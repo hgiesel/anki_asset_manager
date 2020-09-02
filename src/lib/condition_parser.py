@@ -82,13 +82,21 @@ def get_condition_parser(card, position):
 
         elif cond[0] == 'pos':
             if cond[1] == '=':
-                if (position == cond[2]):
+                if (
+                    position == cond[2] or
+                    (position == 'question' and cond[2] in ['question', 'front', 'qfmt']) or
+                    (position == 'answer' and cond[2] in ['answer', 'back', 'afmt'])
+                ):
                     return True, True
                 else:
                     return False, False
 
             elif cond[1] == '!=':
-                if (position != cond[2]):
+                if (
+                    position != cond[2] and
+                    not (position == 'question' and cond[2] in ['question', 'front', 'qfmt']) and
+                    not (position == 'answer' and cond[2] in ['answer', 'back', 'afmt'])
+                ):
                     return True, True
                 else:
                     return False, False
@@ -99,13 +107,21 @@ def get_condition_parser(card, position):
                 return True, True
 
             elif cond[1] == '=':
-                if (position == cond[2]):
+                if (
+                    position == cond[2] or
+                    (position == 'question' and cond[2] in ['question', 'front', 'qfmt']) or
+                    (position == 'answer' and cond[2] in ['answer', 'back', 'afmt'])
+                ):
                     return True, True
                 else:
                     return False, False
 
             elif cond[1] == '!=':
-                if (position != cond[2]):
+                if (
+                    position != cond[2] and
+                    not (position == 'question' and cond[2] in ['question', 'front', 'qfmt']) and
+                    not (position == 'answer' and cond[2] in ['answer', 'back', 'afmt'])
+                ):
                     return True, True
                 else:
                     return False, False

@@ -66,6 +66,41 @@
       ]
     },
 
+    "posCondition": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": [
+        {
+          "type": "string",
+          "enum": [
+            "pos"
+          ]
+        },
+        {
+          "type": "string",
+          "enum": [
+            "=",
+            "!="
+          ]
+        },
+        {
+          "type": "string",
+          "enum": [
+            "front",
+            "question",
+            "qfmt",
+            "back",
+            "answer",
+            "afmt",
+            "head",
+            "body",
+            "external"
+          ]
+        }
+      ]
+    },
+
     "negation": {
       "type": "array",
       "minItems": 2,
@@ -88,6 +123,9 @@
           },
           {
             "$ref": "#/definitions/sideCondition"
+          },
+          {
+            "$ref": "#/definitions/posCondition"
           },
           {
             "$ref": "#/definitions/negation"
@@ -122,6 +160,9 @@
             "$ref": "#/definitions/sideCondition"
           },
           {
+            "$ref": "#/definitions/posCondition"
+          },
+          {
             "$ref": "#/definitions/negation"
           },
           {
@@ -141,6 +182,9 @@
         },
         {
           "$ref": "#/definitions/sideCondition"
+        },
+        {
+          "$ref": "#/definitions/posCondition"
         },
         {
           "$ref": "#/definitions/negation"
