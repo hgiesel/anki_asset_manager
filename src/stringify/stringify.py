@@ -1,3 +1,4 @@
+from hashlib import sha1
 from typing import Optional, Union, Literal
 
 from ..config_types import Setting, ConcreteScript, ScriptInsertion, ScriptPosition, Fmt
@@ -26,15 +27,27 @@ def indent_lines(text: str, indent_size: int) -> str:
     ])
 
 def stringify_script_data(sd, indent_size: int, in_html: bool) -> str:
-    srcTag = f"src=\"{sd['src']}\" " if 'src' in sd else ''
+    srcTag = f" src=\"{sd['src']}\"" if 'src' in sd else ''
 
     opening, closing = (
-        f'<script {srcTag}{sd["tag"]}>\n',
+        f'<script {sd["tag"]}{srcTag}>',
         '</script>',
-    ) if in_html else (f'// {sd["tag"]}\n', '')
+    ) if in_html else (
+        f'// {sd["tag"]}',
+        '',
+    )
 
     wrapped_code = wrap_code(sd["code"], sd["conditions"])
-    indented_code = indent_lines(wrapped_code, indent_size if in_html else 0) + '\n'
+    indented_code = indent_lines(wrapped_code, indent_size if in_html else 0)
+
+    # avoid two empty new lines for external scripts
+    opening, indented_code = (
+        f'{opening}\n',
+        f'{indented_code}\n',
+    ) if len(indented_code) > 0 else (
+        opening,
+        ''
+    )
 
     return (
         opening +
@@ -115,30 +128,38 @@ def stringify_setting(
         if not needs_inject:
             continue
 
-        if script_gotten.position == 'external' and position in ['question', 'answer']:
-            # special case where it should be <script src="_foobar.js"></script>
-            pass
+
+        code = (
+            script_gotten.code
+            if isinstance(script, ConcreteScript)
+            else get_interface(script.tag).generator(
+                script.id,
+                script.storage,
+                model_name,
+                cardtype_name,
+                position,
+            )
+        )
 
         sd = {
             'tag': gen_data_attributes(
                 script_gotten.name,
                 script_gotten.version,
             ),
-            'code': (
-                script_gotten.code
-                if isinstance(script, ConcreteScript)
-                else get_interface(script.tag).generator(
-                    script.id,
-                    script.storage,
-                    model_name,
-                    cardtype_name,
-                    position,
-                )
+            'src': f'_am_{sha1((model_name + script.name).encode()).hexdigest()}',
+            # no code or conditions, as they are present in external file
+            'code': '',
+            'conditions': [],
+        } if script_gotten.position == 'external' and position in ['question', 'answer'] else {
+            'tag': gen_data_attributes(
+                script_gotten.name,
+                script_gotten.version,
             ),
+            'code': code,
             'conditions': conditions_simplified,
         }
 
-        if len(sd['code']) > 0:
+        if len(code) > 0:
             script_data.append(sd)
 
     stringified_scripts = [
