@@ -134,7 +134,7 @@ def stringify_setting(
             script_gotten.name,
             script_gotten.version,
         )
-        filename = f'_am_{model_id}_{sha1(script_gotten.name.encode()).hexdigest()}'
+        filename = f'_am_{model_id}_{sha1(script_gotten.name.encode()).hexdigest()}.js'
 
         code = (
             script_gotten.code
