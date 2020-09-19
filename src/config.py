@@ -103,5 +103,5 @@ def maybe_get_setting_from_card(card) -> Optional[Setting]:
 
     return get_setting_from_notetype(maybe_model) if maybe_model else None
 
-def write_setting(model_id, sett: Setting):
-    mw.col.models.get(model_id)['assetManager'] = serialize_setting(sett)
+def write_setting(model_id, setting: Setting):
+    mw.col.models.get(model_id)['assetManager'] = serialize_setting(setting)

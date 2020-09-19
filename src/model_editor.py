@@ -10,7 +10,7 @@ from anki import media
 from aqt import mw
 
 from .config import get_setting_from_notetype
-from .config_types import AnkiFmt, Fmt
+from .config_types import AnkiFmt, Fmt, Setting
 
 from .stringify import stringify_setting_for_template
 
@@ -53,13 +53,11 @@ def update_model_template(template: object, fmt: AnkiFmt, script_string: str) ->
 
     return False
 
-def setup_model(modelId: int):
+def setup_model(model_id: int, setting: Setting):
     needs_saving = False
-    model = mw.col.models.get(modelId)
+    model = mw.col.models.get(model_id)
 
     for template in model['tmpls']:
-        setting = get_setting_from_notetype(model)
-
         # anki uses qfmt and afmt in model objects
         # I use question and answer
         for fmt in ['qfmt', 'afmt']:
@@ -69,6 +67,7 @@ def setup_model(modelId: int):
                 stringify_setting_for_template(
                     setting,
                     model['name'],
+                    model_id,
                     template['name'],
                     'question' if fmt == 'qfmt' else 'answer',
                 ),

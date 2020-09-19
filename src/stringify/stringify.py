@@ -94,6 +94,7 @@ var ankiAms = document.querySelectorAll('#anki-am')
 def stringify_setting(
     setting: Setting,
     model_name: str,
+    model_id: int,
     cardtype_name: str,
     position: ScriptInsertion,
 ) -> str:
@@ -117,9 +118,10 @@ def stringify_setting(
             continue
 
         if (
-            script_gotten.position != position and
-            not script_gotten.position in ['into_template', 'external'] and
-            position in ['question', 'answer']
+            script_gotten.position != position and not (
+                script_gotten.position in ['into_template', 'external'] and
+                position in ['question', 'answer']
+            )
         ):
             continue
 
@@ -128,6 +130,11 @@ def stringify_setting(
         if not needs_inject:
             continue
 
+        tag = gen_data_attributes(
+            script_gotten.name,
+            script_gotten.version,
+        )
+        filename = f'_am_{model_id}_{sha1(script_gotten.name.encode()).hexdigest()}'
 
         code = (
             script_gotten.code
@@ -142,30 +149,23 @@ def stringify_setting(
         )
 
         sd = {
-            'tag': gen_data_attributes(
-                script_gotten.name,
-                script_gotten.version,
-            ),
-            'src': f'_am_{sha1((model_name + script.name).encode()).hexdigest()}',
+            'tag': tag,
+            'src': filename,
             # no code or conditions, as they are present in external file
             'code': '',
             'conditions': [],
         } if script_gotten.position == 'external' and position in ['question', 'answer'] else {
-            'tag': gen_data_attributes(
-                script_gotten.name,
-                script_gotten.version,
-            ),
+            'tag': tag,
             'code': code,
             'conditions': conditions_simplified,
         }
 
-        if len(code) > 0:
-            script_data.append(sd)
+        if len(code) == 0:
+            continue
 
-    stringified_scripts = [
-        stringify_script_data(sd, setting.indent_size, True)
-        for sd
-        in script_data
-    ]
+        if position == 'external':
+            script_data.append((filename, stringify_script_data(sd, setting.indent_size, False)))
+        else:
+            script_data.append(stringify_script_data(sd, setting.indent_size, True))
 
-    return stringified_scripts
+    return script_data

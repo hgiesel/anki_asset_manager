@@ -20,6 +20,8 @@ def append_scripts(web_content: WebContent, context):
         return
 
     model_name = context.card.model()['name']
+    model_id = context.card.model()['id']
+
     template_name = context.card.template()['name']
 
     ## alternative approach, which would require creating as file and sourcing from web folder
@@ -29,8 +31,19 @@ def append_scripts(web_content: WebContent, context):
     # web_content.js.append(
     #     f"/_addons/{addon_package}/web/my-addon.js")
 
-    web_content.head += stringify_setting_for_head(setting, model_name, template_name)
-    web_content.body += stringify_setting_for_body(setting, model_name, template_name)
+    web_content.head += stringify_setting_for_head(
+        setting,
+        model_name,
+        model_id,
+        template_name,
+    )
+
+    web_content.body += stringify_setting_for_body(
+        setting,
+        model_name,
+        model_id,
+        template_name,
+    )
 
 def init_webview():
     webview_will_set_content.append(append_scripts)

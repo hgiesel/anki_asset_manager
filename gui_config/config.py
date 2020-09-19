@@ -11,6 +11,7 @@ from aqt.utils import getText, showWarning, showInfo, askUser, openLink, restore
 
 from ..src.config import deserialize_setting, serialize_setting, write_setting
 from ..src.model_editor import setup_model
+from ..src.media_writer import write_media
 
 from .forms.config_ui import Ui_Config
 from .script_tab import ScriptTab
@@ -50,7 +51,9 @@ class ConfigDialog(QDialog):
         setting_data = self.ui.configWidget.exportData()
 
         write_setting(self.modelId, setting_data)
-        setup_model(self.modelId)
+
+        setup_model(self.modelId, setting_data)
+        write_media(self.modelId, setting_data)
 
         self.accept()
 
