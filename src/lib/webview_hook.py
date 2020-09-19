@@ -16,13 +16,15 @@ def append_scripts(web_content: WebContent, context):
     if not setting:
         return
 
+    model_name = context.card.model()['name']
+    template_name = context.card.template()['name']
+
+    ## alternative approach, which would require creating as file and sourcing from web folder
+    ## however it would have the same effect in practice
     # web_content.css.append(
     #     f"/_addons/{addon_package}/web/my-addon.css")
     # web_content.js.append(
     #     f"/_addons/{addon_package}/web/my-addon.js")
-
-    model_name = context.card.model()['name']
-    template_name = context.card.template()['name']
 
     web_content.head += stringify_setting_for_head(setting, model_name, template_name)
     web_content.body += stringify_setting_for_body(setting, model_name, template_name)
