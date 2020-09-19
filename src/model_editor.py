@@ -15,33 +15,6 @@ from .config_types import AnkiFmt, Fmt
 from .stringify import stringify_setting_for_template
 
 
-def setup_model(modelId: int):
-    needs_saving = False
-    model = mw.col.models.get(modelId)
-
-    for template in model['tmpls']:
-        setting = get_setting_from_notetype(model)
-
-        # anki uses qfmt and afmt in model objects
-        # I use question and answer
-        for fmt in ['qfmt', 'afmt']:
-            did_insert = update_model_template(
-                template,
-                fmt,
-                stringify_setting_for_template(
-                    setting,
-                    model['name'],
-                    template['name'],
-                    'question' if fmt == 'qfmt' else 'answer',
-                ),
-            )
-
-            needs_saving = needs_saving or did_insert
-
-    # notify anki that models changed (for synchronization e.g.)
-    if needs_saving:
-        mw.col.models.save(model, True)
-
 def get_template_slice(t):
     try:
         startpos_regex = re.compile(r'\n?\n? *?<div.*?id="anki\-am".*?>', re.MULTILINE)
@@ -79,3 +52,30 @@ def update_model_template(template: object, fmt: AnkiFmt, script_string: str) ->
         return True
 
     return False
+
+def setup_model(modelId: int):
+    needs_saving = False
+    model = mw.col.models.get(modelId)
+
+    for template in model['tmpls']:
+        setting = get_setting_from_notetype(model)
+
+        # anki uses qfmt and afmt in model objects
+        # I use question and answer
+        for fmt in ['qfmt', 'afmt']:
+            did_insert = update_model_template(
+                template,
+                fmt,
+                stringify_setting_for_template(
+                    setting,
+                    model['name'],
+                    template['name'],
+                    'question' if fmt == 'qfmt' else 'answer',
+                ),
+            )
+
+            needs_saving = needs_saving or did_insert
+
+    # notify anki that models changed (for synchronization e.g.)
+    if needs_saving:
+        mw.col.models.save(model, True)

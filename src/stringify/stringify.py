@@ -26,8 +26,12 @@ def indent_lines(text: str, indent_size: int) -> str:
     ])
 
 def stringify_script_data(sd, indent_size: int, in_html: bool) -> str:
-    opening = f'<script {sd["tag"]}>\n' if in_html else f'// {sd["tag"]}\n'
-    closing = '</script>' if in_html else ''
+    srcTag = f"src=\"{sd['src']}\" " if 'src' in sd else ''
+
+    opening, closing = (
+        f'<script {srcTag}{sd["tag"]}>\n',
+        '</script>',
+    ) if in_html else (f'// {sd["tag"]}\n', '')
 
     wrapped_code = wrap_code(sd["code"], sd["conditions"])
     indented_code = indent_lines(wrapped_code, indent_size if in_html else 0) + '\n'
@@ -62,7 +66,17 @@ def encapsulate_scripts(scripts, version, indent_size) -> str:
 def gen_data_attributes(name: str, version: str):
     return f'data-name="{name}" data-version="{version}"'
 
-####################### stringify functions
+prevent_reinclusion = {
+    'tag': gen_data_attributes('Prevent reinclusion', 'v0.1'),
+    'code': """
+var ankiAms = document.querySelectorAll('#anki-am')
+  if (ankiAms.length > 1) {
+    for (const am of Array.from(ankiAms).slice(0, -1)) {
+      am.outerHTML = ''
+  }
+}""".strip(),
+    'conditions': [],
+}
 
 def stringify_setting(
     setting: Setting,
@@ -86,34 +100,46 @@ def stringify_setting(
             )
         )
 
+        if not script_gotten.enabled:
+            continue
+
         if (
-            script_gotten.enabled and
-            script_gotten.position == ('into_template' if position in ['question', 'answer'] else position)
+            script_gotten.position != position and
+            not script_gotten.position in ['into_template', 'external'] and
+            position in ['question', 'answer']
         ):
-            needs_inject, conditions_simplified = the_parser(script_gotten.conditions)
+            continue
 
-            if needs_inject:
-                sd = {
-                    'tag': gen_data_attributes(
-                        script_gotten.name,
-                        script_gotten.version,
-                    ),
-                    'code': (
-                        script_gotten.code
-                        if isinstance(script, ConcreteScript)
-                        else get_interface(script.tag).generator(
-                            script.id,
-                            script.storage,
-                            model_name,
-                            cardtype_name,
-                            position,
-                        )
-                    ),
-                    'conditions': conditions_simplified,
-                }
+        needs_inject, conditions_simplified = the_parser(script_gotten.conditions)
 
-                if len(sd['code']) > 0:
-                    script_data.append(sd)
+        if not needs_inject:
+            continue
+
+        if script_gotten.position == 'external' and position in ['question', 'answer']:
+            # special case where it should be <script src="_foobar.js"></script>
+            pass
+
+        sd = {
+            'tag': gen_data_attributes(
+                script_gotten.name,
+                script_gotten.version,
+            ),
+            'code': (
+                script_gotten.code
+                if isinstance(script, ConcreteScript)
+                else get_interface(script.tag).generator(
+                    script.id,
+                    script.storage,
+                    model_name,
+                    cardtype_name,
+                    position,
+                )
+            ),
+            'conditions': conditions_simplified,
+        }
+
+        if len(sd['code']) > 0:
+            script_data.append(sd)
 
     stringified_scripts = [
         stringify_script_data(sd, setting.indent_size, True)
@@ -122,15 +148,3 @@ def stringify_setting(
     ]
 
     return stringified_scripts
-
-prevent_reinclusion = {
-    'tag': gen_data_attributes('Prevent reinclusion', 'v0.1'),
-    'code': """
-var ankiAms = document.querySelectorAll('#anki-am')
-  if (ankiAms.length > 1) {
-    for (const am of Array.from(ankiAms).slice(0, -1)) {
-      am.outerHTML = ''
-  }
-}""".strip(),
-    'conditions': [],
-}
