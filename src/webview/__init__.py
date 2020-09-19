@@ -1,11 +1,14 @@
+from aqt.gui_hooks import webview_will_set_content
+
 from aqt import mw
 from aqt.reviewer import Reviewer
 from aqt.webview import WebContent
 
 from ..config import maybe_get_setting_from_card
-from .stringify import stringify_setting_for_head, stringify_setting_for_body
+from ..stringify import stringify_setting_for_head, stringify_setting_for_body
 
-addon_package = mw.addonManager.addonFromModule(__name__)
+
+# addon_package = mw.addonManager.addonFromModule(__name__)
 
 def append_scripts(web_content: WebContent, context):
     if not isinstance(context, Reviewer):
@@ -28,3 +31,6 @@ def append_scripts(web_content: WebContent, context):
 
     web_content.head += stringify_setting_for_head(setting, model_name, template_name)
     web_content.body += stringify_setting_for_body(setting, model_name, template_name)
+
+def init_webview():
+    webview_will_set_content.append(append_scripts)

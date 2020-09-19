@@ -27,5 +27,5 @@ def init_asset_button(self):
     b = box.addButton(_("Assets..."), t)
     qconnect(b.clicked, lambda: on_assets(self))
 
-def setup_models_dialog():
+def init_models_dialog():
     Models.setupModels = wrap(Models.setupModels, init_asset_button, pos='after')

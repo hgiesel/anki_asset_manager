@@ -10,7 +10,7 @@ from aqt.qt import QDialog, QWidget, QAction
 from aqt.utils import getText, showWarning, showInfo, askUser, openLink, restoreGeom, saveGeom
 
 from ..src.config import deserialize_setting, serialize_setting, write_setting
-from ..src.lib.model_editor import setup_model
+from ..src.model_editor import setup_model
 
 from .forms.config_ui import Ui_Config
 from .script_tab import ScriptTab

@@ -9,10 +9,11 @@ from string import Template
 from anki import media
 from aqt import mw
 
-from ..config import get_setting_from_notetype
-from ..config_types import AnkiFmt, Fmt
+from .config import get_setting_from_notetype
+from .config_types import AnkiFmt, Fmt
 
 from .stringify import stringify_setting_for_template
+
 
 def setup_model(modelId: int):
     needs_saving = False

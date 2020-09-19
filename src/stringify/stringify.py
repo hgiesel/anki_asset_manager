@@ -3,7 +3,8 @@ from typing import Optional, Union, Literal
 from ..config_types import Setting, ConcreteScript, ScriptInsertion, ScriptPosition, Fmt
 from ..utils import version
 
-from .registrar import get_interface
+from ..lib.registrar import get_interface
+
 from .condition_parser import get_condition_parser, stringify_conds
 
 def wrap_code(code, conditions: Union[bool, list]):
@@ -85,7 +86,10 @@ def stringify_setting(
             )
         )
 
-        if script_gotten.enabled and script_gotten.position == ('into_template' if position in ['question', 'answer'] else position):
+        if (
+            script_gotten.enabled and
+            script_gotten.position == ('into_template' if position in ['question', 'answer'] else position)
+        ):
             needs_inject, conditions_simplified = the_parser(script_gotten.conditions)
 
             if needs_inject:
@@ -130,47 +134,3 @@ var ankiAms = document.querySelectorAll('#anki-am')
 }""".strip(),
     'conditions': [],
 }
-
-def stringify_setting_for_template(
-    setting: Setting,
-    model_name: str,
-    cardtype_name: str,
-    fmt: Fmt,
-) -> str:
-    stringified_scripts = stringify_setting(setting, model_name, cardtype_name, fmt)
-
-    if not setting.insert_stub and fmt == 'question':
-        stringified_scripts.insert(0, stringify_script_data(prevent_reinclusion, setting.indent_size, True))
-
-    code_string = encapsulate_scripts(
-        stringified_scripts,
-        version,
-        setting.indent_size,
-    ) if setting.enabled else ''
-
-    return code_string
-
-def stringify_setting_for_head(
-    setting: Setting,
-    model_name: str,
-    cardtype_name: str,
-) -> str:
-    stringified_scripts = stringify_setting(setting, model_name, cardtype_name, 'head')
-    return '\n'.join(stringified_scripts)
-
-def stringify_setting_for_body(
-    setting: Setting,
-    model_name: str,
-    cardtype_name: str,
-) -> str:
-    stringified_scripts = stringify_setting(setting, model_name, cardtype_name, 'body')
-    return '\n'.join(stringified_scripts)
-
-# this is never called, this is how it should look though
-def stringify_setting_for_external(
-    setting: Setting,
-    model_name: str,
-    cardtype_name: str,
-) -> str:
-    stringified_scripts = stringify_setting(setting, model_name, cardtype_name, 'external')
-    return '\n'.join(stringified_scripts)
