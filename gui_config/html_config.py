@@ -24,7 +24,7 @@ from .utils import (
     script_type_to_gui_text, script_position_to_gui_text,
     pos_to_script_type, pos_to_script_position,
 )
-from .js_highlighter import JSHighlighter
+from .highlighter import JSHighlighter
 
 
 def fix_storage(store: ScriptStorage, script: ConcreteScript, to_store: ScriptBool) -> ScriptStorage:
