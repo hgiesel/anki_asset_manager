@@ -14,15 +14,14 @@ from ..src.model_editor import setup_model
 from ..src.media_writer import write_media
 
 from .forms.config_ui import Ui_Config
-from .script_tab import ScriptTab
 
-
-geom_name = 'assetManagerConfigDialog'
 
 def sort_negative_first(v):
     return abs(int(v.name)) * 2 if int(v.name) < 0 else abs(int(v.name)) * 2 + 1
 
 class ConfigDialog(QDialog):
+    geom_name = 'assetManagerConfigDialog'
+
     def __init__(self, parent):
         super().__init__(parent=parent)
 
@@ -32,7 +31,7 @@ class ConfigDialog(QDialog):
         self.accepted.connect(self.save_geom)
         self.rejected.connect(self.save_geom)
 
-        restoreGeom(self, geom_name)
+        restoreGeom(self, self.geom_name)
 
     def setupUi(self, modelId, modelName, setting):
         self.modelId = modelId
@@ -72,4 +71,4 @@ class ConfigDialog(QDialog):
             self.reject()
 
     def save_geom(self):
-        saveGeom(self, geom_name)
+        saveGeom(self, self.geom_name)
