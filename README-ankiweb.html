@@ -1,9 +1,7 @@
 <b>Asset Manager</b> makes it easier for you to manage scripts on your note templates.
 
 <b>Features</b>
-<ul><li>Easily insert JavaScript snippets into your note templates.</li><li>Change the code in one place and Asset Manager will change the code on all templates for you.</li><li>Restrict scripts to only be inserted for specific cases. For example only on the frontside of your templates, or only for specific card types.</li>
-
-You can use Asset Manager in two different ways:
+<ul><li>Easily insert JavaScript snippets into your note templates.</li><li>Change the code in one place and Asset Manager will change the code on all templates for you.</li><li>Restrict scripts to only be inserted for specific cases. For example only on the frontside of your templates, or only for specific card types.</li></ul>You can use Asset Manager in two different ways:
 <ol><li>Manage JavaScript associated with a note type, and easily insert it into card types, or link against it. This will be the case if you do not enable the HTML Template functionality, but you do enable the JavaScript insertion. This will only add a segment to your card types, but not delete / remove anything. By disabling the Script Insertion, you can easily remove this segment again.</li><li>Manage the complete card templates with it. This allows you to define HTML elements in your card templates in a component-wise structure. This will be the case if you do enable the HTML Template, in this case you should also enable the JavaScript Insertion. This will <b>overwrite your templates</b>, if carelessly executed, so be cautious when enabling it for the first time. It is very helpful, if you have many card types which are written in a formulaic way, and a change in one card type means you must also edit another card type.</li></ol>
 
 <b>Functionalites</b>
@@ -19,7 +17,7 @@ You can use Asset Manager in two different ways:
 
 <b>Labels</b>: Labels identify your HTML "snippets", or "fragments". Insertion begins with the "Front" label for the frontside of the card, and "Back" for the backside of the card. When using a label like <code>{{%MyLabel}}</code> in the template, it will be replaced with a fragment with a label "MyLabel".
 <b>Special Labels</b>: There are multiple special labels defined, which you can use. These always start with a small letter: <ul><li><code>{{%idx</code>: will be replaced with the numerical ID of the card</li><li><code>{{%cardidx}}</code>: will be replaced with an ID that is found on the tail of the card name. If the card is named "Card 25", this value will evaluate to 25, even if it is in first position.</li><li><code>{{%scripts}}</code>: This will evaluate to the output of the JavaScript functionality of the add-on</li></ul>
-<b>Insertion Conditions</b>: Same as above. This way you can make a label `{{%MyLabel}}` be replaced with a different code snippet depending on the side of the card, or the card type name.
+<b>Insertion Conditions</b>: Same as above. This way you can make a label <code>{{%MyLabel}}</code> be replaced with a different code snippet depending on the side of the card, or the card type name.
 
 <b>For Developers</b>
 Asset Manager offers a hook for you to insert your own JavaScript snippet via <a href="https://github.com/hgiesel/anki_asset_manager/tree/master/example" rel="nofollow">your own add-on</a>. That way you can easily offer your script, give it a name, version it, and update it through the AnkiWeb platform, without making users have to care about pasting the JavaScript to their templates, copy the code to the media folder, etc.
@@ -30,4 +28,4 @@ Examples include: <ul><li><a href="https://ankiweb.net/shared/info/1051511270" r
 If you like my add-ons, you can consider supporting me. My add-ons will always be freely available for everybody, but what I can offer you is my sincere thanks, and first-hand technical support, if you have any questions/issues with my add-ons. At the same time it allows me to put more time and focus into developing these and making them as powerful and user-friendly as they are. Thanks for considering!
 
 <a href="https://ko-fi.com/hgiesel" rel="nofollow"><img src="https://i.imgur.com/V1lNWqQ.png"> ko-fi.com/hgiesel</a>
-<a href="https://patreon.com/hgiesel" rel="nofollow"><img src="https://i.imgur.com/PYuJm9x.png"> patreon.com/hgiesel</a></ul>
+<a href="https://patreon.com/hgiesel" rel="nofollow"><img src="https://i.imgur.com/PYuJm9x.png"> patreon.com/hgiesel</a>
