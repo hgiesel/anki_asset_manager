@@ -86,7 +86,9 @@ def setup_with_only_scripts(model_id: int, scripts: ScriptSetting):
 
 def find_valid_fragment(fragments: List[HTML], label: str, cond_parser) -> Optional[HTML]:
     for frag in fragments:
-        if frag.label == label and cond_parser(frag.conditions):
+        conded = cond_parser(frag.conditions)
+
+        if frag.label == label and conded[0]:
             return frag
 
     return None
@@ -146,7 +148,6 @@ def get_special_parser(scripts, model, cardtype_name, idx, position):
         return ''
 
     return inner_parser
-
 
 def evaluate_numerical(fragment: str, arguments: List[str]):
     text = fragment
@@ -221,7 +222,6 @@ def setup_full(model_id: int, html: HTMLSetting, scripts: ScriptSetting):
 
             if result:
                 write_model_template(template, fmt, result)
-
 
 def setup_model(model_id: int, html: HTMLSetting, scripts: ScriptSetting):
     if html.enabled:
