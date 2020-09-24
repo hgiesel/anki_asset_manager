@@ -103,7 +103,6 @@ squote = re.compile(r"^'(.*?)'\s*?(?:,|$)")
 dquote = re.compile(r'^"(.*?)"\s*?(?:,|$)')
 naked = re.compile(r'^([^,]+)(?:,|$)')
 
-from aqt.utils import showText
 def match_tag_argument(text):
     if m := re.match(squote, text):
         return text[m.end():len(text)], m.group(1)
@@ -170,6 +169,27 @@ def evaluate_numerical(fragment: str, arguments: List[str]):
 
     return text
 
+
+def indent(text: str, amount: int) -> str:
+    """indent according to amount, but skip first line"""
+
+    return '\n'.join([
+        amount * ' ' + line if id > 0 else line
+        for id, line
+        in enumerate(text.split('\n'))
+    ])
+
+def find_correct_indent(match) -> int:
+    before = match.string[0:match.start()]
+    before_reversed = before[::-1]
+    next_newline = before_reversed.find('\n')
+
+    return (
+        next_newline
+        if next_newline >= 0 and re.match(r'^\s+$', before_reversed[0:next_newline])
+        else 0
+    )
+
 def evaluate_fragment(
     fragments: List[HTML],
     entrance: str,
@@ -190,9 +210,14 @@ def evaluate_fragment(
             if keyword[0].islower():
                 replacement = special_parser(keyword)
 
-            else: # keyword[0].isupper()
+            elif keyword[0].isupper():
                 fragment = find_valid_fragment(fragments, keyword, cond_parser)
                 replacement = evaluate_numerical(fragment.code, arguments) if fragment else ''
+
+            else:
+                replacement = ''
+
+            replacement = indent(replacement, find_correct_indent(match))
 
             text = replacement.join([
                 text[0:match.start()],
