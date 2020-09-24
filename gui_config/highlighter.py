@@ -208,7 +208,7 @@ class HTMLHighlighter(QSyntaxHighlighter):
         # selfTagFormat.setFontWeight(QFont.Bold)
         selfTagFormat.setFontStyleHint(QFont.Monospace)
         selfTagFormat.setForeground(Qt.lightGray if is_night_mode else Qt.gray)
-        self.highlightingRules.append((QRegExp("\{\{.+\}\}"), selfTagFormat))
+        self.highlightingRules.append((QRegExp("\{\{[^<]+\}\}"), selfTagFormat))
 
         tagFormat = QTextCharFormat()
         # tagFormat.setFontWeight(QFont.Bold)
