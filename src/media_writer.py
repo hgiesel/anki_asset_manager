@@ -3,10 +3,10 @@ from os import listdir
 
 from aqt import mw
 
-from .config_types import Setting
+from .config_types import ScriptSetting
 from .stringify import stringify_setting_for_external
 
-def write_media(model_id: int, setting: Setting):
+def write_media(model_id: int, setting: ScriptSetting):
     needs_saving = False
     model = mw.col.models.get(model_id)
 

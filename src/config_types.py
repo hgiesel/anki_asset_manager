@@ -30,14 +30,7 @@ AnkiTmpl = str
 
 Falsifiable = lambda t: Union[Literal[False], t]
 
-################################ for concr scripts
-
-@dataclass(frozen=True)
-class Setting:
-    enabled: bool
-    insert_stub: bool
-    indent_size: int
-    scripts: list
+################################ for scripts
 
 dataclass(frozen=True)
 class Script:
@@ -53,8 +46,6 @@ class ConcreteScript(Script):
     position: ScriptPosition
     conditions: list
     code: str
-
-################################ for meta scripts
 
 @dataclass(frozen=True)
 class ScriptStorage:
@@ -72,6 +63,13 @@ class MetaScript(Script):
     tag: str
     id: str
     storage: ScriptStorage
+
+@dataclass(frozen=True)
+class ScriptSetting:
+    enabled: bool
+    insert_stub: bool
+    indent_size: int
+    scripts: List[Script]
 
 ################################ for interfaces
 
@@ -105,12 +103,12 @@ class Interface:
 
 ################################ default settings for safenav
 
-DEFAULT_SETTING = Setting(False, False, 4, [])
+DEFAULT_SETTING = ScriptSetting(False, False, 4, [])
 
 DEFAULT_CONCRETE_SCRIPT = ConcreteScript(
+    'Example Script',
     False,
     'js',
-    'Example Script',
     'v0.1',
     'This is an example script',
     'into_template',
@@ -123,3 +121,70 @@ DEFAULT_META_SCRIPT = MetaScript(
     'I_DONT_EXIST',
     ScriptStorage(False, False, False, False, False, False, False, False),
 )
+
+################################ for scripts
+
+
+dataclass(frozen=True)
+class HTML:
+    pass
+
+@dataclass(frozen=True)
+class ConcreteHTML(HTML):
+    name: str
+    enabled: bool
+    label: str
+    version: str
+    description: str
+    conditions: list
+    code: str
+
+@dataclass(frozen=True)
+class HTMLBool(HTML):
+    name: bool
+    enabled: bool
+    label: bool
+    version: bool
+    description: bool
+    conditions: bool
+    code: bool
+
+@dataclass(frozen=True)
+class HTMLSetting:
+    enabled: bool
+    fragments: List[HTML]
+
+DEFAULT_CONCRETE_HTML_FRONT = ConcreteHTML(
+    'FrontSide',
+    True,
+    'Front',
+    'v1',
+    'This is the entrance for the front side',
+    [],
+    '{{Front}}\n\n{{%scripts}}',
+)
+
+DEFAULT_CONCRETE_HTML_BACK = ConcreteHTML(
+    'BackSide',
+    True,
+    'Back',
+    'v1',
+    'This is the entrance for the back side',
+    [],
+    '{{FrontSide}}\n\n<hr id="answer">\n\n{{Back}}\n\n{{%scripts}}',
+)
+
+DEFAULT_CONCRETE_HTML = ConcreteHTML(
+    'New Fragment',
+    True,
+    'Fragment',
+    'v1',
+    'This is my custom fragment',
+    [],
+    '<div>\n    Hello world!\n</div>\n',
+)
+
+DEFAULT_HTML_SETTING = HTMLSetting(False, [
+    DEFAULT_CONCRETE_HTML_FRONT,
+    DEFAULT_CONCRETE_HTML_BACK,
+])

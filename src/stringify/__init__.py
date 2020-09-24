@@ -1,10 +1,10 @@
-from ..config_types import Setting, Fmt
+from ..config_types import ScriptSetting, Fmt
 from ..utils import version
 
 from .stringify import stringify_setting, stringify_script_data, prevent_reinclusion, encapsulate_scripts
 
 def stringify_setting_for_template(
-    setting: Setting,
+    setting: ScriptSetting,
     model_name: str,
     model_id: int,
     cardtype_name: str,
@@ -30,7 +30,7 @@ def stringify_setting_for_template(
     return code_string
 
 def stringify_setting_for_head(
-    setting: Setting,
+    setting: ScriptSetting,
     model_name: str,
     model_id: int,
     cardtype_name: str,
@@ -44,7 +44,7 @@ def stringify_setting_for_head(
     ))
 
 def stringify_setting_for_body(
-    setting: Setting,
+    setting: ScriptSetting,
     model_name: str,
     model_id: int,
     cardtype_name: str,
@@ -59,7 +59,7 @@ def stringify_setting_for_body(
 
 # this is never called, this is how it should look though
 def stringify_setting_for_external(
-    setting: Setting,
+    setting: ScriptSetting,
     model_name: str,
     model_id: int,
 ) -> str:

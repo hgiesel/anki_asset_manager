@@ -1,7 +1,7 @@
 from hashlib import sha1
 from typing import Optional, Union, Literal
 
-from ..config_types import Setting, ConcreteScript, ScriptInsertion, ScriptPosition, Fmt
+from ..config_types import ScriptSetting, ConcreteScript, ScriptInsertion, ScriptPosition, Fmt
 from ..utils import version
 
 from ..lib.registrar import get_interface
@@ -92,7 +92,7 @@ var ankiAms = document.querySelectorAll('#anki-am')
 }
 
 def stringify_setting(
-    setting: Setting,
+    setting: ScriptSetting,
     model_name: str,
     model_id: int,
     cardtype_name: str,

@@ -12,13 +12,13 @@ from aqt import mw
 from aqt.qt import QDialog, QWidget, QFont, Qt
 from aqt.utils import askUser, restoreGeom, saveGeom, showInfo # actually needed!
 
-from ..src.config import serialize_script, deserialize_script
-from ..src.config_types import ConcreteScript, MetaScript, ScriptStorage, ScriptBool
+from ..src.config import serialize_html, deserialize_html
+from ..src.config_types import ConcreteHTML
 
-from ..src.lib.interface import make_script_bool
+from ..src.lib.interface import make_html_bool
 from ..src.lib.registrar import get_interface
 
-from .forms.script_config_ui import Ui_ScriptConfig
+from .forms.html_config_ui import Ui_HTMLConfig
 
 from .utils import (
     script_type_to_gui_text, script_position_to_gui_text,
@@ -26,25 +26,6 @@ from .utils import (
 )
 from .highlighter import JSHighlighter
 
-
-def fix_storage(store: ScriptStorage, script: ConcreteScript, to_store: ScriptBool) -> ScriptStorage:
-    """save to store from script according to to_store"""
-
-    def filter_store(tost):
-        return [
-            storekey[0]
-            for storekey
-            in asdict(tost).items() if storekey[1]
-        ]
-
-    filtered_store = filter_store(to_store)
-    the_dict = dict([
-        (key, getattr(script, key))
-        for key
-        in filtered_store
-    ])
-
-    return replace(store, **the_dict)
 
 geom_name = 'assetManagerScriptConfig'
 
@@ -55,7 +36,7 @@ class HTMLConfig(QDialog):
         self.callback = callback
         self.modelName = model_name
 
-        self.ui = Ui_ScriptConfig()
+        self.ui = Ui_HTMLConfig()
         self.ui.setupUi(self)
 
         self.accepted.connect(self.onAccept)
@@ -88,37 +69,20 @@ class HTMLConfig(QDialog):
 
         self.highlighter = JSHighlighter(editor.document())
 
-    def setupUi(self, script):
-        if isinstance(script, ConcreteScript):
-            self.setupUiConcrete(script)
-        else:
-            self.setupUiMeta(script)
-
-    def setupUiConcrete(self, concrete_script: ConcreteScript):
+    def setupUi(self, concrete_script: ConcreteHTML):
         self.ui.nameLineEdit.setText(concrete_script.name)
 
         self.ui.enableScriptCheckBox.setChecked(concrete_script.enabled)
-        self.ui.typeComboBox.setCurrentText(script_type_to_gui_text(concrete_script.type))
 
         self.ui.versionLineEdit.setText(concrete_script.version)
         self.ui.descriptionTextEdit.setPlainText(concrete_script.description)
 
-        self.ui.positionComboBox.setCurrentText(script_position_to_gui_text(concrete_script.position))
+        self.ui.labelEdit.setText(concrete_script.label)
         self.ui.conditionsTextEdit.setPlainText(json.dumps(concrete_script.conditions))
 
         self.ui.codeTextEdit.setPlainText(concrete_script.code)
 
         self.enableChangeGui()
-
-    def setupUiMeta(self, meta_script: MetaScript):
-        self.meta = meta_script
-        self.iface = get_interface(meta_script.tag)
-
-        self.setupUiConcrete(self.iface.getter(self.meta.id, self.meta.storage))
-        self.ui.metaLabel.setText(self.iface.label(self.meta.id, self.meta.storage))
-
-        if self.iface.reset:
-            self.ui.resetButton.show()
 
     def reset(self):
         # only available for meta scripts
@@ -145,12 +109,10 @@ class HTMLConfig(QDialog):
             self.ui.nameLineEdit.repaint()
 
             self.ui.enableScriptCheckBox.repaint()
-            self.ui.typeComboBox.repaint()
 
             self.ui.versionLineEdit.repaint()
             self.ui.descriptionTextEdit.repaint()
 
-            self.ui.positionComboBox.repaint()
             self.ui.conditionsTextEdit.repaint()
 
             self.ui.codeTextEdit.repaint()
@@ -161,14 +123,13 @@ class HTMLConfig(QDialog):
         except AttributeError:
             self.enableChange(self.ui.enableScriptCheckBox.isChecked())
 
-    def enableChange(self, state=True, readonly=make_script_bool()):
+    def enableChange(self, state=True, readonly=make_html_bool()):
         self.ui.nameLineEdit.setReadOnly(not state or readonly.name)
-        self.ui.typeComboBox.setEnabled(state and not readonly.type)
 
         self.ui.versionLineEdit.setReadOnly(not state or readonly.version)
         self.ui.descriptionTextEdit.setReadOnly(not state or readonly.description)
 
-        self.ui.positionComboBox.setEnabled(state and not readonly.position)
+        self.ui.labelEdit.setReadOnly(not state or readonly.label)
         self.ui.conditionsTextEdit.setReadOnly(not state or readonly.conditions)
 
         self.ui.codeTextEdit.setReadOnly(not state or readonly.code)
@@ -203,42 +164,22 @@ class HTMLConfig(QDialog):
         else:
             showInfo('Valid Conditions.')
 
-    def exportData(self) -> Union[ConcreteScript, MetaScript]:
-        result = deserialize_script({
+    def exportData(self) -> Union[ConcreteHTML]:
+        result = deserialize_html({
             'name': self.ui.nameLineEdit.text(),
 
             'enabled': self.ui.enableScriptCheckBox.isChecked(),
-            'type': pos_to_script_type(self.ui.typeComboBox.currentIndex()),
 
             'version': self.ui.versionLineEdit.text(),
             'description': self.ui.descriptionTextEdit.toPlainText(),
 
-            'position': pos_to_script_position(self.ui.positionComboBox.currentIndex()),
+            'label': self.ui.labelEdit.text(),
             'conditions': self.getConditions(),
 
             'code': self.ui.codeTextEdit.toPlainText(),
         })
 
-        try:
-            user_result = self.iface.setter(self.meta.id, result)
-
-            if isinstance(user_result, ConcreteScript):
-                return replace(
-                    self.meta,
-                    storage = fix_storage(self.meta.storage, user_result, self.iface.store),
-                )
-
-            elif user_result:
-                return replace(
-                    self.meta,
-                    storage = fix_storage(self.meta.storage, result, self.iface.store),
-                )
-
-            else:
-                return self.meta
-
-        except AttributeError:
-            return result
+        return result
 
     def cancel(self):
         if askUser('Discard changes?'):

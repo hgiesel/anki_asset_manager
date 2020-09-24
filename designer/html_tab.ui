@@ -100,12 +100,7 @@
      </column>
      <column>
       <property name="text">
-       <string>Meta</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Position</string>
+       <string>Label</string>
       </property>
      </column>
      <column>
@@ -123,12 +118,7 @@
        <string>✓</string>
       </property>
      </item>
-     <item row="0" column="2">
-      <property name="text">
-       <string>✗</string>
-      </property>
-     </item>
-     <item row="0" column="4">
+     <item row="0" column="3">
       <property name="text">
        <string>[&quot;tag&quot;, &quot;endsWith&quot;, &quot;context&quot;]</string>
       </property>
@@ -143,12 +133,7 @@
        <string>yes</string>
       </property>
      </item>
-     <item row="1" column="2">
-      <property name="text">
-       <string>no</string>
-      </property>
-     </item>
-     <item row="1" column="4">
+     <item row="1" column="3">
       <property name="text">
        <string>[&quot;&amp;&quot;, [&quot;tag&quot;, &quot;endsWith&quot;, &quot;context&quot;], [&quot;iter&quot;, &quot;startsWith&quot;, &quot;+&quot;]]</string>
       </property>
@@ -175,13 +160,6 @@
       <widget class="QCheckBox" name="enableCheckBox">
        <property name="text">
         <string>Enabled</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="insertStubCheckBox">
-       <property name="text">
-        <string> Stub Only</string>
        </property>
       </widget>
      </item>

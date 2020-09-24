@@ -3,19 +3,24 @@ from aqt.models import Models
 from anki.hooks import wrap
 
 from ..gui_config.config import ConfigDialog
-from .config import get_setting_from_notetype, maybe_get_setting_from_card
+from .config import (
+    get_setting_from_notetype,
+    get_html_setting_from_notetype,
+)
+
 
 def on_assets(models):
     current_row = models.form.modelsList.currentRow()
     current_notetype = models.mm.get(models.models[current_row].id)
-    current_setting = get_setting_from_notetype(current_notetype)
+
 
     dialog = ConfigDialog(models.mw)
 
     dialog.setupUi(
         current_notetype['id'],
         current_notetype['name'],
-        current_setting,
+        get_html_setting_from_notetype(current_notetype),
+        get_setting_from_notetype(current_notetype),
     )
 
     dialog.exec_()

@@ -6,14 +6,25 @@ from anki.cards import Card
 from aqt import mw
 
 from .config_types import (
-    Setting, Script, ConcreteScript, MetaScript, ScriptStorage,
+    ScriptSetting, Script, ConcreteScript, MetaScript, ScriptStorage,
     DEFAULT_SETTING, DEFAULT_CONCRETE_SCRIPT, DEFAULT_META_SCRIPT,
+
+    HTMLSetting, HTML, ConcreteHTML,
+    DEFAULT_HTML_SETTING, DEFAULT_CONCRETE_HTML,
 )
 
-from .lib.interface import make_setting, make_script, make_meta_script, make_script_storage
+from .lib.interface import (
+    make_setting, make_script, make_meta_script, make_script_storage,
+    make_html_setting, make_fragment,
+)
+
 from .lib.registrar import has_interface, get_meta_scripts, has_meta_script
 
-def deserialize_setting(model_id: int, model_setting: dict) -> Setting:
+######################## scripts
+
+scriptsKeyword = 'assetManager'
+
+def deserialize_setting(model_id: int, model_setting: dict) -> ScriptSetting:
     return make_setting(
         model_setting['enabled'] if 'enabled' in model_setting else DEFAULT_SETTING.enabled,
         model_setting['insertStub'] if 'insertStub' in model_setting else DEFAULT_SETTING.insert_stub,
@@ -67,7 +78,7 @@ def deserialize_meta_script(script_data: dict) -> MetaScript:
 
     return result
 
-def serialize_setting(setting: Setting) -> dict:
+def serialize_setting(setting: ScriptSetting) -> dict:
     return {
         'enabled': setting.enabled,
         'insertStub': setting.insert_stub,
@@ -89,19 +100,66 @@ def serialize_script(script: Union[ConcreteScript, MetaScript]) -> dict:
             }
         }
 
-def get_setting_from_notetype(notetype) -> Setting:
+def get_setting_from_notetype(notetype) -> ScriptSetting:
     return deserialize_setting(
         notetype['id'],
-        (notetype['assetManager']
-         if 'assetManager' in notetype and type(notetype['assetManager']) is dict
+        (notetype[scriptsKeyword]
+         if scriptsKeyword in notetype and type(notetype[scriptsKeyword]) is dict
          else {}),
     )
 
-def maybe_get_setting_from_card(card) -> Optional[Setting]:
+def maybe_get_setting_from_card(card) -> Optional[ScriptSetting]:
     the_note = Card(mw.col, card.id).note()
     maybe_model = the_note.model()
 
     return get_setting_from_notetype(maybe_model) if maybe_model else None
 
-def write_setting(model_id, setting: Setting):
-    mw.col.models.get(model_id)['assetManager'] = serialize_setting(setting)
+######################## html
+
+htmlKeyword = 'assetManagerHtml'
+
+def deserialize_html_setting(model_id: int, model_setting: dict) -> ScriptSetting:
+    return make_html_setting(
+        model_setting['enabled'] if 'enabled' in model_setting else DEFAULT_HTML_SETTING.enabled,
+        [
+            deserialize_html(fragment)
+            for fragment
+            in (model_setting['fragments'] if 'fragments' in model_setting else DEFAULT_HTML_SETTING.fragments)
+        ],
+    )
+
+def deserialize_html(script_data: dict) -> ConcreteHTML:
+    return script_data if isinstance(script_data, HTML) else make_fragment(
+        script_data['name'] if 'name' in script_data else DEFAULT_CONCRETE_HTML.name,
+        script_data['enabled'] if 'enabled' in script_data else DEFAULT_CONCRETE_HTML.enabled,
+        script_data['label'] if 'label' in script_data else DEFAULT_CONCRETE_HTML.label,
+        script_data['version'] if 'version' in script_data else DEFAULT_CONCRETE_HTML.version,
+        script_data['description'] if 'description' in script_data else DEFAULT_CONCRETE_HTML.description,
+        script_data['conditions'] if 'conditions' in script_data else DEFAULT_CONCRETE_HTML.conditions,
+        script_data['code'] if 'code' in script_data else DEFAULT_CONCRETE_HTML.code,
+    )
+
+def serialize_html_setting(setting: HTMLSetting) -> dict:
+    return {
+        'enabled': setting.enabled,
+        'fragments': [serialize_html(script) for script in setting.fragments],
+    }
+
+def serialize_html(fragment: Union[ConcreteHTML]) -> dict:
+    return asdict(fragment)
+
+def get_html_setting_from_notetype(notetype) -> HTMLSetting:
+    return deserialize_html_setting(
+        notetype['id'],
+        (notetype[htmlKeyword]
+         if htmlKeyword in notetype and type(notetype[htmlKeyword]) is dict
+         else {}),
+    )
+
+######################## together
+
+def write_setting(model_id, html: HTMLSetting, scripts: ScriptSetting):
+    model = mw.col.models.get(model_id)
+
+    model[htmlKeyword] = serialize_html_setting(html)
+    model[scriptsKeyword] = serialize_setting(scripts)

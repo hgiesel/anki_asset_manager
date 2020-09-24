@@ -10,29 +10,25 @@ from aqt import mw
 from aqt.qt import QWidget, QLabel, Qt
 
 from ..src.config import (
-    serialize_script,
-    deserialize_concrete_script,
-    serialize_setting,
-    deserialize_setting,
+    serialize_html,
+    deserialize_html,
+    serialize_html_setting,
+    deserialize_html_setting,
 )
 
-from ..src.config_types import ConcreteScript, MetaScript
-from ..src.lib.registrar import get_interface
+from ..src.config_types import ConcreteHTML, DEFAULT_CONCRETE_HTML
 
-from .forms.script_tab_ui import Ui_ScriptTab
-from .script_config import ScriptConfig
+from .forms.html_tab_ui import Ui_HTMLTab
+from .html_config import HTMLConfig
 
-from .utils import (
-    map_truth_value_to_icon,
-    script_position_to_gui_text,
-)
+from .utils import map_truth_value_to_icon
 
 
 class HTMLTab(QWidget):
     def __init__(self, parent):
         super().__init__(parent)
 
-        self.ui = Ui_ScriptTab()
+        self.ui = Ui_HTMLTab()
         self.ui.setupUi(self)
 
         self.ui.addPushButton.clicked.connect(self.addScript)
@@ -43,37 +39,25 @@ class HTMLTab(QWidget):
         self.ui.scriptsTable.currentCellChanged.connect(self.updateButtonsForCurrentCell)
         self.ui.scriptsTable.cellDoubleClicked.connect(self.editScript)
         self.ui.scriptsTable.setColumnWidth(1, 55)
-        self.ui.scriptsTable.setColumnWidth(2, 55)
+        self.ui.scriptsTable.setColumnWidth(2, 110)
 
     def setupUi(self, modelId, setting):
         self.modelId = modelId
         self.ui.enableCheckBox.setChecked(setting.enabled),
-        self.ui.insertStubCheckBox.setChecked(setting.insert_stub),
-        self.scr = setting.scripts
+        self.frags = setting.fragments
 
         self.drawScripts()
         self.updateButtons(False)
 
     def drawScripts(self):
         self.ui.scriptsTable.clearContents()
-        self.ui.scriptsTable.setRowCount(len(self.scr))
+        self.ui.scriptsTable.setRowCount(len(self.frags))
 
         headerLabels = []
 
-        for idx, script in enumerate(self.scr):
+        for idx, script in enumerate(self.frags):
             headerLabels.append(f'Script {idx}')
-
-            if isinstance(script, ConcreteScript):
-                self.setRowModFromScript(idx, script, False)
-
-            else:
-                iface = get_interface(script.tag)
-                script_gotten = iface.getter(script.id, script.storage)
-
-                if iface.tag == '__loose':
-                    self.setRowModFromScript(idx, script_gotten, 'loose')
-                else:
-                    self.setRowModFromScript(idx, script_gotten, True)
+            self.setRowModFromScript(idx, script, False)
 
         self.ui.scriptsTable.setVerticalHeaderLabels(headerLabels)
 
@@ -82,8 +66,7 @@ class HTMLTab(QWidget):
             idx,
             script.name,
             map_truth_value_to_icon(script.enabled),
-            map_truth_value_to_icon(isMeta),
-            script_position_to_gui_text(script.position),
+            script.label,
             json.dumps(script.conditions),
         )
 
@@ -97,11 +80,11 @@ class HTMLTab(QWidget):
 
     def editScript(self, row, column):
         def saveScript(newScript):
-            self.scr[row] = newScript
+            self.frags[row] = newScript
             self.drawScripts()
 
-        a = ScriptConfig(mw, self.modelId, saveScript)
-        a.setupUi(self.scr[row])
+        a = HTMLConfig(mw, self.modelId, saveScript)
+        a.setupUi(self.frags[row])
         a.exec_()
 
     ###########
@@ -115,44 +98,13 @@ class HTMLTab(QWidget):
         self.ui.upPushButton.setEnabled(state)
 
     def addScript(self):
-        newScript = deserialize_concrete_script({
-            'name': 'New Script',
-            'type': 'js',
-            'description': '',
-            'enabled': True,
-            'conditions': [],
-            'statements': [],
-        })
-
-        self.scr.append(newScript)
+        self.frags.append(DEFAULT_CONCRETE_HTML)
         self.drawScripts()
 
     def deleteScript(self):
-        current_scr: Union[ConcreteScript, MetaScript] = self.scr[self.ui.scriptsTable.currentRow()]
+        current_scr = self.frags[self.ui.scriptsTable.currentRow()]
 
-        def show_nondeletable():
-            from aqt.utils import showInfo # not to be deleted!
-            showInfo(
-                'This script does not allow for deletion.\n'
-                'You might have to uninstall the add-on which inserted this script.'
-            )
-
-        if isinstance(current_scr, ConcreteScript):
-            del self.scr[self.ui.scriptsTable.currentRow()] # gotta delete within dict
-        else:
-            iface = get_interface(current_scr.tag)
-
-            if iface.deletable:
-                is_deletable = iface.deletable(current_scr.id, current_scr.storage)
-
-                if is_deletable:
-                    del self.scr[self.ui.scriptsTable.currentRow()] # gotta delete within dict
-
-                else:
-                    show_nondeletable()
-
-            else:
-                show_nondeletable()
+        del self.frags[self.ui.scriptsTable.currentRow()] # gotta delete within dict
 
         self.drawScripts()
         self.updateButtons(False)
@@ -160,25 +112,23 @@ class HTMLTab(QWidget):
     def moveDown(self):
         i = self.ui.scriptsTable.currentRow()
 
-        if len(self.scr) != 1 and i < len(self.scr) - 1:
-            self.scr[i], self.scr[i + 1] = self.scr[i + 1], self.scr[i]
+        if len(self.frags) != 1 and i < len(self.frags) - 1:
+            self.frags[i], self.frags[i + 1] = self.frags[i + 1], self.frags[i]
             self.drawScripts()
             self.ui.scriptsTable.setCurrentCell(i + 1, 0)
 
     def moveUp(self):
         i = self.ui.scriptsTable.currentRow()
 
-        if len(self.scr) != 1 and i > 0:
-            self.scr[i], self.scr[i - 1] = self.scr[i - 1], self.scr[i]
+        if len(self.frags) != 1 and i > 0:
+            self.frags[i], self.frags[i - 1] = self.frags[i - 1], self.frags[i]
             self.drawScripts()
             self.ui.scriptsTable.setCurrentCell(i - 1, 0)
 
     ###########
 
     def exportData(self):
-        result = deserialize_setting(self.modelId, {
-            "enabled": self.ui.enableCheckBox.isChecked(),
-            "insertStub": self.ui.insertStubCheckBox.isChecked(),
-            "scripts": self.scr,
+        return deserialize_html_setting(self.modelId, {
+            'enabled': self.ui.enableCheckBox.isChecked(),
+            'fragments': self.frags,
         })
-        return result

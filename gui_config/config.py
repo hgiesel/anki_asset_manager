@@ -33,33 +33,35 @@ class ConfigDialog(QDialog):
 
         restoreGeom(self, self.geom_name)
 
-    def setupUi(self, modelId, modelName, setting):
+    def setupUi(self, modelId, modelName, htmlSetting, scriptSetting):
         self.modelId = modelId
 
         self.setWindowTitle(f'Assets for {modelName}')
 
+        self.ui.helpButton.clicked.connect(self.showHelp)
         self.ui.wbButton.clicked.connect(self.writeBackCurrentSetting)
         self.ui.saveButton.clicked.connect(self.saveCurrentSetting)
         self.ui.cancelButton.clicked.connect(self.cancel)
 
-        self.ui.helpButton.clicked.connect(self.showHelp)
-
-        self.ui.configWidget.setupUi(self.modelId, setting)
+        self.ui.configWidgetHtml.setupUi(self.modelId, htmlSetting)
+        self.ui.configWidget.setupUi(self.modelId, scriptSetting)
 
     def writeBackCurrentSetting(self, isClicked):
-        setting_data = self.ui.configWidget.exportData()
+        html_data = self.ui.configWidgetHtml.exportData()
+        script_data = self.ui.configWidget.exportData()
 
-        write_setting(self.modelId, setting_data)
+        write_setting(self.modelId, html_data, script_data)
 
-        setup_model(self.modelId, setting_data)
-        write_media(self.modelId, setting_data)
+        setup_model(self.modelId, html_data, script_data)
+        write_media(self.modelId, script_data)
 
         self.accept()
 
     def saveCurrentSetting(self, isClicked):
-        setting_data = self.ui.configWidget.exportData()
+        html_data = self.ui.configWidgetHtml.exportData()
+        script_data = self.ui.configWidget.exportData()
 
-        write_setting(self.modelId, setting_data)
+        write_setting(self.modelId, html_data, script_data)
 
         self.accept()
 
