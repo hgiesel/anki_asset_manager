@@ -1,88 +1,14 @@
-import os
-import io
 import re
-import base64
 
-from typing import Optional, Tuple, List
-from json import dumps
-from string import Template
+from typing import List, Optional
 
-from anki import media
 from aqt import mw
 
-from .config import get_setting_from_notetype
-from .config_types import AnkiFmt, Fmt, HTML, HTMLSetting, ScriptSetting
+from ..config_types import HTML, HTMLSetting, ScriptSetting
+from ..stringify import stringify_for_template, get_condition_parser
 
-from .stringify import stringify_setting_for_template
-from .stringify.condition_parser import get_condition_parser
+from .common import write_model_template
 
-
-startpos_regex = re.compile(r'\n?\n? *?<div.*?id="anki\-am".*?>', re.MULTILINE)
-endpos_regex = re.compile(r'</div> *?$', re.MULTILINE)
-
-def get_template_slice(t) -> Optional[Tuple[int, int]]:
-    try:
-        startpos = re.search(startpos_regex, t)
-        endpos = re.search(endpos_regex, t[startpos.end():])
-
-        startpos_actual = startpos.start()
-        endpos_actual = startpos.end() + endpos.end()
-
-        return (startpos_actual, endpos_actual)
-
-    except AttributeError:
-        return None
-
-def get_new_template(slice: Optional[Tuple[int, int]], old_template: str, script_string: str) -> Optional[str]:
-    sep_scripts = '\n\n' + script_string
-
-    return (
-        sep_scripts.join([
-            old_template[:slice[0]],
-            old_template[slice[1]:],
-        ]) if slice
-        else f'{old_template}{sep_scripts}' if len(script_string) > 0
-        else None
-    )
-
-def update_model_template(template: object, fmt: AnkiFmt, script_string: str) -> bool:
-    slice = get_template_slice(template[fmt])
-    new_template = get_new_template(slice, template[fmt], script_string)
-
-    if new_template:
-        write_model_template(template, fmt, new_template)
-        return True
-
-    return False
-
-def write_model_template(template: object, fmt: AnkiFmt, value: str) -> bool:
-    template[fmt] = value
-
-def setup_with_only_scripts(model_id: int, scripts: ScriptSetting):
-    needs_saving = False
-    model = mw.col.models.get(model_id)
-
-    for template in model['tmpls']:
-        # anki uses qfmt and afmt in model objects
-        # I use question and answer
-        for fmt in ['qfmt', 'afmt']:
-            did_insert = update_model_template(
-                template,
-                fmt,
-                stringify_setting_for_template(
-                    scripts,
-                    model['name'],
-                    model_id,
-                    template['name'],
-                    'question' if fmt == 'qfmt' else 'answer',
-                ),
-            )
-
-            needs_saving = needs_saving or did_insert
-
-    # notify anki that models changed (for synchronization e.g.)
-    if needs_saving:
-        mw.col.models.save(model, True)
 
 def find_valid_fragment(fragments: List[HTML], label: str, cond_parser) -> Optional[HTML]:
     for frag in fragments:
@@ -136,7 +62,7 @@ def get_special_parser(scripts, model, cardtype_name, idx, position):
             return re.search(r'\d*$', cardtype_name)[0]
 
         elif keyword == 'scripts':
-            return stringify_setting_for_template(
+            return stringify_for_template(
                 scripts,
                 model['name'],
                 model['id'],
@@ -168,7 +94,6 @@ def evaluate_numerical(fragment: str, arguments: List[str]):
         ])
 
     return text
-
 
 def indent(text: str, amount: int) -> str:
     """indent according to amount, but skip first line"""
@@ -247,9 +172,3 @@ def setup_full(model_id: int, html: HTMLSetting, scripts: ScriptSetting):
 
             if result:
                 write_model_template(template, fmt, result)
-
-def setup_model(model_id: int, html: HTMLSetting, scripts: ScriptSetting):
-    if html.enabled:
-        setup_full(model_id, html, scripts)
-    else:
-        setup_with_only_scripts(model_id, scripts)

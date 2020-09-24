@@ -1,9 +1,13 @@
+from typing import List
+
 from ..config_types import ScriptSetting, Fmt
 from ..utils import version
 
 from .stringify import stringify_setting, stringify_script_data, prevent_reinclusion, encapsulate_scripts
+from .condition_parser import get_condition_parser
 
-def stringify_setting_for_template(
+
+def stringify_for_template(
     setting: ScriptSetting,
     model_name: str,
     model_id: int,
@@ -29,7 +33,7 @@ def stringify_setting_for_template(
 
     return code_string
 
-def stringify_setting_for_head(
+def stringify_for_head(
     setting: ScriptSetting,
     model_name: str,
     model_id: int,
@@ -43,7 +47,7 @@ def stringify_setting_for_head(
         'head',
     ))
 
-def stringify_setting_for_body(
+def stringify_for_body(
     setting: ScriptSetting,
     model_name: str,
     model_id: int,
@@ -57,10 +61,17 @@ def stringify_setting_for_body(
         'body',
     ))
 
-# this is never called, this is how it should look though
-def stringify_setting_for_external(
+def stringify_for_external(
     setting: ScriptSetting,
     model_name: str,
     model_id: int,
-) -> str:
+) -> List[str]:
     return stringify_setting(setting, model_name, model_id, None, 'external')
+
+__all__ = [
+    stringify_for_template,
+    stringify_for_head,
+    stringify_for_body,
+    stringify_for_external,
+    get_condition_parser,
+]
