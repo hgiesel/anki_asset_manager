@@ -24,7 +24,7 @@ from .utils import (
     script_type_to_gui_text, script_position_to_gui_text,
     pos_to_script_type, pos_to_script_position,
 )
-from .highlighter import JSHighlighter
+from .highlighter import HTMLHighlighter
 
 
 geom_name = 'assetManagerScriptConfig'
@@ -67,7 +67,7 @@ class HTMLConfig(QDialog):
 
         editor.setFont(font)
 
-        self.highlighter = JSHighlighter(editor.document())
+        self.highlighter = HTMLHighlighter(editor.document())
 
     def setupUi(self, concrete_script: ConcreteHTML):
         self.ui.nameLineEdit.setText(concrete_script.name)
