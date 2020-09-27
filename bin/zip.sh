@@ -18,5 +18,4 @@ zip -r "build/$addon_id.ankiaddon" \
   "gui_config/"*".py" \
   "gui_config/forms/"*".py" \
   "json_schemas/"* \
-  "config."{json,md} \
   "manifest.json"
