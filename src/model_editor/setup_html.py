@@ -172,3 +172,5 @@ def setup_full(model_id: int, html: HTMLSetting, scripts: ScriptSetting):
 
             if result:
                 write_model_template(template, fmt, result)
+
+    mw.col.models.save(model, True)
