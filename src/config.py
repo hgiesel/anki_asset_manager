@@ -158,7 +158,7 @@ def get_html_setting_from_notetype(notetype) -> HTMLSetting:
 
 ######################## together
 
-def write_setting(model_id, html: HTMLSetting, scripts: ScriptSetting):
+def write_setting(model_id: int, html: HTMLSetting, scripts: ScriptSetting):
     model = mw.col.models.get(model_id)
 
     model[htmlKeyword] = serialize_html_setting(html)
