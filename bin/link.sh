@@ -1,45 +1,38 @@
 #!/usr/bin/env bash
 declare DIR="$(cd "$(dirname "$0")/.." && pwd -P)"
 
-declare name='anki_asset_manager'
-declare addon_dev_name="AssetManagerDev"
-
+declare addon_name="AssetManagerDev"
 declare customdir=''
 
+if [[ -d "$customdir" ]]; then
+  declare target="$customdir/$addon_name"
+
+elif [[ -d "$HOME/.local/share/AnkiDev/addons21" ]]; then
+  declare target="$HOME/.local/share/AnkiDev/addons21/$addon_name"
+
+elif [[ $(uname) = 'Darwin' ]]; then
+  declare target="$HOME/Library/Application Support/Anki2/addons21/$addon_name"
+
+elif [[ $(uname) = 'Linux' ]]; then
+  declare target="$HOME/.local/share/Anki2/addons21/$addon_name"
+
+else
+  echo 'Unknown platform'
+  exit -1
+fi
+
 if [[ "$1" =~ ^-?d$ ]]; then
-  if [[ -d "$customdir" ]]; then
-    rm -f "$customdir/$addon_dev_name"
-
-  elif [[ -d "$HOME/.local/share/AnkiDev/addons21" ]]; then
-    rm -f "$HOME/.local/share/AnkiDev/addons21/$addon_dev_name"
-
-  elif [[ $(uname) = 'Darwin' ]]; then
-    rm -f "$HOME/Library/Application Support/Anki2/addons21/$addon_dev_name"
-
-  elif [[ $(uname) = 'Linux' ]]; then
-    rm -f "$HOME/.local/share/Anki2/addons21/$addon_dev_name"
-
+  if [[ ! -h "$target" ]]; then
+    echo 'Directory was not linked'
   else
-    echo 'Unknown platform'
-    exit -1
+    rm "$target"
   fi
 
 elif [[ "$1" =~ ^-?c$ ]]; then
-  if [[ -d "$customdir" ]]; then
-    ln -s "$DIR" "$customdir/$addon_dev_name"
-
-  elif [[ -d "$HOME/.local/share/AnkiDev/addons21" ]]; then
-    ln -s "$DIR" "$HOME/.local/share/AnkiDev/addons21/$addon_dev_name"
-
-  elif [[ $(uname) = 'Darwin' ]]; then
-    ln -s "$DIR" "$HOME/Library/Application\ Support/Anki2/addons21/$addon_dev_name"
-
-  elif [[ $(uname) = 'Linux' ]]; then
-    ln -s "$DIR" "$HOME/.local/share/Anki2/addons21/$addon_dev_name"
-
+  if [[ ! -h "$target" ]]; then
+    ln -s "$DIR" "$target"
   else
-    echo 'Unknown platform'
-    exit -1
+    echo 'Directory was already linked.'
   fi
 
 else
