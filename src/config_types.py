@@ -95,6 +95,7 @@ class Interface:
     label: Falsifiable(Callable[[str, ScriptStorage], LabelText])
     reset: Falsifiable(Callable[[str, ScriptStorage], ConcreteScript])
     deletable: Falsifiable(Callable[[str, ScriptStorage], bool])
+    autodelete: Falsifiable(Callable[[str, ScriptStorage], bool])
 
     # list of values that are readonly
     readonly: ScriptBool

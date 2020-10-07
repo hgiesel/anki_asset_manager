@@ -114,6 +114,7 @@ def make_interface(
     label: Optional[Falsifiable(Callable[[str, ScriptStorage], LabelText])] = None,
     reset: Optional[Falsifiable(Callable[[str, ScriptStorage], ConcreteScript])] = None,
     deletable: Optional[Falsifiable(Callable[[str, ScriptStorage], bool])] = None,
+    autodelete: Optional[Falsifiable(Callable[[str, ScriptStorage], bool])] = None,
     readonly: Optional[Union[List[ScriptKeys], ScriptStorage]] = None,
     store: Optional[Union[List[ScriptKeys], ScriptStorage]] = None,
 ) -> Interface:
@@ -125,6 +126,7 @@ def make_interface(
         label if label is not None else lambda id, _storage: f"{tag}: {id}",
         reset if reset is not None else lambda id, _storage: getter(id, make_script_storage()),
         deletable if deletable is not None else lambda _id, _storage: False,
+        autodelete if autodelete is not None else lambda _id, _storage: False,
         readonly if isinstance(readonly, ScriptStorage) else (
             __list_to_script_bool(readonly) if readonly is not None else make_script_bool()
         ),

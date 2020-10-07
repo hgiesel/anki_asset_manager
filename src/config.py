@@ -18,7 +18,7 @@ from .lib.interface import (
     make_html_setting, make_fragment,
 )
 
-from .lib.registrar import has_interface, get_meta_scripts, has_meta_script
+from .lib.registrar import get_interface, has_interface, get_meta_scripts, has_meta_script
 
 ######################## scripts
 
@@ -36,19 +36,31 @@ def deserialize_setting(model_id: int, model_setting: dict) -> ScriptSetting:
         ] if s]),
     )
 
+def should_autodelete(script: Script) -> bool:
+    if isinstance(script, ConcreteScript):
+        return False
+
+    interface = get_interface(script.tag)
+
+    if isinstance(interface.autodelete, bool):
+        return interface.autodelete
+
+    return interface.autodelete(script.id, script.storage)
+
 def add_other_metas(model_id: int, scripts: List[Script]) -> List[Script]:
     meta_scripts = get_meta_scripts(model_id)
 
     for ms in meta_scripts:
         try:
-            found = next(filter(lambda v: isinstance(v, MetaScript) and v.tag == ms.tag and v.id == ms.id, scripts))
+            found = next(filter(lambda script: isinstance(script, MetaScript) and script.tag == ms.tag and script.id == ms.id, scripts))
         except StopIteration:
+            # newly inserted meta scripts, which were not written to config before
             scripts.append(make_meta_script(
                 ms.tag,
                 ms.id,
             ))
 
-    return scripts
+    return list(filter(lambda script: not should_autodelete(script), scripts))
 
 def deserialize_script(script_data: dict) -> Union[ConcreteScript, MetaScript]:
     return script_data if isinstance(script_data, Script) else (
@@ -73,7 +85,11 @@ def deserialize_meta_script(script_data: dict) -> MetaScript:
     result = make_meta_script(
         script_data['tag'] if 'tag' in script_data else DEFAULT_META_SCRIPT.tag,
         script_data['id'] if 'id' in script_data else DEFAULT_META_SCRIPT.id,
-        make_script_storage(**script_data['storage'] if 'storage' in script_data else DEFAULT_META_SCRIPT.storage),
+        make_script_storage(
+            **script_data['storage']
+            if 'storage' in script_data
+            else DEFAULT_META_SCRIPT.storage
+        ),
     )
 
     return result

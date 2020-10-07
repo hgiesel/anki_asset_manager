@@ -25,6 +25,7 @@ def make_and_register_interface(
     label: Optional[Falsifiable(Callable[[str, ScriptStorage], LabelText])] = None,
     reset: Optional[Falsifiable(Callable[[str, ScriptStorage], ConcreteScript])] = None,
     deletable: Optional[Falsifiable(Callable[[str, ScriptStorage], bool])] = None,
+    autodelete: Optional[Falsifiable(Callable[[str, ScriptStorage], bool])] = None,
     readonly: Optional[Union[List[ScriptKeys], ScriptStorage]] = None,
     store: Optional[Union[List[ScriptKeys], ScriptStorage]] = None,
 ) -> Interface:
@@ -36,6 +37,7 @@ def make_and_register_interface(
         label,
         reset,
         deletable,
+        autodelete,
         readonly,
         store,
     ))
@@ -57,11 +59,12 @@ loose_interface = make_interface(
         storage.code if storage.code is not None else '',
     ),
     setter = lambda id, script: True,
-    store = ['name', 'type', 'version', 'description', 'enabled', 'conditions', 'position', 'code'],
-    readonly = [],
+    generator = lambda id, storage, model, tmpl, pos: '',
     reset = False,
     deletable = lambda id, storage: True,
-    generator = lambda id, storage, model, tmpl, pos: '',
+    autodelete = False,
+    readonly = [],
+    store = ['name', 'type', 'version', 'description', 'enabled', 'conditions', 'position', 'code'],
 )
 
 def get_interface(tag: str) -> Interface:
