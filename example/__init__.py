@@ -91,21 +91,31 @@ def setup_script():
         # model is the note type name, tmpl is the card type name, fmt is 'qfmt' (front) or 'afmt' (back)
         # if your return an empty str, it won't insert anything
         # generator = lambda id, storage, model, tmpl, fmt: your code that returns a str (that is then inserted into the template)
+
+        # Change auto destruction behavior
+        # Auto destruction will completely remove a script upon finding, if the condition applies
+        # This is useful, if you want to update the id of a script without the user noticing
+        # By default it is false, which means that scripts are never destroyed
+        # autodestroy = False
+        # it can also be a function, taking id and storage
+        # autodestroy = lambda id, storage: True or False
     )
 
     amr.register_interface(my_interface)
 
 def install_script():
-    # create the meta script which points to your interface
-    my_meta_script = ami.make_meta_script(
-        # this is the tag your interface above is registered on!
-        f"{script_name}_tag",
-        # your id: you can register an id only once per model per tag
-        f"{script_name}_id",
-    )
-
     # insert the script for every model
     for model_id in mw.col.models.ids():
+        # create the meta script which points to your interface
+        my_meta_script = ami.make_meta_script(
+            # this is the tag your interface above is registered on!
+            f"{script_name}_tag",
+            # your id: you can register an id only once per model per tag
+            # it is typically useful to point to the model_id from the id
+            # this way you can associate scripts with models from within the interface methods above if you need to
+            f"{model_id}",
+        )
+
         amr.register_meta_script(
             model_id,
             my_meta_script,
