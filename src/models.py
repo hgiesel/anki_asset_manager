@@ -1,5 +1,7 @@
 from aqt.qt import QDialogButtonBox, qconnect
 from aqt.models import Models
+from aqt.gui_hooks import models_did_init_buttons
+
 from anki.hooks import wrap
 
 from ..gui_config.config import ConfigDialog
@@ -13,7 +15,6 @@ def on_assets(models):
     current_row = models.form.modelsList.currentRow()
     current_notetype = models.mm.get(models.models[current_row].id)
 
-
     dialog = ConfigDialog(models.mw)
 
     dialog.setupUi(
@@ -25,12 +26,11 @@ def on_assets(models):
 
     dialog.exec_()
 
-def init_asset_button(self):
-    f = self.form
-    box = f.buttonBox
-    t = QDialogButtonBox.ActionRole
-    b = box.addButton(_("Assets..."), t)
-    qconnect(b.clicked, lambda: on_assets(self))
+def init_asset_button(buttons, models):
+    buttons.append(
+        _("Assets..."),
+        lambda: on_assets(models),
+    )
 
 def init_models_dialog():
-    Models.setupModels = wrap(Models.setupModels, init_asset_button, pos='after')
+    models_did_init_buttons.append(init_asset_button)
