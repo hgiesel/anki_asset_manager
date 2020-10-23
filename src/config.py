@@ -74,6 +74,7 @@ def deserialize_concrete_script(script_data: dict) -> ConcreteScript:
         script_data['name'] if 'name' in script_data else DEFAULT_CONCRETE_SCRIPT.name,
         script_data['enabled'] if 'enabled' in script_data else DEFAULT_CONCRETE_SCRIPT.enabled,
         script_data['type'] if 'type' in script_data else DEFAULT_CONCRETE_SCRIPT.type,
+        script_data['label'] if 'label' in script_data else DEFAULT_CONCRETE_SCRIPT.label,
         script_data['version'] if 'version' in script_data else DEFAULT_CONCRETE_SCRIPT.version,
         script_data['description'] if 'description' in script_data else DEFAULT_CONCRETE_SCRIPT.description,
         script_data['position'] if 'position' in script_data else DEFAULT_CONCRETE_SCRIPT.position,

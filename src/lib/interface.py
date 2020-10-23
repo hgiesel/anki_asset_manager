@@ -24,14 +24,15 @@ def make_setting(
     )
 
 def make_script(
-    name: str,
-    enabled: bool,
-    type: ScriptType,
-    version: str,
-    description: str,
-    position: ScriptPosition,
-    conditions: list,
-    code: str,
+    name: str = DEFAULT_CONCRETE_SCRIPT.name,
+    enabled: bool = DEFAULT_CONCRETE_SCRIPT.enabled,
+    type: ScriptType = DEFAULT_CONCRETE_SCRIPT.type,
+    label: str = DEFAULT_CONCRETE_SCRIPT.label,
+    version: str = DEFAULT_CONCRETE_SCRIPT.version,
+    description: str = DEFAULT_CONCRETE_SCRIPT.description,
+    position: ScriptPosition = DEFAULT_CONCRETE_SCRIPT.position,
+    conditions: list = DEFAULT_CONCRETE_SCRIPT.conditions,
+    code: str = DEFAULT_CONCRETE_SCRIPT.code,
 ) -> ConcreteScript:
     possible_types = ['js', 'css']
     possible_positions = ['external', 'head', 'body', 'into_template']
@@ -40,6 +41,7 @@ def make_script(
         name,
         enabled,
         type if type in possible_types else DEFAULT_CONCRETE_SCRIPT.type,
+        label,
         version,
         description,
         position if position in possible_positions else DEFAULT_CONCRETE_SCRIPT.position,
@@ -62,6 +64,7 @@ def make_script_bool(
     name: Optional[bool] = None,
     enabled: Optional[bool] = None,
     type: Optional[bool] = None,
+    label: Optional[bool] = None,
     version: Optional[bool] = None,
     description: Optional[bool] = None,
     position: Optional[bool] = None,
@@ -72,6 +75,7 @@ def make_script_bool(
         name if name is not None else False,
         enabled if enabled is not None else False,
         type if type is not None else False,
+        label if label is not None else False,
         version if version is not None else False,
         description if description is not None else False,
         position if position is not None else False,
@@ -83,6 +87,7 @@ def make_script_storage(
     name: Optional[str] = None,
     enabled: Optional[bool] = None,
     type: Optional[ScriptType] = None,
+    label: Optional[str] = None,
     version: Optional[str] = None,
     description: Optional[str] = None,
     position: Optional[list] = None,
@@ -93,6 +98,7 @@ def make_script_storage(
         name,
         enabled,
         type,
+        label,
         version,
         description,
         position,

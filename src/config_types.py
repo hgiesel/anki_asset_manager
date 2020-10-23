@@ -17,6 +17,7 @@ ScriptKeys = Literal[
     'name',
     'enabled',
     'type',
+    'label',
     'version',
     'description',
     'position',
@@ -41,6 +42,7 @@ class ConcreteScript(Script):
     name: str
     enabled: bool
     type: ScriptType
+    label: str
     version: str
     description: str
     position: ScriptPosition
@@ -52,6 +54,7 @@ class ScriptStorage:
     name: Optional[str]
     enabled: Optional[bool]
     type: Optional[ScriptType]
+    label: Optional[str]
     version: Optional[str]
     description: Optional[str]
     position: Optional[ScriptPosition]
@@ -78,6 +81,7 @@ class ScriptBool:
     name: bool
     enabled: bool
     type: bool
+    label: bool
     version: bool
     description: bool
     position: bool
@@ -110,6 +114,7 @@ DEFAULT_CONCRETE_SCRIPT = ConcreteScript(
     'Example Script',
     False,
     'js',
+    '',
     'v0.1',
     'This is an example script',
     'into_template',
