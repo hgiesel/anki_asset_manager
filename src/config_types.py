@@ -3,7 +3,7 @@ from dataclasses import dataclass, replace
 
 ################################ simple types
 
-ScriptType = Literal['js', 'css']
+ScriptType = Literal['js', 'esm', 'css']
 
 Position = Literal['external', 'head', 'body']
 ScriptPosition = Union[Position, Literal['into_template']]
