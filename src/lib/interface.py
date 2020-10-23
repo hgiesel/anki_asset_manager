@@ -2,12 +2,30 @@ from typing import Optional, Callable, Union, List, Literal
 from dataclasses import dataclass, replace
 
 from ..config_types import (
-    Interface, ScriptSetting, ConcreteScript, MetaScript,
-    ScriptBool, ScriptStorage, ScriptPosition, ScriptType, ScriptKeys,
-    AnkiModel, AnkiTmpl, ScriptInsertion, ScriptText, LabelText, Falsifiable,
+    Interface,
+    ScriptSetting,
+    Script,
+    ConcreteScript,
+    MetaScript,
+    ScriptBool,
+    ScriptStorage,
+    ScriptPosition,
+    ScriptType,
+    ScriptKeys,
+    AnkiModel,
+    AnkiTmpl,
+    ScriptInsertion,
+    ScriptText,
+    LabelText,
+    Falsifiable,
     DEFAULT_CONCRETE_SCRIPT,
 
-    HTMLSetting, ConcreteHTML, HTMLBool,
+    LabelReducer,
+    DEFAULT_REDUCER,
+
+    HTMLSetting,
+    ConcreteHTML,
+    HTMLBool,
 )
 
 def make_setting(
@@ -137,8 +155,8 @@ def __list_to_script_bool(
     )
 
 def make_interface(
-    *,
     tag: str,
+    *,
     getter: Callable[[str, ScriptStorage], ConcreteScript],
     setter: Callable[[str, ConcreteScript], Union[bool, ConcreteScript]],
     generator: Optional[Callable[[str, ScriptStorage, AnkiModel, AnkiTmpl, ScriptInsertion], Falsifiable(ScriptText)]] = None,
@@ -164,6 +182,18 @@ def make_interface(
         store if isinstance(store, ScriptStorage) else (
             __list_to_script_bool(store) if store is not None else make_script_bool()
         ),
+    )
+
+######################## reducer
+
+def make_reducer(
+    label: str,
+    *,
+    reducer: Callable[[List[str]], str],
+) -> LabelReducer:
+    return LabelReducer(
+        label,
+        reducer if reducer is not None else DEFAULT_REDUCER.reducer,
     )
 
 ######################## html

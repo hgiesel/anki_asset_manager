@@ -1,10 +1,13 @@
 from typing import List
+from dataclasses import replace
 
 from ..config_types import ScriptSetting, Fmt
 from ..utils import version
 
-from .stringify import stringify_setting, stringify_script_data, prevent_reinclusion, encapsulate_scripts
+from .stringify import stringify_setting, encapsulate_scripts
+from .prevent_reinclusion import get_prevent_reinclusion
 from .condition_parser import get_condition_parser
+from .groupify import groupify
 
 
 def stringify_for_template(
@@ -14,6 +17,8 @@ def stringify_for_template(
     cardtype_name: str,
     fmt: Fmt,
 ) -> str:
+    groups = groupify(setting.scripts)
+
     stringified_scripts = stringify_setting(
         setting,
         model_name,
@@ -23,7 +28,7 @@ def stringify_for_template(
     )
 
     if not setting.insert_stub and fmt == 'question':
-        stringified_scripts.insert(0, stringify_script_data(prevent_reinclusion, setting.indent_size, True))
+        stringified_scripts.insert(0, get_prevent_reinclusion(setting.indent_size))
 
     code_string = encapsulate_scripts(
         stringified_scripts,

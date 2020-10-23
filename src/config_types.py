@@ -128,8 +128,19 @@ DEFAULT_META_SCRIPT = MetaScript(
     ScriptStorage(False, False, False, False, False, False, False, False, False),
 )
 
-################################ for scripts
+################################ REDUCERS
 
+@dataclass(frozen=True)
+class LabelReducer:
+    label: str
+    reducer: Callable[[List[str]], str]
+
+DEFAULT_REDUCER = LabelReducer(
+    label = '__unnamed',
+    reducer = lambda lst: '\n\n'.join(str(lst)),
+)
+
+################################ HTML
 
 dataclass(frozen=True)
 class HTML:

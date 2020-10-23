@@ -1,21 +1,31 @@
 from typing import Optional, List, Tuple, Callable, Union
 
 from ..config_types import (
-    Interface, MetaScript, ConcreteScript,
-    ScriptStorage, ScriptKeys, ScriptText,
-    Falsifiable, AnkiModel, AnkiTmpl, ScriptInsertion, LabelText,
+    Interface,
+    Script,
+    MetaScript,
+    ConcreteScript,
+
+    ScriptStorage,
+    ScriptKeys,
+    ScriptText,
+    ScriptInsertion,
+
+    AnkiModel,
+    AnkiTmpl,
+    LabelText,
+    Falsifiable,
+
+    LabelReducer,
+    DEFAULT_REDUCER,
 )
 
-from .interface import make_interface, make_script_v2
+from .interface import make_interface, make_script_v2, make_reducer
+
+
+############## META INTERFACES
 
 _meta_interfaces: List[Interface] = []
-_meta_scripts: List[Tuple[str, MetaScript]] = []
-
-# needs to be cast to int
-ModelId = Union[int, str]
-
-class InterfaceIsNotRegistered(Exception):
-    pass
 
 def make_and_register_interface(
     tag: str,
@@ -95,7 +105,15 @@ def has_interface(tag: str) -> bool:
     except StopIteration:
         return False
 
-##############
+############## META SCRIPTS
+
+_meta_scripts: List[Tuple[str, MetaScript]] = []
+
+class InterfaceIsNotRegistered(Exception):
+    pass
+
+# needs to be cast to int
+ModelId = Union[int, str]
 
 def register_meta_script(model_id: ModelId, meta_script: MetaScript) -> None:
     mid = int(model_id)
@@ -170,5 +188,34 @@ def has_meta_script(model_id: ModelId, tag: str, id: str) -> bool:
         ))
         return True
 
+    except StopIteration:
+        return False
+
+############## LABEL REDUCER
+
+_label_reducers: List[LabelReducer] = []
+
+def make_and_register_reducer(
+    label: str,
+    reducer: Callable[[List[str]], str],
+) -> LabelReducer:
+    register_reducer(make_reducer(
+        label = label,
+        reducer = reducer,
+    ))
+
+def register_reducer(redux: LabelReducer) -> None:
+    _label_reducers.append(redux)
+
+def get_reducer(label: str) -> LabelReducer:
+    try:
+        return next(filter(lambda v: v.label == label, _label_reducers))
+    except StopIteration:
+        return DEFAULT_REDUCER
+
+def has_reducer(label: str) -> bool:
+    try:
+        next(filter(lambda v: v.label == label, _label_reducers))
+        return True
     except StopIteration:
         return False

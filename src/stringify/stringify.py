@@ -1,5 +1,5 @@
 from hashlib import sha1
-from typing import Optional, Union, Literal
+from typing import Optional, Union, Literal, Tuple
 
 from ..config_types import ScriptSetting, ConcreteScript, ScriptInsertion, ScriptPosition, Fmt
 from ..utils import version
@@ -79,17 +79,54 @@ def encapsulate_scripts(scripts, version, indent_size) -> str:
 def gen_data_attributes(name: str, version: str):
     return f'data-name="{name}" data-version="{version}"'
 
-prevent_reinclusion = {
-    'tag': gen_data_attributes('Prevent reinclusion', 'v0.1'),
-    'code': """
-var ankiAms = document.querySelectorAll('#anki-am')
-  if (ankiAms.length > 1) {
-    for (const am of Array.from(ankiAms).slice(0, -1)) {
-      am.outerHTML = ''
-  }
-}""".strip(),
-    'conditions': [],
-}
+
+def position_does_not_match(script, position) -> bool:
+    return script.position != position and not (
+        script.position in ['into_template', 'external'] and
+        position in ['question', 'answer']
+    )
+
+def get_script_and_code(script, model_name, cardtype_name, position) -> Tuple[ConcreteScript, str]:
+    script
+    if isinstance(script, ConcreteScript):
+        return (script, script.code)
+    else:
+
+        iface = get_interface(script.tag)
+
+        return (
+            iface.getter(
+                script.id,
+                script.storage,
+            ),
+            iface.generator(
+                script.id,
+                script.storage,
+                model_name,
+                cardtype_name,
+                position,
+            ),
+        )
+
+def package(tag: str, code: str, conditions_simplified: list, indent_size: int) -> str:
+    sd = {
+        'tag': tag,
+        'code': code,
+        'conditions': conditions_simplified,
+    }
+
+    return stringify_script_data(sd, indent_size, True)
+
+def package_for_external(tag: str, filename: str, indent_size: int) -> Tuple[str, str]:
+    sd = {
+        'tag': tag,
+        'src': filename,
+        # no code or conditions, as they are present in external file
+        'code': '',
+        'conditions': [],
+    }
+
+    return ((filename, stringify_script_data(sd, indent_size, False)))
 
 def stringify_setting(
     setting: ScriptSetting,
@@ -104,68 +141,28 @@ def stringify_setting(
     if not setting.enabled or setting.insert_stub:
         return script_data
 
-    for script in setting.scripts:
-        script_gotten = (
-            script
-            if isinstance(script, ConcreteScript)
-            else get_interface(script.tag).getter(
-                script.id,
-                script.storage,
-            )
-        )
-
-        if not script_gotten.enabled:
-            continue
-
+    for script, code in map(lambda s: get_script_and_code(s, model_name, cardtype_name, position), setting.scripts):
         if (
-            script_gotten.position != position and not (
-                script_gotten.position in ['into_template', 'external'] and
-                position in ['question', 'answer']
-            )
+            not script.enabled or
+            len(code) == 0 or
+            position_does_not_match(script, position)
         ):
             continue
 
-        needs_inject, conditions_simplified = the_parser(script_gotten.conditions)
+        needs_inject, conditions_simplified = the_parser(script.conditions)
 
         if not needs_inject:
             continue
 
         tag = gen_data_attributes(
-            script_gotten.name,
-            script_gotten.version,
-        )
-        filename = f'_am_{model_id}_{sha1(script_gotten.name.encode()).hexdigest()}.js'
-
-        code = (
-            script_gotten.code
-            if isinstance(script, ConcreteScript)
-            else get_interface(script.tag).generator(
-                script.id,
-                script.storage,
-                model_name,
-                cardtype_name,
-                position,
-            )
+            script.name,
+            script.version,
         )
 
-        sd = {
-            'tag': tag,
-            'src': filename,
-            # no code or conditions, as they are present in external file
-            'code': '',
-            'conditions': [],
-        } if script_gotten.position == 'external' and position in ['question', 'answer'] else {
-            'tag': tag,
-            'code': code,
-            'conditions': conditions_simplified,
-        }
-
-        if len(code) == 0:
-            continue
-
-        if position == 'external':
-            script_data.append((filename, stringify_script_data(sd, setting.indent_size, False)))
+        if script.position == 'external' and position in ['question', 'answer']:
+            filename = f'_am_{model_id}_{sha1(script.name.encode()).hexdigest()}.js'
+            script_data.append(package_for_external(tag, filename, setting.indent_size))
         else:
-            script_data.append(stringify_script_data(sd, setting.indent_size, True))
+            script_data.append(package(tag, code, conditions_simplified, setting.indent_size))
 
     return script_data
