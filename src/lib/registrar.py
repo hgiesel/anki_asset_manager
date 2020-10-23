@@ -6,7 +6,7 @@ from ..config_types import (
     Falsifiable, AnkiModel, AnkiTmpl, ScriptInsertion, LabelText,
 )
 
-from .interface import make_interface, make_script
+from .interface import make_interface, make_script_v2
 
 _meta_interfaces: List[Interface] = []
 _meta_scripts: List[Tuple[str, MetaScript]] = []
@@ -30,51 +30,70 @@ def make_and_register_interface(
     store: Optional[Union[List[ScriptKeys], ScriptStorage]] = None,
 ) -> Interface:
     register_interface(make_interface(
-        tag,
-        getter,
-        setter,
-        generator,
-        label,
-        reset,
-        deletable,
-        autodelete,
-        readonly,
-        store,
+        tag = tag,
+        getter = getter,
+        setter = setter,
+        generator = generator,
+        label = label,
+        reset = reset,
+        deletable = deletable,
+        autodelete = autodelete,
+        readonly = readonly,
+        store = store,
     ))
 
 def register_interface(iface: Interface) -> None:
     _meta_interfaces.append(iface)
 
-
-loose_interface = make_interface(
-    tag = '__loose',
-    getter = lambda id, storage: make_script(
-        storage.name if storage.name is not None else '',
-        storage.enabled if storage.enabled is not None else True,
-        storage.type if storage.type is not None else 'js',
-        storage.version if storage.version is not None else '',
-        storage.description if storage.description is not None else '',
-        storage.position if storage.position is not None else 'into_template',
-        storage.conditions if storage.conditions is not None else [],
-        storage.code if storage.code is not None else '',
-    ),
-    setter = lambda id, script: True,
-    generator = lambda id, storage, model, tmpl, pos: '',
-    reset = False,
-    deletable = lambda id, storage: True,
-    autodelete = False,
-    readonly = [],
-    store = ['name', 'type', 'version', 'description', 'enabled', 'conditions', 'position', 'code'],
+loose_script = make_script_v2(
+    name = '',
+    enabled = False,
+    type = 'js',
+    label = '',
+    version = '',
+    description = '',
+    position = 'into_template',
+    conditions = [],
+    code = '',
 )
+
+all_attributes = ['name', 'enabled', 'type', 'label', 'version', 'description', 'position', 'conditions', 'code']
+
+def make_loose_interface(tag: str) -> Interface:
+    return make_interface(
+        tag = tag,
+        getter = lambda id, storage: make_script_v2(
+            name = storage.name if storage.name is not None else loose_script.name,
+            enabled = storage.enabled if storage.enabled is not None else loose_script.enabled,
+            type = storage.type if storage.type is not None else loose_script.type,
+            label = storage.label if storage.label is not None else loose_script.label,
+            version = storage.version if storage.version is not None else loose_script.version,
+            description = storage.description if storage.description is not None else loose_script.description,
+            position = storage.position if storage.position is not None else loose_script.position,
+            conditions = storage.conditions if storage.conditions is not None else loose_script.conditions,
+            code = storage.code if storage.code is not None else loose_script.code,
+        ),
+        setter = lambda id, script: False,
+        generator = lambda id, storage, model, tmpl, pos: '',
+        reset = False,
+        deletable = lambda id, storage: True,
+        autodelete = False,
+        readonly = all_attributes,
+        store = all_attributes,
+    )
 
 def get_interface(tag: str) -> Interface:
     try:
         return next(filter(lambda v: v.tag == tag, _meta_interfaces))
     except StopIteration:
-        return loose_interface
+        return make_loose_interface(tag)
 
 def has_interface(tag: str) -> bool:
-    return True if get_interface(tag) else False
+    try:
+        next(filter(lambda v: v.tag == tag, _meta_interfaces))
+        return True
+    except StopIteration:
+        return False
 
 ##############
 

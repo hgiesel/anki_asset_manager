@@ -38,15 +38,16 @@ def setup_script():
         # This is is used for displaying the script in the tag window
         # the code is not necessarily the code that is actually inserted into the template: for that, see `generator`
         # however the conditions are used for calculating whether to insert
-        getter = lambda id, storage: ami.make_script(
-            script_name,
-            storage.enabled if storage.enabled is not None else True,
-            'js',
-            version,
-            description,
-            storage.position if storage.position is not None else 'into_template',
-            storage.conditions if storage.conditions is not None else [],
-            storage.code if storage.code is not None else script,
+        getter = lambda id, storage: ami.make_script_v2(
+            name = script_name,
+            enabled = storage.enabled if storage.enabled is not None else True,
+            type = 'js',
+            label = '',
+            version = version,
+            description = description,
+            position = storage.position if storage.position is not None else 'into_template',
+            conditions = storage.conditions if storage.conditions is not None else [],
+            code = storage.code if storage.code is not None else script,
         ),
 
         # What happens when the user commits new changes to the script
@@ -73,15 +74,16 @@ def setup_script():
         # Change the behavior when resetting the script
         # By default your script is reset to the getter function with an empty storage
         # this reset function does not reset the enabled status or the conditions
-        reset = lambda id, storage: ami.make_script(
-            script_name,
-            storage.enabled if storage.enabled else True,
-            'js',
-            version,
-            description,
-            'into_template',
-            storage.conditions if storage.conditions is not None else [],
-            script,
+        reset = lambda id, storage: ami.make_script_v2(
+            name = script_name,
+            enabled = storage.enabled if storage.enabled else True,
+            type = 'js',
+            label = '',
+            version = version,
+            description = description,
+            position = 'into_template',
+            conditions = storage.conditions if storage.conditions is not None else [],
+            code = script,
         ),
         # ...or...
         # reset = False (your code cannot be reset + reset button is hidden)

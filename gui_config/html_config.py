@@ -16,7 +16,6 @@ from ..src.config import serialize_html, deserialize_html
 from ..src.config_types import ConcreteHTML
 
 from ..src.lib.interface import make_html_bool
-from ..src.lib.registrar import get_interface
 
 from .forms.html_config_ui import Ui_HTMLConfig
 

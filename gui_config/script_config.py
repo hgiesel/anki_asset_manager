@@ -100,6 +100,8 @@ class ScriptConfig(QDialog):
         self.ui.enableScriptCheckBox.setChecked(concrete_script.enabled)
         self.ui.typeComboBox.setCurrentText(script_type_to_gui_text(concrete_script.type))
 
+        self.ui.labelLineEdit.setText(concrete_script.label)
+
         self.ui.versionLineEdit.setText(concrete_script.version)
         self.ui.descriptionTextEdit.setPlainText(concrete_script.description)
 
@@ -147,6 +149,8 @@ class ScriptConfig(QDialog):
             self.ui.enableScriptCheckBox.repaint()
             self.ui.typeComboBox.repaint()
 
+            self.ui.labelLineEdit.repaint()
+
             self.ui.versionLineEdit.repaint()
             self.ui.descriptionTextEdit.repaint()
 
@@ -164,6 +168,8 @@ class ScriptConfig(QDialog):
     def enableChange(self, state=True, readonly=make_script_bool()):
         self.ui.nameLineEdit.setReadOnly(not state or readonly.name)
         self.ui.typeComboBox.setEnabled(state and not readonly.type)
+
+        self.ui.labelLineEdit.setReadOnly(not state or readonly.version)
 
         self.ui.versionLineEdit.setReadOnly(not state or readonly.version)
         self.ui.descriptionTextEdit.setReadOnly(not state or readonly.description)
@@ -210,6 +216,8 @@ class ScriptConfig(QDialog):
             'enabled': self.ui.enableScriptCheckBox.isChecked(),
             'type': pos_to_script_type(self.ui.typeComboBox.currentIndex()),
 
+            'label': self.ui.labelLineEdit.text(),
+
             'version': self.ui.versionLineEdit.text(),
             'description': self.ui.descriptionTextEdit.toPlainText(),
 
@@ -219,7 +227,7 @@ class ScriptConfig(QDialog):
             'code': self.ui.codeTextEdit.toPlainText(),
         })
 
-        try:
+        try: # in case of meta script
             user_result = self.iface.setter(self.meta.id, result)
 
             if isinstance(user_result, ConcreteScript):
@@ -237,7 +245,7 @@ class ScriptConfig(QDialog):
             else:
                 return self.meta
 
-        except AttributeError:
+        except AttributeError: # in case of concrete script
             return result
 
     def cancel(self):

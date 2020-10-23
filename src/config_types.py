@@ -125,7 +125,7 @@ DEFAULT_CONCRETE_SCRIPT = ConcreteScript(
 DEFAULT_META_SCRIPT = MetaScript(
     'I_DONT_EXIST',
     'I_DONT_EXIST',
-    ScriptStorage(False, False, False, False, False, False, False, False),
+    ScriptStorage(False, False, False, False, False, False, False, False, False),
 )
 
 ################################ for scripts

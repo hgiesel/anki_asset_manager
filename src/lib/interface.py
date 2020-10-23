@@ -27,6 +27,28 @@ def make_script(
     name: str = DEFAULT_CONCRETE_SCRIPT.name,
     enabled: bool = DEFAULT_CONCRETE_SCRIPT.enabled,
     type: ScriptType = DEFAULT_CONCRETE_SCRIPT.type,
+    version: str = DEFAULT_CONCRETE_SCRIPT.version,
+    description: str = DEFAULT_CONCRETE_SCRIPT.description,
+    position: ScriptPosition = DEFAULT_CONCRETE_SCRIPT.position,
+    conditions: list = DEFAULT_CONCRETE_SCRIPT.conditions,
+    code: str = DEFAULT_CONCRETE_SCRIPT.code,
+) -> ConcreteScript:
+    return make_script_v2(
+        name = name,
+        enabled = enabled,
+        type = type,
+        version = version,
+        description = description,
+        position = position,
+        conditions = conditions,
+        code = code,
+    )
+
+def make_script_v2(
+    *,
+    name: str = DEFAULT_CONCRETE_SCRIPT.name,
+    enabled: bool = DEFAULT_CONCRETE_SCRIPT.enabled,
+    type: ScriptType = DEFAULT_CONCRETE_SCRIPT.type,
     label: str = DEFAULT_CONCRETE_SCRIPT.label,
     version: str = DEFAULT_CONCRETE_SCRIPT.version,
     description: str = DEFAULT_CONCRETE_SCRIPT.description,
@@ -34,19 +56,19 @@ def make_script(
     conditions: list = DEFAULT_CONCRETE_SCRIPT.conditions,
     code: str = DEFAULT_CONCRETE_SCRIPT.code,
 ) -> ConcreteScript:
-    possible_types = ['js', 'css']
+    possible_types = ['js', 'esm', 'css']
     possible_positions = ['external', 'head', 'body', 'into_template']
 
     return ConcreteScript(
-        name,
-        enabled,
+        name if name is not None else DEFAULT_CONCRETE_SCRIPT.name,
+        enabled if enabled is not None else DEFAULT_CONCRETE_SCRIPT.enabled,
         type if type in possible_types else DEFAULT_CONCRETE_SCRIPT.type,
-        label,
-        version,
-        description,
+        label if name is not None else DEFAULT_CONCRETE_SCRIPT.label,
+        version if version is not None else DEFAULT_CONCRETE_SCRIPT.version,
+        description if description is not None else DEFAULT_CONCRETE_SCRIPT.description,
         position if position in possible_positions else DEFAULT_CONCRETE_SCRIPT.position,
-        conditions,
-        code,
+        conditions if conditions is not None else DEFAULT_CONCRETE_SCRIPT.conditions,
+        code if code is not None else DEFAULT_CONCRETE_SCRIPT.code,
     )
 
 def make_meta_script(
@@ -106,13 +128,16 @@ def make_script_storage(
         code,
     )
 
-def __list_to_script_bool(vals: List[ScriptKeys]) -> ScriptBool:
+def __list_to_script_bool(
+    vals: List[ScriptKeys],
+) -> ScriptBool:
     return replace(
         make_script_bool(),
         **dict([(key, True) for key in vals])
     )
 
 def make_interface(
+    *,
     tag: str,
     getter: Callable[[str, ScriptStorage], ConcreteScript],
     setter: Callable[[str, ConcreteScript], Union[bool, ConcreteScript]],

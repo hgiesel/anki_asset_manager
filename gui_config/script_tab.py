@@ -1,7 +1,7 @@
 import json
 import os
 
-from typing import Union
+from typing import Union, Tuple
 
 from pathlib import Path
 from jsonschema import RefResolver, Draft7Validator
@@ -17,7 +17,7 @@ from ..src.config import (
 )
 
 from ..src.config_types import ConcreteScript, MetaScript
-from ..src.lib.registrar import get_interface
+from ..src.lib.registrar import get_interface, has_interface
 
 from .forms.script_tab_ui import Ui_ScriptTab
 from .script_config import ScriptConfig
@@ -26,6 +26,17 @@ from .utils import (
     map_truth_value_to_icon,
     script_position_to_gui_text,
 )
+
+
+def get_from_meta(meta_script: MetaScript) -> Tuple[ConcreteScript, Union[str, bool]]:
+    iface = get_interface(meta_script.tag)
+    is_loose = not has_interface(meta_script.tag)
+
+    script = iface.getter(meta_script.id, meta_script.storage)
+
+    label = 'loose' if is_loose else True
+
+    return (script, label)
 
 
 class ScriptTab(QWidget):
@@ -62,22 +73,15 @@ class ScriptTab(QWidget):
 
         for idx, script in enumerate(self.scr):
             headerLabels.append(f'Script {idx}')
-
-            if isinstance(script, ConcreteScript):
-                self.setRowModFromScript(idx, script, False)
-
-            else:
-                iface = get_interface(script.tag)
-                script_gotten = iface.getter(script.id, script.storage)
-
-                if iface.tag == '__loose':
-                    self.setRowModFromScript(idx, script_gotten, 'loose')
-                else:
-                    self.setRowModFromScript(idx, script_gotten, True)
+            self.setRowModFromScript(idx, *(
+                (script, False)
+                if isinstance(script, ConcreteScript)
+                else get_from_meta(script)
+            ))
 
         self.ui.scriptsTable.setVerticalHeaderLabels(headerLabels)
 
-    def setRowModFromScript(self, idx, script, isMeta: bool):
+    def setRowModFromScript(self, idx, script, isMeta: Union[bool, str]):
         self.setRowMod(
             idx,
             script.name,

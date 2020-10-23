@@ -14,11 +14,11 @@ from .config_types import (
 )
 
 from .lib.interface import (
-    make_setting, make_script, make_meta_script, make_script_storage,
+    make_setting, make_script_v2, make_meta_script, make_script_storage,
     make_html_setting, make_fragment,
 )
 
-from .lib.registrar import get_interface, has_interface, get_meta_scripts, has_meta_script
+from .lib.registrar import get_interface, get_meta_scripts
 
 ######################## scripts
 
@@ -70,16 +70,16 @@ def deserialize_script(script_data: dict) -> Union[ConcreteScript, MetaScript]:
     )
 
 def deserialize_concrete_script(script_data: dict) -> ConcreteScript:
-    return make_script(
-        script_data['name'] if 'name' in script_data else DEFAULT_CONCRETE_SCRIPT.name,
-        script_data['enabled'] if 'enabled' in script_data else DEFAULT_CONCRETE_SCRIPT.enabled,
-        script_data['type'] if 'type' in script_data else DEFAULT_CONCRETE_SCRIPT.type,
-        script_data['label'] if 'label' in script_data else DEFAULT_CONCRETE_SCRIPT.label,
-        script_data['version'] if 'version' in script_data else DEFAULT_CONCRETE_SCRIPT.version,
-        script_data['description'] if 'description' in script_data else DEFAULT_CONCRETE_SCRIPT.description,
-        script_data['position'] if 'position' in script_data else DEFAULT_CONCRETE_SCRIPT.position,
-        script_data['conditions'] if 'conditions' in script_data else DEFAULT_CONCRETE_SCRIPT.conditions,
-        script_data['code'] if 'code' in script_data else DEFAULT_CONCRETE_SCRIPT.code,
+    return make_script_v2(
+        name = script_data['name'] if 'name' in script_data else DEFAULT_CONCRETE_SCRIPT.name,
+        enabled = script_data['enabled'] if 'enabled' in script_data else DEFAULT_CONCRETE_SCRIPT.enabled,
+        type = script_data['type'] if 'type' in script_data else DEFAULT_CONCRETE_SCRIPT.type,
+        label = script_data['label'] if 'label' in script_data else DEFAULT_CONCRETE_SCRIPT.label,
+        version = script_data['version'] if 'version' in script_data else DEFAULT_CONCRETE_SCRIPT.version,
+        description = script_data['description'] if 'description' in script_data else DEFAULT_CONCRETE_SCRIPT.description,
+        position = script_data['position'] if 'position' in script_data else DEFAULT_CONCRETE_SCRIPT.position,
+        conditions = script_data['conditions'] if 'conditions' in script_data else DEFAULT_CONCRETE_SCRIPT.conditions,
+        code = script_data['code'] if 'code' in script_data else DEFAULT_CONCRETE_SCRIPT.code,
     )
 
 def deserialize_meta_script(script_data: dict) -> MetaScript:
