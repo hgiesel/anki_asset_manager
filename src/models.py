@@ -2,6 +2,7 @@ from aqt.models import Models
 from aqt.gui_hooks import models_did_init_buttons
 
 from ..gui_config.config import ConfigDialog
+
 from .config import (
     get_setting_from_notetype,
     get_html_setting_from_notetype,

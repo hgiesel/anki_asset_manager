@@ -1,5 +1,5 @@
 from aqt import mw
-from aqt.utils import showInfo # not for debugging
+from aqt.utils import showInfo
 
 def show_info():
     showInfo('To configure the functionality of this add-on, go to "Tools > Manage Note Types", select your note type, and click "Assets...".')

@@ -1,21 +1,34 @@
-from os import path
 from dataclasses import asdict
 from typing import Union, Optional, List
 
-from anki.cards import Card
 from aqt import mw
 
-from .config_types import (
-    ScriptSetting, Script, ConcreteScript, MetaScript, ScriptStorage,
-    DEFAULT_SETTING, DEFAULT_CONCRETE_SCRIPT, DEFAULT_META_SCRIPT,
+from anki.cards import Card
 
-    HTMLSetting, HTML, ConcreteHTML,
-    DEFAULT_HTML_SETTING, DEFAULT_CONCRETE_HTML,
+from .config_types import (
+    ScriptSetting,
+    Script,
+    ConcreteScript,
+    MetaScript,
+    ScriptStorage,
+    DEFAULT_SETTING,
+    DEFAULT_CONCRETE_SCRIPT,
+    DEFAULT_META_SCRIPT,
+
+    HTMLSetting,
+    HTML,
+    ConcreteHTML,
+    DEFAULT_HTML_SETTING,
+    DEFAULT_CONCRETE_HTML,
 )
 
 from .lib.interface import (
-    make_setting, make_script_v2, make_meta_script, make_script_storage,
-    make_html_setting, make_fragment,
+    make_setting,
+    make_script_v2,
+    make_meta_script,
+    make_script_storage,
+    make_html_setting,
+    make_fragment,
 )
 
 from .lib.registrar import get_interface, get_meta_scripts

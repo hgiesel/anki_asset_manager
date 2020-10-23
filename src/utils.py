@@ -8,8 +8,3 @@ def find_addon_by_name(addon_name):
             return name
 
     return None
-
-def show(x):
-    from aqt.utils import showInfo
-    import html
-    showInfo(repr(html.escape(x)))
