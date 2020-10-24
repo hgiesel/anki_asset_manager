@@ -14,6 +14,65 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0" colspan="6">
+    <layout class="QHBoxLayout" name="topBar">
+     <item>
+      <widget class="QPushButton" name="addPushButton">
+       <property name="text">
+        <string>⊕ Add</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="deletePushButton">
+       <property name="text">
+        <string>⌫ Delete</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="enableCheckBox">
+       <property name="text">
+        <string>Enabled</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="insertStubCheckBox">
+       <property name="text">
+        <string> Stub Only</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="downPushButton">
+       <property name="text">
+        <string>▼ Down</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="upPushButton">
+       <property name="text">
+        <string>▲ Up</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
    <item row="8" column="0" colspan="6">
     <widget class="QTableWidget" name="scriptsTable">
      <property name="font">
@@ -110,6 +169,11 @@
      </column>
      <column>
       <property name="text">
+       <string>Label</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
        <string>Conditions</string>
       </property>
      </column>
@@ -128,7 +192,7 @@
        <string>✗</string>
       </property>
      </item>
-     <item row="0" column="4">
+     <item row="0" column="5">
       <property name="text">
        <string>[&quot;tag&quot;, &quot;endsWith&quot;, &quot;context&quot;]</string>
       </property>
@@ -148,71 +212,12 @@
        <string>no</string>
       </property>
      </item>
-     <item row="1" column="4">
+     <item row="1" column="5">
       <property name="text">
        <string>[&quot;&amp;&quot;, [&quot;tag&quot;, &quot;endsWith&quot;, &quot;context&quot;], [&quot;iter&quot;, &quot;startsWith&quot;, &quot;+&quot;]]</string>
       </property>
      </item>
     </widget>
-   </item>
-   <item row="0" column="0" colspan="6">
-    <layout class="QHBoxLayout" name="topBar">
-     <item>
-      <widget class="QPushButton" name="addPushButton">
-       <property name="text">
-        <string>⊕ Add</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="deletePushButton">
-       <property name="text">
-        <string>⌫ Delete</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="enableCheckBox">
-       <property name="text">
-        <string>Enabled</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="insertStubCheckBox">
-       <property name="text">
-        <string> Stub Only</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="downPushButton">
-       <property name="text">
-        <string>▼ Down</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="upPushButton">
-       <property name="text">
-        <string>▲ Up</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
    </item>
   </layout>
  </widget>

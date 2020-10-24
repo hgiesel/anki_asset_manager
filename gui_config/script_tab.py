@@ -88,6 +88,7 @@ class ScriptTab(QWidget):
             map_truth_value_to_icon(script.enabled),
             map_truth_value_to_icon(isMeta),
             script_position_to_gui_text(script.position),
+            script.label,
             json.dumps(script.conditions),
         )
 
