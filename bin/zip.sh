@@ -12,6 +12,8 @@ zip -r "build/$addon_id.ankiaddon" \
   "__init__.py" \
   "src/"*".py" \
   "src/lib/"*".py" \
+  "src/lib/interface/"*".py" \
+  "src/lib/registrar/"*".py" \
   "src/stringify/"*".py" \
   "src/webview/"*".py" \
   "src/model_editor/"*".py" \
