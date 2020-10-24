@@ -137,7 +137,7 @@ class LabelReducer:
 
 DEFAULT_REDUCER = LabelReducer(
     label = '__unnamed',
-    reducer = lambda lst: '\n\n'.join(str(lst)),
+    reducer = lambda lst: '\n\n'.join(lst),
 )
 
 ################################ HTML

@@ -3,11 +3,12 @@ from dataclasses import replace
 
 from ..config_types import ScriptSetting, Fmt
 from ..utils import version
+from ..lib.registrar import get_reducer
 
 from .stringify import stringify_setting, encapsulate_scripts
 from .prevent_reinclusion import get_prevent_reinclusion
 from .condition_parser import get_condition_parser
-from .groupify import groupify
+from .groupify import groupify_external
 
 
 def stringify_for_template(
@@ -17,8 +18,6 @@ def stringify_for_template(
     cardtype_name: str,
     fmt: Fmt,
 ) -> str:
-    groups = groupify(setting.scripts)
-
     stringified_scripts = stringify_setting(
         setting,
         model_name,
@@ -71,7 +70,29 @@ def stringify_for_external(
     model_name: str,
     model_id: int,
 ) -> List[str]:
-    return stringify_setting(setting, model_name, model_id, None, 'external')
+    stringified_scripts = []
+    groups = groupify_external(setting.scripts)
+
+    for key, group in groups:
+        inner_setting = replace(setting, scripts=list(group))
+        inner = stringify_setting(
+            inner_setting,
+            model_name,
+            model_id,
+            None,
+            'external',
+        )
+
+        if len(inner) == 0:
+            continue
+
+        if len(key) == 0:
+            stringified_scripts.extend(inner)
+        else:
+            reducer = get_reducer(key)
+            stringified_scripts.append(reducer.reducer(inner))
+
+    return stringified_scripts
 
 __all__ = [
     stringify_for_template,

@@ -2,11 +2,13 @@ from hashlib import sha1
 from typing import Optional, Union, Literal, Tuple
 
 from ..config_types import ScriptSetting, ConcreteScript, ScriptInsertion, ScriptPosition, Fmt
+from ..lib.registrar import get_reducer
 from ..utils import version
 
 from ..lib.registrar import get_interface
 
 from .condition_parser import get_condition_parser, stringify_conds
+from .groupify import groupify_script_data
 
 def wrap_code(code, conditions: Union[bool, list]):
     if ((type(conditions) is bool) and conditions) or len(conditions) == 0:
@@ -28,9 +30,10 @@ def indent_lines(text: str, indent_size: int) -> str:
 
 def stringify_script_data(sd, indent_size: int, in_html: bool) -> str:
     srcTag = f" src=\"{sd['src']}\"" if 'src' in sd else ''
+    module = ' type="module"' if sd['type'] == 'esm' else ''
 
     opening, closing = (
-        f'<script {sd["tag"]}{srcTag}>',
+        f'<script {sd["tag"]}{module}{srcTag}>',
         '</script>',
     ) if in_html else (
         f'// {sd["tag"]}',
@@ -108,25 +111,43 @@ def get_script_and_code(script, model_name, cardtype_name, position) -> Tuple[Co
             ),
         )
 
-def package(tag: str, code: str, conditions_simplified: list, indent_size: int) -> str:
-    sd = {
+def package(tag: str, subtype: str, label: str, code: str, conditions_simplified: list) -> object:
+    return {
         'tag': tag,
+        'type': subtype,
+        'label': label,
         'code': code,
         'conditions': conditions_simplified,
     }
 
-    return stringify_script_data(sd, indent_size, True)
-
-def package_for_external(tag: str, filename: str, indent_size: int) -> Tuple[str, str]:
-    sd = {
+def package_for_external(tag: str, subtype: str, filename: str) -> object:
+    return {
         'tag': tag,
+        'type': subtype,
         'src': filename,
         # no code or conditions, as they are present in external file
         'code': '',
         'conditions': [],
     }
 
-    return ((filename, stringify_script_data(sd, indent_size, False)))
+def stringify_sd(sd, indent_size):
+    if 'label' in sd:
+        return stringify_script_data(sd, indent_size, True)
+    else:
+        return ((sd['filename'], stringify_script_data(sd, indent_size, False)))
+
+def merge_sd(key: str, sds: list):
+    base = sds[0] # Top script in list
+    reducer = get_reducer(key)
+    compiled = reducer.reducer([sd['code'] for sd in sds])
+
+    return package(
+        base['tag'],
+        base['type'],
+        key,
+        compiled,
+        base['conditions'],
+    )
 
 def stringify_setting(
     setting: ScriptSetting,
@@ -141,7 +162,12 @@ def stringify_setting(
     if not setting.enabled or setting.insert_stub:
         return script_data
 
-    for script, code in map(lambda s: get_script_and_code(s, model_name, cardtype_name, position), setting.scripts):
+    for script, code in map(lambda s: get_script_and_code(
+        s,
+        model_name,
+        cardtype_name,
+        position,
+    ), setting.scripts):
         if (
             not script.enabled or
             len(code) == 0 or
@@ -161,8 +187,17 @@ def stringify_setting(
 
         if script.position == 'external' and position in ['question', 'answer']:
             filename = f'_am_{model_id}_{sha1(script.name.encode()).hexdigest()}.js'
-            script_data.append(package_for_external(tag, filename, setting.indent_size))
+            script_data.append(package_for_external(tag, script.type, filename))
         else:
-            script_data.append(package(tag, code, conditions_simplified, setting.indent_size))
+            script_data.append(package(tag, script.type, script.label, code, conditions_simplified))
 
-    return script_data
+    stringified = []
+    groups = groupify_script_data(script_data)
+
+    for key, group in groups:
+        if len(key) == 0:
+            stringified.extend([stringify_sd(sd, setting.indent_size) for sd in group])
+        else:
+            stringified.append(stringify_sd(merge_sd(key, list(group)), setting.indent_size))
+
+    return stringified
