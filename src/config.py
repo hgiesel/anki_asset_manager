@@ -31,11 +31,17 @@ from .lib.interface import (
     make_fragment,
 )
 
-from .lib.registrar import get_interface, get_meta_scripts
+from .lib.registrar import (
+    get_interface,
+    get_meta_scripts,
+)
 
-######################## scripts
+from .utils import (
+    scripts_config,
+    html_config,
+)
 
-scriptsKeyword = 'assetManager'
+######################## SCRIPTS
 
 def deserialize_setting(model_id: int, model_setting: dict) -> ScriptSetting:
     return make_setting(
@@ -131,11 +137,11 @@ def serialize_script(script: Union[ConcreteScript, MetaScript]) -> dict:
         }
 
 def get_setting_from_notetype(notetype) -> ScriptSetting:
+    scripts_config.model_id = notetype['id']
+
     return deserialize_setting(
-        notetype['id'],
-        (notetype[scriptsKeyword]
-         if scriptsKeyword in notetype and type(notetype[scriptsKeyword]) is dict
-         else {}),
+        scripts_config.model_id,
+        scripts_config.value,
     )
 
 def maybe_get_setting_from_card(card) -> Optional[ScriptSetting]:
@@ -144,11 +150,9 @@ def maybe_get_setting_from_card(card) -> Optional[ScriptSetting]:
 
     return get_setting_from_notetype(maybe_model) if maybe_model else None
 
-######################## html
+######################## HTML
 
-htmlKeyword = 'assetManagerHtml'
-
-def deserialize_html_setting(model_id: int, model_setting: dict) -> ScriptSetting:
+def deserialize_html_setting(_model_id: int, model_setting: dict) -> ScriptSetting:
     return make_html_setting(
         model_setting['enabled'] if 'enabled' in model_setting else DEFAULT_HTML_SETTING.enabled,
         [
@@ -179,17 +183,18 @@ def serialize_html(fragment: Union[ConcreteHTML]) -> dict:
     return asdict(fragment)
 
 def get_html_setting_from_notetype(notetype) -> HTMLSetting:
+    html_config.model_id = notetype['id']
+
     return deserialize_html_setting(
-        notetype['id'],
-        (notetype[htmlKeyword]
-         if htmlKeyword in notetype and type(notetype[htmlKeyword]) is dict
-         else {}),
+        html_config.model_id,
+        html_config.value,
     )
 
 ######################## together
 
 def write_setting(model_id: int, html: HTMLSetting, scripts: ScriptSetting):
-    model = mw.col.models.get(model_id)
+    scripts_config.model_id = model_id
+    scripts_config.value = serialize_setting(scripts)
 
-    model[htmlKeyword] = serialize_html_setting(html)
-    model[scriptsKeyword] = serialize_setting(scripts)
+    html_config.model_id = model_id
+    html_config.value = serialize_html_setting(html)
