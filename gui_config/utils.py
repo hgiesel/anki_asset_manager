@@ -12,6 +12,8 @@ def map_truth_value_to_icon(b: Union[bool, str]) -> str:
 def script_type_to_gui_text(txt: str) -> str:
     if txt == 'js':
         return 'JavaScript'
+    elif txt == 'esm':
+        return 'ES Module'
     elif txt == 'css':
         return 'CSS'
 
@@ -19,6 +21,8 @@ def pos_to_script_type(pos: int) -> str:
     if pos == 0:
         return 'js'
     elif pos == 1:
+        return 'esm'
+    elif pos == 2:
         return 'css'
 
 def script_position_to_gui_text(txt: str) -> str:

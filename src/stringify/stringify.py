@@ -28,7 +28,8 @@ def indent_lines(text: str, indent_size: int) -> str:
         in text.split('\n')
     ])
 
-def stringify_script_data(sd, indent_size: int, in_html: bool) -> str:
+def stringify_script_data(sd, indent_size: int) -> str:
+    in_html = 'label' in sd
     srcTag = f" src=\"{sd['src']}\"" if 'src' in sd else ''
     module = ' type="module"' if sd['type'] == 'esm' else ''
 
@@ -82,7 +83,6 @@ def encapsulate_scripts(scripts, version, indent_size) -> str:
 def gen_data_attributes(name: str, version: str):
     return f'data-name="{name}" data-version="{version}"'
 
-
 def position_does_not_match(script, position) -> bool:
     return script.position != position and not (
         script.position in ['into_template', 'external'] and
@@ -131,10 +131,11 @@ def package_for_external(tag: str, subtype: str, filename: str) -> object:
     }
 
 def stringify_sd(sd, indent_size):
-    if 'label' in sd:
-        return stringify_script_data(sd, indent_size, True)
-    else:
-        return ((sd['filename'], stringify_script_data(sd, indent_size, False)))
+    return (
+        (sd['filename'], stringify_script_data(sd, indent_size))
+        if 'filename' in sd
+        else stringify_script_data(sd, indent_size)
+    )
 
 def merge_sd(key: str, sds: list):
     base = sds[0] # Top script in list

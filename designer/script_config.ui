@@ -141,6 +141,11 @@
         </item>
         <item>
          <property name="text">
+          <string>ES Module</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
           <string>CSS</string>
          </property>
         </item>
