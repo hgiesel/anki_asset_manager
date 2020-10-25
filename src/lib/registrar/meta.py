@@ -4,7 +4,7 @@ from ...config_types import (
     MetaScript,
 )
 
-from .interface import has_interface
+from .iface import has_interface
 
 
 _meta_scripts: List[Tuple[str, MetaScript]] = []

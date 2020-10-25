@@ -1,4 +1,4 @@
-from .interface import (
+from .iface import (
     register_interface,
     make_and_register_interface,
     get_interface,
