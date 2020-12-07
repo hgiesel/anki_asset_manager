@@ -17,10 +17,6 @@ from aqt.utils import (
     saveGeom,
 )
 
-from ..src.config import deserialize_setting, serialize_setting, write_setting
-from ..src.model_editor import setup_model
-from ..src.media_writer import write_media
-
 from .forms.config_ui import Ui_Config
 
 
@@ -31,8 +27,11 @@ def sort_negative_first(v):
 class ConfigDialog(QDialog):
     geom_name = "assetManagerConfigDialog"
 
-    def __init__(self, parent):
+    def __init__(self, parent, save_callback, write_back_callback):
         super().__init__(parent=parent)
+
+        self.save_callback = save_callback
+        self.write_back_callback = write_back_callback
 
         self.ui = Ui_Config()
         self.ui.setupUi(self)
@@ -56,22 +55,11 @@ class ConfigDialog(QDialog):
         self.ui.configWidget.setupUi(self.modelId, scriptSetting)
 
     def writeBackCurrentSetting(self, isClicked):
-        html_data = self.ui.configWidgetHtml.exportData()
-        script_data = self.ui.configWidget.exportData()
-
-        write_setting(self.modelId, html_data, script_data)
-
-        setup_model(self.modelId, html_data, script_data)
-        write_media(self.modelId, script_data)
-
+        self.write_back_callback(*self.export_data())
         self.accept()
 
     def saveCurrentSetting(self, isClicked):
-        html_data = self.ui.configWidgetHtml.exportData()
-        script_data = self.ui.configWidget.exportData()
-
-        write_setting(self.modelId, html_data, script_data)
-
+        self.save_callback(*self.export_data())
         self.accept()
 
     def showHelp(self):
@@ -80,6 +68,12 @@ class ConfigDialog(QDialog):
     def cancel(self, isClicked):
         if askUser("Discard changes?"):
             self.reject()
+
+    def export_data(self):
+        html_data = self.ui.configWidgetHtml.exportData()
+        script_data = self.ui.configWidget.exportData()
+
+        return self.modelId, html_data, script_data
 
     def save_geom(self):
         saveGeom(self, self.geom_name)

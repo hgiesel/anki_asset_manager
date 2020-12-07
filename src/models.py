@@ -5,13 +5,28 @@ from aqt.gui_hooks import models_did_init_buttons
 from ..gui_config.config import ConfigDialog
 
 from .config import (
+    write_setting,
     get_setting_from_notetype,
     get_html_setting_from_notetype,
 )
 
+from .model_editor import setup_model
+from .media_writer import write_media
+
+
+def write_back(model_id: int, html_data, script_data) -> None:
+    write_setting(model_id, html_data, script_data)
+
+    setup_model(model_id, html_data, script_data)
+    write_media(model_id, script_data)
+
+
+def save(model_id: int, html_data, script_data):
+    write_setting(model_id, html_data, script_data)
+
 
 def open_asset_manager_menu(parent_window: QDialog, note_type):
-    dialog = ConfigDialog(parent_window)
+    dialog = ConfigDialog(parent_window, save, write_back)
 
     dialog.setupUi(
         note_type["id"],
