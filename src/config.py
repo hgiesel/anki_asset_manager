@@ -277,9 +277,16 @@ def get_html_setting_from_notetype(notetype) -> HTMLSetting:
 ######################## together
 
 
-def write_setting(model_id: int, html: HTMLSetting, scripts: ScriptSetting):
+def write_html(model_id: int, html: HTMLSetting):
+    html_config.model_id = model_id
+    html_config.value = serialize_html_setting(html)
+
+
+def write_scripts(model_id: int, scripts: ScriptSetting):
     scripts_config.model_id = model_id
     scripts_config.value = serialize_setting(scripts)
 
-    html_config.model_id = model_id
-    html_config.value = serialize_html_setting(html)
+
+def write_setting(model_id: int, html: HTMLSetting, scripts: ScriptSetting):
+    write_html(model_id, html)
+    write_scripts(model_id, scripts)
