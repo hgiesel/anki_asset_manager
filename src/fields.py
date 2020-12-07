@@ -14,7 +14,7 @@ from .config import (
 
 
 def make_pattern(tag_name: str) -> str:
-    return r'\{\{([#/^]?)' + re.escape(tag_name) + r'\}\}'
+    return r"\{\{([#/^]?)" + re.escape(tag_name) + r"\}\}"
 
 
 def replace_reference(text: str, old: str, new: str) -> str:
@@ -34,9 +34,10 @@ def rename_in_assets(fields, field, old_name: str):
     new_html = replace(
         html,
         fragments=[
-            replace(fragment, code=replace_reference(fragment.code, old_name, field["name"]))
-            for fragment
-            in html.fragments
+            replace(
+                fragment, code=replace_reference(fragment.code, old_name, field["name"])
+            )
+            for fragment in html.fragments
         ],
     )
 
@@ -53,8 +54,7 @@ def delete_in_assets(fields, field):
         html,
         fragments=[
             replace(fragment, code=delete_reference(fragment.code, field["name"]))
-            for fragment
-            in html.fragments
+            for fragment in html.fragments
         ],
     )
 

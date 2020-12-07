@@ -3,7 +3,7 @@ from typing import Any
 from aqt import mw
 
 
-version = "2.0"
+version = "2.1"
 
 
 def find_addon_by_name(addon_name):
@@ -12,6 +12,33 @@ def find_addon_by_name(addon_name):
             return name
 
     return None
+
+
+class ProfileConfig:
+    """Can be used for profile-specific settings"""
+
+    def __init__(self, keyword: str, default: Any):
+        self.keyword = keyword
+        self.default = default
+
+    @property
+    def value(self) -> Any:
+        return mw.pm.profile.get(self.keyword, self.default)
+
+    @value.setter
+    def value(self, new_value: Any):
+        mw.pm.profile[self.keyword] = new_value
+
+    def remove(self):
+        try:
+            del mw.pm.profile[self.keyword]
+        except KeyError:
+            # same behavior as Collection.remove_config
+            pass
+
+
+add_assets = ProfileConfig("assetManagerAddAssets", False)
+remove_cards = ProfileConfig("assetManagerRemoveCards", False)
 
 
 class ModelConfig:

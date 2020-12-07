@@ -278,7 +278,9 @@ def get_html_setting_from_notetype(notetype: NoteType) -> HTMLSetting:
 ######################## together
 
 
-def write_html(html: HTMLSetting, /, model_id: int = None , custom_model: NoteType = None):
+def write_html(
+    html: HTMLSetting, /, model_id: int = None, custom_model: NoteType = None
+):
     if custom_model:
         html_config.model = custom_model
     elif model_id:
@@ -287,7 +289,9 @@ def write_html(html: HTMLSetting, /, model_id: int = None , custom_model: NoteTy
     html_config.value = serialize_html_setting(html)
 
 
-def write_scripts(scripts: ScriptSetting, /, model_id: int = None, custom_model: NoteType = None):
+def write_scripts(
+    scripts: ScriptSetting, /, model_id: int = None, custom_model: NoteType = None
+):
     if custom_model:
         scripts_config.model = custom_model
     elif model_id:
@@ -296,6 +300,12 @@ def write_scripts(scripts: ScriptSetting, /, model_id: int = None, custom_model:
     scripts_config.value = serialize_setting(scripts)
 
 
-def write_setting(html: HTMLSetting, scripts: ScriptSetting, /, model_id: int = None, custom_model: NoteType = None):
+def write_setting(
+    html: HTMLSetting,
+    scripts: ScriptSetting,
+    /,
+    model_id: int = None,
+    custom_model: NoteType = None,
+):
     write_html(html, model_id=model_id, custom_model=custom_model)
     write_scripts(scripts, model_id=model_id, custom_model=custom_model)
