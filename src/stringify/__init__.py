@@ -26,16 +26,21 @@ def stringify_for_template(
         fmt,
     )
 
-    if not setting.insert_stub and fmt == 'question':
+    if not setting.insert_stub and fmt == "question":
         stringified_scripts.insert(0, get_prevent_reinclusion(setting.indent_size))
 
-    code_string = encapsulate_scripts(
-        stringified_scripts,
-        version,
-        setting.indent_size,
-    ) if setting.enabled else ''
+    code_string = (
+        encapsulate_scripts(
+            stringified_scripts,
+            version,
+            setting.indent_size,
+        )
+        if setting.enabled
+        else ""
+    )
 
     return code_string
+
 
 def stringify_for_head(
     setting: ScriptSetting,
@@ -43,13 +48,16 @@ def stringify_for_head(
     model_id: int,
     cardtype_name: str,
 ) -> str:
-    return '\n'.join(stringify_setting(
-        setting,
-        model_name,
-        model_id,
-        cardtype_name,
-        'head',
-    ))
+    return "\n".join(
+        stringify_setting(
+            setting,
+            model_name,
+            model_id,
+            cardtype_name,
+            "head",
+        )
+    )
+
 
 def stringify_for_body(
     setting: ScriptSetting,
@@ -57,13 +65,16 @@ def stringify_for_body(
     model_id: int,
     cardtype_name: str,
 ) -> str:
-    return '\n'.join(stringify_setting(
-        setting,
-        model_name,
-        model_id,
-        cardtype_name,
-        'body',
-    ))
+    return "\n".join(
+        stringify_setting(
+            setting,
+            model_name,
+            model_id,
+            cardtype_name,
+            "body",
+        )
+    )
+
 
 def stringify_for_external(
     setting: ScriptSetting,
@@ -80,7 +91,7 @@ def stringify_for_external(
             model_name,
             model_id,
             None,
-            'external',
+            "external",
         )
 
         if len(inner) == 0:
@@ -93,6 +104,7 @@ def stringify_for_external(
             stringified_scripts.append(reducer.reducer(inner))
 
     return stringified_scripts
+
 
 __all__ = [
     stringify_for_template,

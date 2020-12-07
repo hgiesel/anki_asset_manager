@@ -5,9 +5,9 @@ from ...config_types import (
     ConcreteScript,
     ScriptType,
     ScriptPosition,
-
     DEFAULT_CONCRETE_SCRIPT,
 )
+
 
 def make_setting(
     enabled: bool,
@@ -22,6 +22,7 @@ def make_setting(
         scripts,
     )
 
+
 def make_script(
     name: str = DEFAULT_CONCRETE_SCRIPT.name,
     enabled: bool = DEFAULT_CONCRETE_SCRIPT.enabled,
@@ -33,15 +34,16 @@ def make_script(
     code: str = DEFAULT_CONCRETE_SCRIPT.code,
 ) -> ConcreteScript:
     return make_script_v2(
-        name = name,
-        enabled = enabled,
-        type = type,
-        version = version,
-        description = description,
-        position = position,
-        conditions = conditions,
-        code = code,
+        name=name,
+        enabled=enabled,
+        type=type,
+        version=version,
+        description=description,
+        position=position,
+        conditions=conditions,
+        code=code,
     )
+
 
 def make_script_v2(
     *,
@@ -55,8 +57,8 @@ def make_script_v2(
     conditions: list = DEFAULT_CONCRETE_SCRIPT.conditions,
     code: str = DEFAULT_CONCRETE_SCRIPT.code,
 ) -> ConcreteScript:
-    possible_types = ['js', 'esm', 'css']
-    possible_positions = ['external', 'head', 'body', 'into_template']
+    possible_types = ["js", "esm", "css"]
+    possible_positions = ["external", "head", "body", "into_template"]
 
     return ConcreteScript(
         name if name is not None else DEFAULT_CONCRETE_SCRIPT.name,
@@ -65,7 +67,9 @@ def make_script_v2(
         label if name is not None else DEFAULT_CONCRETE_SCRIPT.label,
         version if version is not None else DEFAULT_CONCRETE_SCRIPT.version,
         description if description is not None else DEFAULT_CONCRETE_SCRIPT.description,
-        position if position in possible_positions else DEFAULT_CONCRETE_SCRIPT.position,
+        position
+        if position in possible_positions
+        else DEFAULT_CONCRETE_SCRIPT.position,
         conditions if conditions is not None else DEFAULT_CONCRETE_SCRIPT.conditions,
         code if code is not None else DEFAULT_CONCRETE_SCRIPT.code,
     )

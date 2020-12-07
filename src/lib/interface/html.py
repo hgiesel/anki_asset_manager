@@ -7,6 +7,7 @@ from ...config_types import (
     ConcreteHTML,
 )
 
+
 def make_html_setting(
     enabled: bool,
     fragments: list,
@@ -15,6 +16,7 @@ def make_html_setting(
         enabled,
         fragments,
     )
+
 
 def make_html_bool(
     name: Optional[bool] = None,
@@ -35,11 +37,10 @@ def make_html_bool(
         code if code is not None else False,
     )
 
+
 def __list_to_html_bool(vals: List[str]) -> HTMLBool:
-    return replace(
-        make_html_bool(),
-        **dict([(key, True) for key in vals])
-    )
+    return replace(make_html_bool(), **dict([(key, True) for key in vals]))
+
 
 def make_fragment(
     name: str,

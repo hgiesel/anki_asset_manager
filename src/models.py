@@ -16,21 +16,25 @@ def on_assets(models: Models) -> None:
     dialog = ConfigDialog(models.mw)
 
     dialog.setupUi(
-        current_notetype['id'],
-        current_notetype['name'],
+        current_notetype["id"],
+        current_notetype["name"],
         get_html_setting_from_notetype(current_notetype),
         get_setting_from_notetype(current_notetype),
     )
 
     dialog.exec_()
 
+
 def init_asset_button(buttons, models: Models):
-    buttons.append((
-        _("Assets..."),
-        lambda: on_assets(models),
-    ))
+    buttons.append(
+        (
+            _("Assets..."),
+            lambda: on_assets(models),
+        )
+    )
 
     return buttons
+
 
 def init_models_dialog():
     models_did_init_buttons.append(init_asset_button)

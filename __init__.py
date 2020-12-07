@@ -8,4 +8,5 @@ License: GNU AGPLv3 <https://www.gnu.org/licenses/agpl.html>
 """
 
 from .src import setup
+
 setup()

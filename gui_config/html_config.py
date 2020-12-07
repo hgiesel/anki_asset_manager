@@ -10,7 +10,7 @@ from pathlib import Path
 
 from aqt import mw
 from aqt.qt import QDialog, QWidget, QFont, Qt
-from aqt.utils import askUser, restoreGeom, saveGeom, showInfo # actually needed!
+from aqt.utils import askUser, restoreGeom, saveGeom, showInfo  # actually needed!
 
 from ..src.config import serialize_html, deserialize_html
 from ..src.config_types import ConcreteHTML
@@ -20,13 +20,16 @@ from ..src.lib.interface import make_html_bool
 from .forms.html_config_ui import Ui_HTMLConfig
 
 from .utils import (
-    script_type_to_gui_text, script_position_to_gui_text,
-    pos_to_script_type, pos_to_script_position,
+    script_type_to_gui_text,
+    script_position_to_gui_text,
+    pos_to_script_type,
+    pos_to_script_position,
 )
 from .highlighter import HTMLHighlighter
 
 
-geom_name = 'assetManagerScriptConfig'
+geom_name = "assetManagerScriptConfig"
+
 
 class HTMLConfig(QDialog):
     def __init__(self, parent, model_name, callback):
@@ -50,7 +53,7 @@ class HTMLConfig(QDialog):
         self.ui.cancelButton.clicked.connect(self.cancel)
         self.ui.validateButton.clicked.connect(self.validateConditions)
 
-        self.ui.metaLabel.setText('')
+        self.ui.metaLabel.setText("")
         self.ui.enableScriptCheckBox.stateChanged.connect(self.enableChangeGui)
         self.initEditor(self.ui.codeTextEdit)
 
@@ -58,7 +61,7 @@ class HTMLConfig(QDialog):
 
     def initEditor(self, editor):
         font = editor.document().defaultFont()
-        font.setFamily('Courier New')
+        font.setFamily("Courier New")
         font.setStyleHint(QFont.Monospace)
         font.setWeight(QFont.Medium)
         font.setFixedPitch(True)
@@ -85,13 +88,15 @@ class HTMLConfig(QDialog):
 
     def reset(self):
         # only available for meta scripts
-        if not askUser('Are you sure you want to reset this script? This will set it back to its default settings.'):
+        if not askUser(
+            "Are you sure you want to reset this script? This will set it back to its default settings."
+        ):
             return
 
         try:
             self.validateConditionsRaw()
         except:
-            showInfo('Invalid Conditions. Please fix the conditions before resetting.')
+            showInfo("Invalid Conditions. Please fix the conditions before resetting.")
         else:
             # this is necessary to trigger the meta hooks before resetting
             current_script = self.exportData()
@@ -102,7 +107,9 @@ class HTMLConfig(QDialog):
                 reset_script = self.iface.reset(self.meta.id, self.meta.storage)
                 self.setupUiConcrete(reset_script)
             except:
-                showInfo('Ooops, it seems like the developer responsible for this script did not setup the reset function correctly.')
+                showInfo(
+                    "Ooops, it seems like the developer responsible for this script did not setup the reset function correctly."
+                )
                 self.setupUiMeta(current_script)
 
             self.ui.nameLineEdit.repaint()
@@ -118,7 +125,9 @@ class HTMLConfig(QDialog):
 
     def enableChangeGui(self):
         try:
-            self.enableChange(self.ui.enableScriptCheckBox.isChecked(), self.iface.readonly)
+            self.enableChange(
+                self.ui.enableScriptCheckBox.isChecked(), self.iface.readonly
+            )
         except AttributeError:
             self.enableChange(self.ui.enableScriptCheckBox.isChecked())
 
@@ -133,14 +142,17 @@ class HTMLConfig(QDialog):
 
         self.ui.codeTextEdit.setReadOnly(not state or readonly.code)
 
-    def getConditions(self): # can throw
+    def getConditions(self):  # can throw
         return json.loads(self.ui.conditionsTextEdit.toPlainText())
 
     def validateConditionsRaw(self):
-        dirpath  = Path(f'{os.path.dirname(os.path.realpath(__file__))}', '../json_schemas/script_cond.json')
+        dirpath = Path(
+            f"{os.path.dirname(os.path.realpath(__file__))}",
+            "../json_schemas/script_cond.json",
+        )
         schema_path = dirpath.absolute().as_uri()
 
-        with dirpath.open('r') as jsonfile:
+        with dirpath.open("r") as jsonfile:
 
             schema = json.load(jsonfile)
             resolver = RefResolver(
@@ -161,34 +173,34 @@ class HTMLConfig(QDialog):
         except jsonschema.exceptions.ValidationError as e:
             showInfo(str(e))
         else:
-            showInfo('Valid Conditions.')
+            showInfo("Valid Conditions.")
 
     def exportData(self) -> Union[ConcreteHTML]:
-        result = deserialize_html({
-            'name': self.ui.nameLineEdit.text(),
-
-            'enabled': self.ui.enableScriptCheckBox.isChecked(),
-
-            'version': self.ui.versionLineEdit.text(),
-            'description': self.ui.descriptionTextEdit.toPlainText(),
-
-            'label': self.ui.labelEdit.text(),
-            'conditions': self.getConditions(),
-
-            'code': self.ui.codeTextEdit.toPlainText(),
-        })
+        result = deserialize_html(
+            {
+                "name": self.ui.nameLineEdit.text(),
+                "enabled": self.ui.enableScriptCheckBox.isChecked(),
+                "version": self.ui.versionLineEdit.text(),
+                "description": self.ui.descriptionTextEdit.toPlainText(),
+                "label": self.ui.labelEdit.text(),
+                "conditions": self.getConditions(),
+                "code": self.ui.codeTextEdit.toPlainText(),
+            }
+        )
 
         return result
 
     def cancel(self):
-        if askUser('Discard changes?'):
+        if askUser("Discard changes?"):
             self.reject()
 
     def tryAccept(self):
         try:
             self.validateConditionsRaw()
         except:
-            showInfo('Invalid Conditions. Please correct the conditions or just set it to `[]`.')
+            showInfo(
+                "Invalid Conditions. Please correct the conditions or just set it to `[]`."
+            )
         else:
             self.accept()
 

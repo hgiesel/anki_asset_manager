@@ -7,7 +7,15 @@ from jsonschema import validate, RefResolver, Draft7Validator
 
 from aqt import mw
 from aqt.qt import QDialog, QWidget, QAction
-from aqt.utils import getText, showWarning, showInfo, askUser, openLink, restoreGeom, saveGeom
+from aqt.utils import (
+    getText,
+    showWarning,
+    showInfo,
+    askUser,
+    openLink,
+    restoreGeom,
+    saveGeom,
+)
 
 from ..src.config import deserialize_setting, serialize_setting, write_setting
 from ..src.model_editor import setup_model
@@ -19,8 +27,9 @@ from .forms.config_ui import Ui_Config
 def sort_negative_first(v):
     return abs(int(v.name)) * 2 if int(v.name) < 0 else abs(int(v.name)) * 2 + 1
 
+
 class ConfigDialog(QDialog):
-    geom_name = 'assetManagerConfigDialog'
+    geom_name = "assetManagerConfigDialog"
 
     def __init__(self, parent):
         super().__init__(parent=parent)
@@ -36,7 +45,7 @@ class ConfigDialog(QDialog):
     def setupUi(self, modelId, modelName, htmlSetting, scriptSetting):
         self.modelId = modelId
 
-        self.setWindowTitle(f'Assets for {modelName}')
+        self.setWindowTitle(f"Assets for {modelName}")
 
         self.ui.helpButton.clicked.connect(self.showHelp)
         self.ui.wbButton.clicked.connect(self.writeBackCurrentSetting)
@@ -66,10 +75,10 @@ class ConfigDialog(QDialog):
         self.accept()
 
     def showHelp(self):
-        openLink('https://ankiweb.net/shared/info/656021484')
+        openLink("https://ankiweb.net/shared/info/656021484")
 
     def cancel(self, isClicked):
-        if askUser('Discard changes?'):
+        if askUser("Discard changes?"):
             self.reject()
 
     def save_geom(self):

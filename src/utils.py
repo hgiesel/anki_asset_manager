@@ -3,7 +3,8 @@ from typing import Any
 from aqt import mw
 
 
-version = '2.0'
+version = "2.0"
+
 
 def find_addon_by_name(addon_name):
     for name in mw.addonManager.allAddons():
@@ -11,6 +12,7 @@ def find_addon_by_name(addon_name):
             return name
 
     return None
+
 
 class ModelConfig:
     """Can be used for model-specific settings"""
@@ -21,7 +23,7 @@ class ModelConfig:
 
     @property
     def model_id(self):
-        return self.model['id']
+        return self.model["id"]
 
     @model_id.setter
     def model_id(self, model_id: int):
@@ -42,5 +44,6 @@ class ModelConfig:
             # same behavior as Collection.remove_config
             pass
 
-scripts_config = ModelConfig('assetManager', {})
-html_config = ModelConfig('assetManagerHtml', {})
+
+scripts_config = ModelConfig("assetManager", {})
+html_config = ModelConfig("assetManagerHtml", {})

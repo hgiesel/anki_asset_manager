@@ -10,12 +10,13 @@ from ..stringify import stringify_for_template
 from .common import write_model_template
 
 startpos_regex = re.compile(r'\n?\n? *?<div.*?id="anki\-am".*?>', re.MULTILINE)
-endpos_regex = re.compile(r'</div> *?$', re.MULTILINE)
+endpos_regex = re.compile(r"</div> *?$", re.MULTILINE)
+
 
 def get_template_slice(t) -> Optional[Tuple[int, int]]:
     try:
         startpos = re.search(startpos_regex, t)
-        endpos = re.search(endpos_regex, t[startpos.end():])
+        endpos = re.search(endpos_regex, t[startpos.end() :])
 
         startpos_actual = startpos.start()
         endpos_actual = startpos.end() + endpos.end()
@@ -25,17 +26,25 @@ def get_template_slice(t) -> Optional[Tuple[int, int]]:
     except AttributeError:
         return None
 
-def get_new_template(slice: Optional[Tuple[int, int]], old_template: str, script_string: str) -> Optional[str]:
-    sep_scripts = '\n\n' + script_string
+
+def get_new_template(
+    slice: Optional[Tuple[int, int]], old_template: str, script_string: str
+) -> Optional[str]:
+    sep_scripts = "\n\n" + script_string
 
     return (
-        sep_scripts.join([
-            old_template[:slice[0]],
-            old_template[slice[1]:],
-        ]) if slice
-        else f'{old_template}{sep_scripts}' if len(script_string) > 0
+        sep_scripts.join(
+            [
+                old_template[: slice[0]],
+                old_template[slice[1] :],
+            ]
+        )
+        if slice
+        else f"{old_template}{sep_scripts}"
+        if len(script_string) > 0
         else None
     )
+
 
 def update_model_template(template: object, fmt: AnkiFmt, script_string: str) -> bool:
     slice = get_template_slice(template[fmt])
@@ -47,23 +56,24 @@ def update_model_template(template: object, fmt: AnkiFmt, script_string: str) ->
 
     return False
 
+
 def setup_with_only_scripts(model_id: int, scripts: ScriptSetting) -> None:
     needs_saving = False
     model = mw.col.models.get(model_id)
 
-    for template in model['tmpls']:
+    for template in model["tmpls"]:
         # anki uses qfmt and afmt in model objects
         # I use question and answer
-        for fmt in ['qfmt', 'afmt']:
+        for fmt in ["qfmt", "afmt"]:
             did_insert = update_model_template(
                 template,
                 fmt,
                 stringify_for_template(
                     scripts,
-                    model['name'],
+                    model["name"],
                     model_id,
-                    template['name'],
-                    'question' if fmt == 'qfmt' else 'answer',
+                    template["name"],
+                    "question" if fmt == "qfmt" else "answer",
                 ),
             )
 

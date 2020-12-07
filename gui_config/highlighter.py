@@ -1,4 +1,12 @@
-from aqt.qt import QRegExp, QRegularExpression, QColor, QTextCharFormat, QFont, QSyntaxHighlighter, Qt
+from aqt.qt import (
+    QRegExp,
+    QRegularExpression,
+    QColor,
+    QTextCharFormat,
+    QFont,
+    QSyntaxHighlighter,
+    Qt,
+)
 from aqt import mw
 
 
@@ -16,11 +24,9 @@ class JSHighlighter(QSyntaxHighlighter):
         keywordPatterns = [
             "\\bfunction\\b",
             "\\bclass\\b",
-
             "\\bvar\\b",
             "\\blet\\b",
             "\\bconst\\b",
-
             "\\bbreak\\b",
             "\\bcase\\b",
             "\\bcatch\\b",
@@ -60,9 +66,7 @@ class JSHighlighter(QSyntaxHighlighter):
         ]
 
         self.highlightingRules = [
-            (QRegExp(pattern), keywordFormat)
-            for pattern
-            in keywordPatterns
+            (QRegExp(pattern), keywordFormat) for pattern in keywordPatterns
         ]
 
         classFormat = QTextCharFormat()
@@ -91,13 +95,15 @@ class JSHighlighter(QSyntaxHighlighter):
         quotationFormat.setFontStyleHint(QFont.Monospace)
         self.highlightingRules.append((QRegExp('".*"'), quotationFormat))
         self.highlightingRules.append((QRegExp("'.*'"), quotationFormat))
-        self.highlightingRules.append((QRegExp('`.*`'), quotationFormat))
+        self.highlightingRules.append((QRegExp("`.*`"), quotationFormat))
 
         functionFormat = QTextCharFormat()
         functionFormat.setFontItalic(True)
         functionFormat.setFontStyleHint(QFont.Monospace)
         functionFormat.setForeground(Qt.lightGray if is_night_mode else Qt.gray)
-        self.highlightingRules.append((QRegExp("\\b[A-Za-z0-9_]+(?=\\()"), functionFormat))
+        self.highlightingRules.append(
+            (QRegExp("\\b[A-Za-z0-9_]+(?=\\()"), functionFormat)
+        )
 
         self.commentStartExpression = QRegExp("/\\*")
         self.commentEndExpression = QRegExp("\\*/")
@@ -124,12 +130,15 @@ class JSHighlighter(QSyntaxHighlighter):
                 self.setCurrentBlockState(1)
                 commentLength = len(text) - startIndex
             else:
-                commentLength = endIndex - startIndex + self.commentEndExpression.matchedLength()
+                commentLength = (
+                    endIndex - startIndex + self.commentEndExpression.matchedLength()
+                )
 
-            self.setFormat(startIndex, commentLength,
-                    self.multiLineCommentFormat)
-            startIndex = self.commentStartExpression.indexIn(text,
-                    startIndex + commentLength);
+            self.setFormat(startIndex, commentLength, self.multiLineCommentFormat)
+            startIndex = self.commentStartExpression.indexIn(
+                text, startIndex + commentLength
+            )
+
 
 class HTMLHighlighter(QSyntaxHighlighter):
     def __init__(self, parent=None):
@@ -154,19 +163,15 @@ class HTMLHighlighter(QSyntaxHighlighter):
             "\\bmeta\\b",
             "\\bhead\\b",
             "\\bheader\\b",
-
             "\\bdiv\\b",
             "\\bspan\\b",
-
             "\\bem\\b",
             "\\bb\\b",
             "\\bi\\b",
             "\\bu\\b",
             "\\bblockquote\\b",
-
             "\\btextarea\\b",
             "\\btable\\b",
-
             "\\bh1\\b",
             "\\bh2\\b",
             "\\bh3\\b",
@@ -174,23 +179,19 @@ class HTMLHighlighter(QSyntaxHighlighter):
             "\\bh5\\b",
             "\\bh6\\b",
             "\\bhr\\b",
-
             "\\bpre\\b",
             "\\bcode\\b",
             "\\bbutton\\b",
         ]
 
-        self.highlightingRules.extend([
-            (QRegExp(pattern), keywordFormat)
-            for pattern
-            in keywordPatterns
-        ])
+        self.highlightingRules.extend(
+            [(QRegExp(pattern), keywordFormat) for pattern in keywordPatterns]
+        )
 
         multiLineCommentFormat = QTextCharFormat()
         multiLineCommentFormat.setFontStyleHint(QFont.Monospace)
         multiLineCommentFormat.setForeground(Qt.red if is_night_mode else Qt.darkRed)
         self.multiLineCommentFormat = multiLineCommentFormat
-
 
         numberFormat = QTextCharFormat()
         numberFormat.setFontStyleHint(QFont.Monospace)
@@ -202,7 +203,7 @@ class HTMLHighlighter(QSyntaxHighlighter):
         quotationFormat.setFontStyleHint(QFont.Monospace)
         self.highlightingRules.append((QRegExp('".*"'), quotationFormat))
         self.highlightingRules.append((QRegExp("'.*'"), quotationFormat))
-        self.highlightingRules.append((QRegExp('`.*`'), quotationFormat))
+        self.highlightingRules.append((QRegExp("`.*`"), quotationFormat))
 
         selfTagFormat = QTextCharFormat()
         # selfTagFormat.setFontWeight(QFont.Bold)
@@ -243,9 +244,11 @@ class HTMLHighlighter(QSyntaxHighlighter):
                 self.setCurrentBlockState(1)
                 commentLength = len(text) - startIndex
             else:
-                commentLength = endIndex - startIndex + self.commentEndExpression.matchedLength()
+                commentLength = (
+                    endIndex - startIndex + self.commentEndExpression.matchedLength()
+                )
 
-            self.setFormat(startIndex, commentLength,
-                    self.multiLineCommentFormat)
-            startIndex = self.commentStartExpression.indexIn(text,
-                    startIndex + commentLength);
+            self.setFormat(startIndex, commentLength, self.multiLineCommentFormat)
+            startIndex = self.commentStartExpression.indexIn(
+                text, startIndex + commentLength
+            )

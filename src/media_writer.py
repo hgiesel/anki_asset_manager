@@ -13,11 +13,11 @@ def write_media(model_id: int, setting: ScriptSetting):
 
     external_scripts = stringify_for_external(
         setting,
-        model['name'],
+        model["name"],
         model_id,
     )
 
-    prefix_regex = f'^_am_{model_id}_'
+    prefix_regex = f"^_am_{model_id}_"
     files = [file for file in listdir(mw.col.media.dir()) if match(prefix_regex, file)]
     mw.col.media.trash_files(files)
 

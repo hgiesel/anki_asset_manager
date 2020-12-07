@@ -3,26 +3,26 @@ from dataclasses import dataclass
 
 ################################ simple types
 
-ScriptType = Literal['js', 'esm', 'css']
+ScriptType = Literal["js", "esm", "css"]
 
-Position = Literal['external', 'head', 'body']
-ScriptPosition = Union[Position, Literal['into_template']]
+Position = Literal["external", "head", "body"]
+ScriptPosition = Union[Position, Literal["into_template"]]
 
-AnkiFmt = Literal['qfmt', 'afmt']
-Fmt = Literal['question', 'answer']
+AnkiFmt = Literal["qfmt", "afmt"]
+Fmt = Literal["question", "answer"]
 ScriptInsertion = Union[Position, Fmt]
 
 ScriptText = str
 ScriptKeys = Literal[
-    'name',
-    'enabled',
-    'type',
-    'label',
-    'version',
-    'description',
-    'position',
-    'conditions',
-    'code',
+    "name",
+    "enabled",
+    "type",
+    "label",
+    "version",
+    "description",
+    "position",
+    "conditions",
+    "code",
 ]
 
 LabelText = str
@@ -34,8 +34,11 @@ Falsifiable = lambda t: Union[Literal[False], t]
 ################################ for scripts
 
 dataclass(frozen=True)
+
+
 class Script:
     pass
+
 
 @dataclass(frozen=True)
 class ConcreteScript(Script):
@@ -49,6 +52,7 @@ class ConcreteScript(Script):
     conditions: list
     code: str
 
+
 @dataclass(frozen=True)
 class ScriptStorage:
     name: Optional[str]
@@ -61,11 +65,13 @@ class ScriptStorage:
     conditions: Optional[list]
     code: Optional[str]
 
+
 @dataclass(frozen=True)
 class MetaScript(Script):
     tag: str
     id: str
     storage: ScriptStorage
+
 
 @dataclass(frozen=True)
 class ScriptSetting:
@@ -74,7 +80,9 @@ class ScriptSetting:
     indent_size: int
     scripts: List[Script]
 
+
 ################################ for interfaces
+
 
 @dataclass(frozen=True)
 class ScriptBool:
@@ -88,6 +96,7 @@ class ScriptBool:
     conditions: bool
     code: bool
 
+
 @dataclass(frozen=True)
 class Interface:
     # name for the type of the interface
@@ -95,7 +104,10 @@ class Interface:
     getter: Callable[[str, ScriptStorage], ConcreteScript]
     # result is used for storing
     setter: Callable[[str, ConcreteScript], Union[bool, ConcreteScript]]
-    generator: Callable[[str, ScriptStorage, AnkiModel, AnkiTmpl, ScriptInsertion], Falsifiable(ScriptText)]
+    generator: Callable[
+        [str, ScriptStorage, AnkiModel, AnkiTmpl, ScriptInsertion],
+        Falsifiable(ScriptText),
+    ]
     label: Falsifiable(Callable[[str, ScriptStorage], LabelText])
     reset: Falsifiable(Callable[[str, ScriptStorage], ConcreteScript])
     deletable: Falsifiable(Callable[[str, ScriptStorage], bool])
@@ -106,45 +118,51 @@ class Interface:
     # list of values or stored in `storage` field
     store: ScriptBool
 
+
 ################################ default settings for safenav
 
 DEFAULT_SETTING = ScriptSetting(False, False, 4, [])
 
 DEFAULT_CONCRETE_SCRIPT = ConcreteScript(
-    'Example Script',
+    "Example Script",
     False,
-    'js',
-    '',
-    'v0.1',
-    'This is an example script',
-    'into_template',
+    "js",
+    "",
+    "v0.1",
+    "This is an example script",
+    "into_template",
     [],
-    'console.log(\'Hello, World!\')',
+    "console.log('Hello, World!')",
 )
 
 DEFAULT_META_SCRIPT = MetaScript(
-    'I_DONT_EXIST',
-    'I_DONT_EXIST',
+    "I_DONT_EXIST",
+    "I_DONT_EXIST",
     ScriptStorage(False, False, False, False, False, False, False, False, False),
 )
 
 ################################ REDUCERS
+
 
 @dataclass(frozen=True)
 class LabelReducer:
     label: str
     reducer: Callable[[List[str]], str]
 
+
 DEFAULT_REDUCER = LabelReducer(
-    label = '__unnamed',
-    reducer = lambda lst: '\n\n'.join(lst),
+    label="__unnamed",
+    reducer=lambda lst: "\n\n".join(lst),
 )
 
 ################################ HTML
 
 dataclass(frozen=True)
+
+
 class HTML:
     pass
+
 
 @dataclass(frozen=True)
 class ConcreteHTML(HTML):
@@ -156,6 +174,7 @@ class ConcreteHTML(HTML):
     conditions: list
     code: str
 
+
 @dataclass(frozen=True)
 class HTMLBool(HTML):
     name: bool
@@ -166,42 +185,47 @@ class HTMLBool(HTML):
     conditions: bool
     code: bool
 
+
 @dataclass(frozen=True)
 class HTMLSetting:
     enabled: bool
     fragments: List[HTML]
 
+
 DEFAULT_CONCRETE_HTML_FRONT = ConcreteHTML(
-    'FrontSide',
+    "FrontSide",
     True,
-    'Front',
-    'v1',
-    'This is the entrance for the front side',
+    "Front",
+    "v1",
+    "This is the entrance for the front side",
     [],
-    '{{Front}}\n\n{{%scripts}}',
+    "{{Front}}\n\n{{%scripts}}",
 )
 
 DEFAULT_CONCRETE_HTML_BACK = ConcreteHTML(
-    'BackSide',
+    "BackSide",
     True,
-    'Back',
-    'v1',
-    'This is the entrance for the back side',
+    "Back",
+    "v1",
+    "This is the entrance for the back side",
     [],
     '{{FrontSide}}\n\n<hr id="answer">\n\n{{Back}}\n\n{{%scripts}}',
 )
 
 DEFAULT_CONCRETE_HTML = ConcreteHTML(
-    'New Fragment',
+    "New Fragment",
     True,
-    'Fragment',
-    'v1',
-    'This is my custom fragment',
+    "Fragment",
+    "v1",
+    "This is my custom fragment",
     [],
-    '<div>\n    Hello world!\n</div>\n',
+    "<div>\n    Hello world!\n</div>\n",
 )
 
-DEFAULT_HTML_SETTING = HTMLSetting(False, [
-    DEFAULT_CONCRETE_HTML_FRONT,
-    DEFAULT_CONCRETE_HTML_BACK,
-])
+DEFAULT_HTML_SETTING = HTMLSetting(
+    False,
+    [
+        DEFAULT_CONCRETE_HTML_FRONT,
+        DEFAULT_CONCRETE_HTML_BACK,
+    ],
+)

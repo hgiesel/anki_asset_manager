@@ -7,13 +7,11 @@ from ...config_types import (
     ScriptStorage,
     ScriptBool,
     ScriptKeys,
-
     AnkiModel,
     AnkiTmpl,
     ScriptInsertion,
     ScriptText,
     LabelText,
-
     MetaScript,
     ConcreteScript,
     Interface,
@@ -43,6 +41,7 @@ def make_script_storage(
         code,
     )
 
+
 def make_script_bool(
     name: Optional[bool] = None,
     enabled: Optional[bool] = None,
@@ -66,31 +65,32 @@ def make_script_bool(
         code if code is not None else False,
     )
 
+
 def __list_to_script_bool(
     vals: List[ScriptKeys],
 ) -> ScriptBool:
-    return replace(
-        make_script_bool(),
-        **dict([(key, True) for key in vals])
-    )
+    return replace(make_script_bool(), **dict([(key, True) for key in vals]))
+
 
 def make_meta_script(
-    tag: str,
-    id: str,
-    storage: Optional[ScriptStorage] = None
+    tag: str, id: str, storage: Optional[ScriptStorage] = None
 ) -> MetaScript:
     return MetaScript(
-        tag,
-        id,
-        storage if storage is not None else make_script_storage()
+        tag, id, storage if storage is not None else make_script_storage()
     )
+
 
 def make_interface(
     tag: str,
     *,
     getter: Callable[[str, ScriptStorage], ConcreteScript],
     setter: Callable[[str, ConcreteScript], Union[bool, ConcreteScript]],
-    generator: Optional[Callable[[str, ScriptStorage, AnkiModel, AnkiTmpl, ScriptInsertion], Falsifiable(ScriptText)]] = None,
+    generator: Optional[
+        Callable[
+            [str, ScriptStorage, AnkiModel, AnkiTmpl, ScriptInsertion],
+            Falsifiable(ScriptText),
+        ]
+    ] = None,
     label: Optional[Falsifiable(Callable[[str, ScriptStorage], LabelText])] = None,
     reset: Optional[Falsifiable(Callable[[str, ScriptStorage], ConcreteScript])] = None,
     deletable: Optional[Falsifiable(Callable[[str, ScriptStorage], bool])] = None,
@@ -102,15 +102,25 @@ def make_interface(
         tag,
         getter,
         setter,
-        generator if generator is not None else lambda id, storage, _model, _tmpl, _pos: getter(id, storage).code,
+        generator
+        if generator is not None
+        else lambda id, storage, _model, _tmpl, _pos: getter(id, storage).code,
         label if label is not None else lambda id, _storage: f"{tag}: {id}",
-        reset if reset is not None else lambda id, _storage: getter(id, make_script_storage()),
+        reset
+        if reset is not None
+        else lambda id, _storage: getter(id, make_script_storage()),
         deletable if deletable is not None else lambda _id, _storage: False,
         autodelete if autodelete is not None else lambda _id, _storage: False,
-        readonly if isinstance(readonly, ScriptStorage) else (
-            __list_to_script_bool(readonly) if readonly is not None else make_script_bool()
+        readonly
+        if isinstance(readonly, ScriptStorage)
+        else (
+            __list_to_script_bool(readonly)
+            if readonly is not None
+            else make_script_bool()
         ),
-        store if isinstance(store, ScriptStorage) else (
+        store
+        if isinstance(store, ScriptStorage)
+        else (
             __list_to_script_bool(store) if store is not None else make_script_bool()
         ),
     )

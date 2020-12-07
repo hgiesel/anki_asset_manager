@@ -36,7 +36,9 @@ class HTMLTab(QWidget):
         self.ui.downPushButton.clicked.connect(self.moveDown)
         self.ui.upPushButton.clicked.connect(self.moveUp)
 
-        self.ui.scriptsTable.currentCellChanged.connect(self.updateButtonsForCurrentCell)
+        self.ui.scriptsTable.currentCellChanged.connect(
+            self.updateButtonsForCurrentCell
+        )
         self.ui.scriptsTable.cellDoubleClicked.connect(self.editScript)
         self.ui.scriptsTable.setColumnWidth(1, 55)
         self.ui.scriptsTable.setColumnWidth(2, 110)
@@ -56,7 +58,7 @@ class HTMLTab(QWidget):
         headerLabels = []
 
         for idx, script in enumerate(self.frags):
-            headerLabels.append(f'Script {idx}')
+            headerLabels.append(f"Script {idx}")
             self.setRowModFromScript(idx, script, False)
 
         self.ui.scriptsTable.setVerticalHeaderLabels(headerLabels)
@@ -89,7 +91,9 @@ class HTMLTab(QWidget):
 
     ###########
 
-    def updateButtonsForCurrentCell(self, currentRow, currentColumn, previousRow, previousColumn):
+    def updateButtonsForCurrentCell(
+        self, currentRow, currentColumn, previousRow, previousColumn
+    ):
         self.updateButtons(currentRow != -1)
 
     def updateButtons(self, state=True):
@@ -104,7 +108,7 @@ class HTMLTab(QWidget):
     def deleteScript(self):
         current_scr = self.frags[self.ui.scriptsTable.currentRow()]
 
-        del self.frags[self.ui.scriptsTable.currentRow()] # gotta delete within dict
+        del self.frags[self.ui.scriptsTable.currentRow()]  # gotta delete within dict
 
         self.drawScripts()
         self.updateButtons(False)
@@ -128,7 +132,10 @@ class HTMLTab(QWidget):
     ###########
 
     def exportData(self):
-        return deserialize_html_setting(self.modelId, {
-            'enabled': self.ui.enableCheckBox.isChecked(),
-            'fragments': self.frags,
-        })
+        return deserialize_html_setting(
+            self.modelId,
+            {
+                "enabled": self.ui.enableCheckBox.isChecked(),
+                "fragments": self.frags,
+            },
+        )

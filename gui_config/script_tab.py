@@ -34,7 +34,7 @@ def get_from_meta(meta_script: MetaScript) -> Tuple[ConcreteScript, Union[str, b
 
     script = iface.getter(meta_script.id, meta_script.storage)
 
-    label = 'loose' if is_loose else True
+    label = "loose" if is_loose else True
 
     return (script, label)
 
@@ -51,7 +51,9 @@ class ScriptTab(QWidget):
         self.ui.downPushButton.clicked.connect(self.moveDown)
         self.ui.upPushButton.clicked.connect(self.moveUp)
 
-        self.ui.scriptsTable.currentCellChanged.connect(self.updateButtonsForCurrentCell)
+        self.ui.scriptsTable.currentCellChanged.connect(
+            self.updateButtonsForCurrentCell
+        )
         self.ui.scriptsTable.cellDoubleClicked.connect(self.editScript)
         self.ui.scriptsTable.setColumnWidth(1, 55)
         self.ui.scriptsTable.setColumnWidth(2, 55)
@@ -72,12 +74,15 @@ class ScriptTab(QWidget):
         headerLabels = []
 
         for idx, script in enumerate(self.scr):
-            headerLabels.append(f'Script {idx}')
-            self.setRowModFromScript(idx, *(
-                (script, False)
-                if isinstance(script, ConcreteScript)
-                else get_from_meta(script)
-            ))
+            headerLabels.append(f"Script {idx}")
+            self.setRowModFromScript(
+                idx,
+                *(
+                    (script, False)
+                    if isinstance(script, ConcreteScript)
+                    else get_from_meta(script)
+                ),
+            )
 
         self.ui.scriptsTable.setVerticalHeaderLabels(headerLabels)
 
@@ -111,7 +116,9 @@ class ScriptTab(QWidget):
 
     ###########
 
-    def updateButtonsForCurrentCell(self, currentRow, currentColumn, previousRow, previousColumn):
+    def updateButtonsForCurrentCell(
+        self, currentRow, currentColumn, previousRow, previousColumn
+    ):
         self.updateButtons(currentRow != -1)
 
     def updateButtons(self, state=True):
@@ -120,30 +127,35 @@ class ScriptTab(QWidget):
         self.ui.upPushButton.setEnabled(state)
 
     def addScript(self):
-        newScript = deserialize_concrete_script({
-            'name': 'New Script',
-            'type': 'js',
-            'description': '',
-            'enabled': True,
-            'conditions': [],
-            'statements': [],
-        })
+        newScript = deserialize_concrete_script(
+            {
+                "name": "New Script",
+                "type": "js",
+                "description": "",
+                "enabled": True,
+                "conditions": [],
+                "statements": [],
+            }
+        )
 
         self.scr.append(newScript)
         self.drawScripts()
 
     def deleteScript(self):
-        current_scr: Union[ConcreteScript, MetaScript] = self.scr[self.ui.scriptsTable.currentRow()]
+        current_scr: Union[ConcreteScript, MetaScript] = self.scr[
+            self.ui.scriptsTable.currentRow()
+        ]
 
         def show_nondeletable():
-            from aqt.utils import showInfo # not to be deleted!
+            from aqt.utils import showInfo  # not to be deleted!
+
             showInfo(
-                'This script does not allow for deletion.\n'
-                'You might have to uninstall the add-on which inserted this script.'
+                "This script does not allow for deletion.\n"
+                "You might have to uninstall the add-on which inserted this script."
             )
 
         if isinstance(current_scr, ConcreteScript):
-            del self.scr[self.ui.scriptsTable.currentRow()] # gotta delete within dict
+            del self.scr[self.ui.scriptsTable.currentRow()]  # gotta delete within dict
         else:
             iface = get_interface(current_scr.tag)
 
@@ -151,7 +163,9 @@ class ScriptTab(QWidget):
                 is_deletable = iface.deletable(current_scr.id, current_scr.storage)
 
                 if is_deletable:
-                    del self.scr[self.ui.scriptsTable.currentRow()] # gotta delete within dict
+                    del self.scr[
+                        self.ui.scriptsTable.currentRow()
+                    ]  # gotta delete within dict
 
                 else:
                     show_nondeletable()
@@ -181,9 +195,12 @@ class ScriptTab(QWidget):
     ###########
 
     def exportData(self):
-        result = deserialize_setting(self.modelId, {
-            "enabled": self.ui.enableCheckBox.isChecked(),
-            "insertStub": self.ui.insertStubCheckBox.isChecked(),
-            "scripts": self.scr,
-        })
+        result = deserialize_setting(
+            self.modelId,
+            {
+                "enabled": self.ui.enableCheckBox.isChecked(),
+                "insertStub": self.ui.insertStubCheckBox.isChecked(),
+                "scripts": self.scr,
+            },
+        )
         return result
