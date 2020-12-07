@@ -4,6 +4,7 @@ from typing import Union, Optional, List
 from aqt import mw
 
 from anki.cards import Card
+from anki.models import NoteType
 
 from .config_types import (
     ScriptSetting,
@@ -265,7 +266,7 @@ def serialize_html(fragment: Union[ConcreteHTML]) -> dict:
     return asdict(fragment)
 
 
-def get_html_setting_from_notetype(notetype) -> HTMLSetting:
+def get_html_setting_from_notetype(notetype: NoteType) -> HTMLSetting:
     html_config.model_id = notetype["id"]
 
     return deserialize_html_setting(
@@ -277,16 +278,24 @@ def get_html_setting_from_notetype(notetype) -> HTMLSetting:
 ######################## together
 
 
-def write_html(model_id: int, html: HTMLSetting):
-    html_config.model_id = model_id
+def write_html(html: HTMLSetting, /, model_id: int = None , custom_model: NoteType = None):
+    if custom_model:
+        html_config.model = custom_model
+    elif model_id:
+        html_config.model_id = model_id
+
     html_config.value = serialize_html_setting(html)
 
 
-def write_scripts(model_id: int, scripts: ScriptSetting):
-    scripts_config.model_id = model_id
+def write_scripts(scripts: ScriptSetting, /, model_id: int = None, custom_model: NoteType = None):
+    if custom_model:
+        scripts_config.model = custom_model
+    elif model_id:
+        scripts_config.model_id = model_id
+
     scripts_config.value = serialize_setting(scripts)
 
 
-def write_setting(model_id: int, html: HTMLSetting, scripts: ScriptSetting):
-    write_html(model_id, html)
-    write_scripts(model_id, scripts)
+def write_setting(html: HTMLSetting, scripts: ScriptSetting, /, model_id: int = None, custom_model: NoteType = None):
+    write_html(html, model_id=model_id, custom_model=custom_model)
+    write_scripts(scripts, model_id=model_id, custom_model=custom_model)

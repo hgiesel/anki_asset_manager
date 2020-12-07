@@ -2,6 +2,8 @@ from aqt.qt import QDialog
 from aqt.models import Models
 from aqt.gui_hooks import models_did_init_buttons
 
+from anki.models import NoteType
+
 from ..gui_config.config import ConfigDialog
 
 from .config import (
@@ -15,17 +17,17 @@ from .media_writer import write_media
 
 
 def write_back(model_id: int, html_data, script_data) -> None:
-    write_setting(model_id, html_data, script_data)
+    write_setting(html_data, script_data, model_id=model_id)
 
     setup_model(model_id, html_data, script_data)
     write_media(model_id, script_data)
 
 
 def save(model_id: int, html_data, script_data):
-    write_setting(model_id, html_data, script_data)
+    write_setting(html_data, script_data, model_id=model_id)
 
 
-def open_asset_manager_menu(parent_window: QDialog, note_type):
+def open_asset_manager_menu(parent_window: QDialog, note_type: NoteType):
     dialog = ConfigDialog(parent_window, save, write_back)
 
     dialog.setupUi(
