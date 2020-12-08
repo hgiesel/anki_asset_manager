@@ -238,11 +238,6 @@ class ScriptConfig(QDialog):
         code = self.ui.codeTextEdit.toPlainText()
         self.syntax_checker.check(code)
 
-    def log(self, message):
-        from aqt.utils import showText
-
-        showText(str(message))
-
     def exportData(self) -> Union[ConcreteScript, MetaScript]:
         result = deserialize_script(
             {

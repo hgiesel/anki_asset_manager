@@ -98,6 +98,7 @@ def insert_minified(
         ),
     )
 
+
 def insert_unminified(
     unminifieds,
     template_fmts,

@@ -86,9 +86,9 @@ class HTMLTab(QWidget):
             self.frags[row] = newScript
             self.drawScripts()
 
-        a = HTMLConfig(mw, self.modelId, saveScript)
+        a = HTMLConfig(self, self.modelId, saveScript)
         a.setupUi(self.frags[row])
-        a.exec_()
+        a.open()
 
     ###########
 

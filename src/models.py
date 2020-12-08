@@ -27,9 +27,8 @@ def save(model_id: int, html_data, script_data):
     write_setting(html_data, script_data, model_id=model_id)
 
 
-def open_asset_manager_menu(parent_window: QDialog, note_type: NoteType):
+def asset_manager_menu(parent_window: QDialog, note_type: NoteType) -> QDialog:
     dialog = ConfigDialog(parent_window, save, write_back)
-
     dialog.setupUi(
         note_type["id"],
         note_type["name"],
@@ -37,13 +36,23 @@ def open_asset_manager_menu(parent_window: QDialog, note_type: NoteType):
         get_setting_from_notetype(note_type),
     )
 
+    return dialog
+
+
+def open_asset_manager_menu(parent_window: QDialog, note_type: NoteType) -> None:
+    dialog = asset_manager_menu(parent_window, note_type)
+    dialog.open()
+
+
+def exec_asset_manager_menu(parent_window: QDialog, note_type: NoteType) -> None:
+    dialog = asset_manager_menu(parent_window, note_type)
     dialog.exec_()
 
 
 def on_assets(models: Models) -> None:
     current_row = models.form.modelsList.currentRow()
     current_notetype = models.mm.get(models.models[current_row].id)
-    open_asset_manager_menu(models.mw, current_notetype)
+    exec_asset_manager_menu(models, current_notetype)
 
 
 def init_asset_button(buttons, models: Models):

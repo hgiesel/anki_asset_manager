@@ -1,19 +1,6 @@
-from typing import Any
-import json
-import sys
-
 from aqt import mw
-from aqt.qt import (
-    QWebEnginePage,
-    QWebEngineView,
-    QWebEngineScript,
-    QWebChannel,
-    QObject,
-    pyqtSlot,
-)
-from aqt.webview import AnkiWebView, AnkiWebPage
+from aqt.webview import AnkiWebView
 from aqt.utils import showInfo, showWarning
-from pdb import set_trace
 
 
 class SyntaxChecker(AnkiWebView):
@@ -51,7 +38,7 @@ def get_syntax_checker(parent) -> SyntaxChecker:
 
     addon_package = mw.addonManager.addonFromModule(__name__)
     syntax_checker.stdHtml(
-        "<h1>Syntax Checker</h1>",
+        "",
         js=[
             f"/_addons/{addon_package}/web/terser.js",
         ],

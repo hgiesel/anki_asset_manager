@@ -110,9 +110,9 @@ class ScriptTab(QWidget):
             self.scr[row] = newScript
             self.drawScripts()
 
-        a = ScriptConfig(mw, self.modelId, saveScript)
+        a = ScriptConfig(self, self.modelId, saveScript)
         a.setupUi(self.scr[row])
-        a.exec_()
+        a.open()
 
     ###########
 
