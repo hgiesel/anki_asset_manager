@@ -18,7 +18,7 @@ from pdb import set_trace
 
 class SyntaxChecker(AnkiWebView):
     def __init__(self, parent):
-        AnkiWebView.__init__(self, parent=mw, title="syntax_checker")
+        AnkiWebView.__init__(self, parent=parent, title="syntax_checker")
 
     def check(self, code: str) -> None:
         escaped = code.replace('"', '\\"').replace("\n", "\\n")
@@ -27,8 +27,8 @@ class SyntaxChecker(AnkiWebView):
             f"""
 Terser.minify("{escaped}")
     .then(
-        _result => pycmd("info:Success:No syntax error found"),
-        error => pycmd(`warning:${{error.name}}:${{error.message}}:${{error.line}}:${{error.col}}`),
+        _result => pycmd("info::Success::No syntax error found"),
+        error => pycmd(`warning::${{error.name}}::${{error.message}}::${{error.line}}::${{error.col}}`),
     )
 """
         )
@@ -36,12 +36,12 @@ Terser.minify("{escaped}")
 
 def bridge_cmd(cmd: str) -> None:
     if cmd.startswith("info"):
-        _, code, message = cmd.split(":")
+        _, code, message = cmd.split("::")
         showInfo(f"{code}: {message}")
         return
 
     elif cmd.startswith("warning"):
-        _, code, message, line, col = cmd.split(":")
+        _, code, message, line, col = cmd.split("::")
         showWarning(f"{code}: {line}:{col}: {message}")
         return
 
