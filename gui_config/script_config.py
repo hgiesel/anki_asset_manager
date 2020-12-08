@@ -1,6 +1,9 @@
 import os
 import json
 
+from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtWebChannel import QWebChannel
+
 from typing import Union
 from dataclasses import asdict, replace
 
@@ -10,7 +13,13 @@ from pathlib import Path
 
 from aqt import mw
 from aqt.qt import QDialog, QWidget, QFont, Qt
-from aqt.utils import askUser, restoreGeom, saveGeom, showInfo  # actually needed!
+from aqt.utils import (
+    askUser,
+    restoreGeom,
+    saveGeom,
+    showInfo,
+    showWarning,
+)  # actually needed!
 
 from ..src.config import serialize_script, deserialize_script
 from ..src.config_types import ConcreteScript, MetaScript, ScriptStorage, ScriptBool
@@ -27,6 +36,7 @@ from .utils import (
     pos_to_script_position,
 )
 from .highlighter import JSHighlighter
+from .syntax_checker import get_syntax_checker
 
 
 def fix_storage(
@@ -49,6 +59,7 @@ geom_name = "assetManagerScriptConfig"
 class ScriptConfig(QDialog):
     def __init__(self, parent, model_name, callback):
         super().__init__(parent=parent)
+        self.parent = parent
 
         self.callback = callback
         self.modelName = model_name
@@ -67,10 +78,13 @@ class ScriptConfig(QDialog):
 
         self.ui.cancelButton.clicked.connect(self.cancel)
         self.ui.validateButton.clicked.connect(self.validateConditions)
+        self.ui.syntaxCheck.clicked.connect(self.checkSyntax)
 
         self.ui.metaLabel.setText("")
         self.ui.enableScriptCheckBox.stateChanged.connect(self.enableChangeGui)
+
         self.initEditor(self.ui.codeTextEdit)
+        self.syntax_checker = get_syntax_checker(self)
 
         restoreGeom(self, geom_name)
 
@@ -219,6 +233,15 @@ class ScriptConfig(QDialog):
             showInfo(str(e))
         else:
             showInfo("Valid Conditions.")
+
+    def checkSyntax(self):
+        code = self.ui.codeTextEdit.toPlainText()
+        self.syntax_checker.check(code)
+
+    def log(self, message):
+        from aqt.utils import showText
+
+        showText(str(message))
 
     def exportData(self) -> Union[ConcreteScript, MetaScript]:
         result = deserialize_script(
