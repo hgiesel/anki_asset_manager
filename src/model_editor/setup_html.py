@@ -8,7 +8,7 @@ from anki.models import NoteType
 from ..config_types import HTML, HTMLSetting, ScriptSetting
 from ..stringify import stringify_for_template, get_condition_parser
 
-from .common import write_model_template
+from .minify import pass_minified_to_callback
 
 
 def find_valid_fragment(
@@ -199,6 +199,6 @@ def setup_full(model_id: int, html: HTMLSetting, scripts: ScriptSetting):
             if result := evaluate_fragment(
                 html.fragments, entrance, cond_parser, special_parser
             ):
-                write_model_template(template, fmt, result)
+                pass_minified_to_callback(template, fmt, result)
 
     mw.col.models.save(model, True)
