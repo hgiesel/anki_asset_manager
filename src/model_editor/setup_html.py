@@ -1,8 +1,9 @@
 import re
 
-from typing import List, Optional
+from typing import List, Optional, Tuple, Callable
 
 from aqt import mw
+from anki.models import NoteType
 
 from ..config_types import HTML, HTMLSetting, ScriptSetting
 from ..stringify import stringify_for_template, get_condition_parser
@@ -24,63 +25,6 @@ def find_valid_fragment(
 
 def gather_numerical_tags(text: str):
     return list(reversed(list(re.finditer(r"\{\{%(\d+)\}\}", text))))
-
-
-def gather_tags(text: str):
-    return list(reversed(list(re.finditer(r"\{\{%(\w+)(?::(.*?))?\}\}", text))))
-
-
-squote = re.compile(r"^'(.*?)'\s*?(?:,|$)")
-dquote = re.compile(r'^"(.*?)"\s*?(?:,|$)')
-naked = re.compile(r"^([^,]+)(?:,|$)")
-
-
-def match_tag_argument(text):
-    if m := re.match(squote, text):
-        return text[m.end() : len(text)], m.group(1)
-    elif m := re.match(dquote, text):
-        return text[m.end() : len(text)], m.group(1)
-    elif m := re.match(naked, text):
-        return text[m.end() : len(text)], m.group(1).rstrip()
-
-    return None
-
-
-def get_tag_arguments(text: Optional[str]):
-    result = []
-
-    while text:
-        next = match_tag_argument(text.lstrip())
-
-        if not next:
-            break
-
-        text = next[0]
-        result.append(next[1])
-
-    return result
-
-
-def get_special_parser(scripts, model, cardtype_name, idx, position):
-    def inner_parser(keyword):
-        if keyword == "idx":
-            return str(idx)
-
-        if keyword == "cardidx":
-            return re.search(r"\d*$", cardtype_name)[0]
-
-        elif keyword == "scripts":
-            return stringify_for_template(
-                scripts,
-                model["name"],
-                model["id"],
-                cardtype_name,
-                position,
-            )
-
-        return ""
-
-    return inner_parser
 
 
 def evaluate_numerical(fragment: str, arguments: List[str]):
@@ -105,6 +49,65 @@ def evaluate_numerical(fragment: str, arguments: List[str]):
         )
 
     return text
+
+
+def gather_tags(text: str):
+    return list(reversed(list(re.finditer(r"\{\{%(\w+)(?::(.*?))?\}\}", text))))
+
+
+squote = re.compile(r"^'(.*?)'\s*?(?:,|$)")
+dquote = re.compile(r'^"(.*?)"\s*?(?:,|$)')
+naked = re.compile(r"^([^,]+)(?:,|$)")
+
+
+def match_tag_argument(text) -> Optional[Tuple[str, str]]:
+    if m := re.match(squote, text):
+        return text[m.end() : len(text)], m.group(1)
+    elif m := re.match(dquote, text):
+        return text[m.end() : len(text)], m.group(1)
+    elif m := re.match(naked, text):
+        return text[m.end() : len(text)], m.group(1).rstrip()
+
+    return None
+
+
+def get_tag_arguments(text: Optional[str]) -> List[str]:
+    result = []
+
+    while text:
+        next = match_tag_argument(text.lstrip())
+
+        if not next:
+            break
+
+        text = next[0]
+        result.append(next[1])
+
+    return result
+
+
+def get_special_parser(
+    scripts, model: NoteType, cardtype_name: str, idx: int, position: str
+) -> Callable[[str], str]:
+    def inner_parser(keyword: str) -> str:
+        if keyword == "idx":
+            return str(idx)
+
+        if keyword == "cardidx":
+            return re.search(r"\d*$", cardtype_name)[0]
+
+        elif keyword == "scripts":
+            return stringify_for_template(
+                scripts,
+                model["name"],
+                model["id"],
+                cardtype_name,
+                position,
+            )
+
+        return ""
+
+    return inner_parser
 
 
 def indent(text: str, amount: int) -> str:
@@ -134,7 +137,7 @@ def evaluate_fragment(
     fragments: List[HTML],
     entrance: str,
     cond_parser,
-    special_parser,
+    special_parser: Callable[[str], str],
 ) -> Optional[str]:
     base = find_valid_fragment(fragments, entrance, cond_parser)
 
@@ -145,13 +148,14 @@ def evaluate_fragment(
     while len(inner_tags) != 0 and iterations < 50:
         for match in inner_tags:
             keyword = match.group(1)
-            arguments = get_tag_arguments(match.group(2))
 
             if keyword[0].islower():
                 replacement = special_parser(keyword)
 
             elif keyword[0].isupper():
                 fragment = find_valid_fragment(fragments, keyword, cond_parser)
+                arguments = get_tag_arguments(match.group(2))
+
                 replacement = (
                     evaluate_numerical(fragment.code, arguments) if fragment else ""
                 )
@@ -184,15 +188,17 @@ def setup_full(model_id: int, html: HTMLSetting, scripts: ScriptSetting):
 
         for fmt in ["qfmt", "afmt"]:
             entrance = "Front" if fmt == "qfmt" else "Back"
-            position = "question" if fmt == "qfmt" else "answer"
 
-            conds = get_condition_parser(cardtype_name, position)
-            specials = get_special_parser(
+            position = "question" if fmt == "qfmt" else "answer"
+            cond_parser = get_condition_parser(cardtype_name, position)
+
+            special_parser = get_special_parser(
                 scripts, model, cardtype_name, idx + 1, position
             )
-            result = evaluate_fragment(html.fragments, entrance, conds, specials)
 
-            if result:
+            if result := evaluate_fragment(
+                html.fragments, entrance, cond_parser, special_parser
+            ):
                 write_model_template(template, fmt, result)
 
     mw.col.models.save(model, True)
