@@ -214,6 +214,9 @@ def deserialize_html_setting(_model_id: int, model_setting: dict) -> ScriptSetti
         model_setting["enabled"]
         if "enabled" in model_setting
         else DEFAULT_HTML_SETTING.enabled,
+        model_setting["minify"]
+        if "minify" in model_setting
+        else DEFAULT_HTML_SETTING.minify,
         [
             deserialize_html(fragment)
             for fragment in (
@@ -258,6 +261,7 @@ def deserialize_html(script_data: dict) -> ConcreteHTML:
 def serialize_html_setting(setting: HTMLSetting) -> dict:
     return {
         "enabled": setting.enabled,
+        "minify": setting.minify,
         "fragments": [serialize_html(script) for script in setting.fragments],
     }
 

@@ -84,19 +84,23 @@ def notify_minification(callback):
     return inner
 
 
-def maybe_minify(
+def insert_minified(
     unminifieds,
     template_fmts,
     callback,
 ) -> None:
-    if True:
-        tooltip("Started insertion of minified HTML")
-        cmd = minify_command(unminifieds)
-        minifier.evalWithCallback(
-            cmd,
-            lambda minifieds: process_minifieds(
-                json.loads(minifieds), template_fmts, notify_minification(callback)
-            ),
-        )
-    else:
-        process_minifieds(unminifieds, template_fmts, callback)
+    tooltip("Started insertion of minified HTML")
+    cmd = minify_command(unminifieds)
+    minifier.evalWithCallback(
+        cmd,
+        lambda minifieds: process_minifieds(
+            json.loads(minifieds), template_fmts, notify_minification(callback)
+        ),
+    )
+
+def insert_unminified(
+    unminifieds,
+    template_fmts,
+    callback,
+) -> None:
+    process_minifieds(unminifieds, template_fmts, callback)

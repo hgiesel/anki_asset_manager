@@ -46,6 +46,7 @@ class HTMLTab(QWidget):
     def setupUi(self, modelId, setting):
         self.modelId = modelId
         self.ui.enableCheckBox.setChecked(setting.enabled),
+        self.ui.minifyHtml.setChecked(setting.minify),
         self.frags = setting.fragments
 
         self.drawScripts()
@@ -136,6 +137,7 @@ class HTMLTab(QWidget):
             self.modelId,
             {
                 "enabled": self.ui.enableCheckBox.isChecked(),
+                "minify": self.ui.minifyHtml.isChecked(),
                 "fragments": self.frags,
             },
         )

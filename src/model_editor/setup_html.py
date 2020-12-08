@@ -7,7 +7,7 @@ from anki.models import NoteType
 from ..config_types import HTML, HTMLSetting, ScriptSetting
 from ..stringify import stringify_for_template, get_condition_parser
 
-from .minify import maybe_minify
+from .minify import insert_minified, insert_unminified
 
 
 def find_valid_fragment(
@@ -204,4 +204,5 @@ def setup_full(model_id: int, html: HTMLSetting, scripts: ScriptSetting):
                 template_fmts.append((template, fmt))
                 unminifieds.append(unminified)
 
-    maybe_minify(unminifieds, template_fmts, lambda: mw.col.models.save(model, True))
+    insert = insert_minified if html.minify else insert_unminified
+    insert(unminifieds, template_fmts, lambda: mw.col.models.save(model, True))

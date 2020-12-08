@@ -189,6 +189,7 @@ class HTMLBool(HTML):
 @dataclass(frozen=True)
 class HTMLSetting:
     enabled: bool
+    minify: bool
     fragments: List[HTML]
 
 
@@ -223,6 +224,7 @@ DEFAULT_CONCRETE_HTML = ConcreteHTML(
 )
 
 DEFAULT_HTML_SETTING = HTMLSetting(
+    False,
     False,
     [
         DEFAULT_CONCRETE_HTML_FRONT,

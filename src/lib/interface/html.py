@@ -10,10 +10,12 @@ from ...config_types import (
 
 def make_html_setting(
     enabled: bool,
+    minify: bool,
     fragments: list,
 ) -> HTMLSetting:
     return HTMLSetting(
         enabled,
+        minify,
         fragments,
     )
 
