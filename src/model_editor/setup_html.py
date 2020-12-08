@@ -1,5 +1,4 @@
 import re
-
 from typing import List, Optional, Tuple, Callable
 
 from aqt import mw
@@ -8,7 +7,7 @@ from anki.models import NoteType
 from ..config_types import HTML, HTMLSetting, ScriptSetting
 from ..stringify import stringify_for_template, get_condition_parser
 
-from .minify import pass_minified_to_callback
+from .minify import maybe_minify
 
 
 def find_valid_fragment(
@@ -179,6 +178,8 @@ def evaluate_fragment(
 
 
 def setup_full(model_id: int, html: HTMLSetting, scripts: ScriptSetting):
+    template_fmts = []
+    unminifieds = []
     model = mw.col.models.get(model_id)
 
     for idx, template in enumerate(model["tmpls"]):
@@ -196,9 +197,11 @@ def setup_full(model_id: int, html: HTMLSetting, scripts: ScriptSetting):
                 scripts, model, cardtype_name, idx + 1, position
             )
 
-            if result := evaluate_fragment(
+            if unminified := evaluate_fragment(
                 html.fragments, entrance, cond_parser, special_parser
             ):
-                pass_minified_to_callback(template, fmt, result)
+                # executes asynchronously
+                template_fmts.append((template, fmt))
+                unminifieds.append(unminified)
 
-    mw.col.models.save(model, True)
+    maybe_minify(unminifieds, template_fmts, lambda: mw.col.models.save(model, True))
