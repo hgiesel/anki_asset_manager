@@ -7,6 +7,7 @@ declare name='anki_asset_manager' # for finding gui files
 cd "$DIR"
 
 "$DIR/bin/compile.sh"
+"$DIR/bin/download_minifier.sh"
 
 zip -r "build/$addon_id.ankiaddon" \
   "__init__.py" \
