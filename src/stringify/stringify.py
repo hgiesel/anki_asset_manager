@@ -47,29 +47,24 @@ def position_does_not_match(script, position: str) -> bool:
     )
 
 
-def get_script_and_code(
+def get_script(
     script, model_name, cardtype_name, position
-) -> Tuple[ConcreteScript, str]:
-    script
-    if isinstance(script, ConcreteScript):
-        return (script, script.code)
-    else:
+) -> ConcreteScript:
+    return script if isinstance(script, ConcreteScript) else get_interface(script.tag).getter(
+        script.id,
+        script.storage,
+    )
 
-        iface = get_interface(script.tag)
-
-        return (
-            iface.getter(
-                script.id,
-                script.storage,
-            ),
-            iface.generator(
-                script.id,
-                script.storage,
-                model_name,
-                cardtype_name,
-                position,
-            ),
-        )
+def get_code(
+    script, model_name, cardtype_name, position
+) -> str:
+    return script.code if isinstance(script, ConcreteScript) else get_interface(script.tag).generator(
+        script.id,
+        script.storage,
+        model_name,
+        cardtype_name,
+        position,
+    )
 
 
 def stringify_setting(
@@ -85,19 +80,17 @@ def stringify_setting(
     if not setting.enabled or setting.insert_stub:
         return script_data
 
-    for script, code in map(
-        lambda s: get_script_and_code(
-            s,
+    for scr in setting.scripts:
+        script = get_script(
+            scr,
             model_name,
             cardtype_name,
             position,
-        ),
-        setting.scripts,
-    ):
+        )
+
         if (
             not script.enabled
-            or len(code) == 0
-            or position_does_not_match(script, position)
+                or position_does_not_match(script, position)
         ):
             continue
 
@@ -109,6 +102,13 @@ def stringify_setting(
         tag = gen_data_attributes(
             script.name,
             script.version,
+        )
+
+        code = get_code(
+            scr,
+            model_name,
+            cardtype_name,
+            position,
         )
 
         if script.position == "external":
