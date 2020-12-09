@@ -83,7 +83,6 @@ def stringify_for_external(
 ) -> List[str]:
     stringified_scripts = []
     groups = groupify_external(setting.scripts)
-
     for key, group in groups:
         inner_setting = replace(setting, scripts=list(group))
         inner = stringify_setting(

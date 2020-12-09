@@ -8,63 +8,14 @@ from ..config_types import (
     ScriptPosition,
     Fmt,
 )
-from ..lib.registrar import get_reducer
+from ..lib.registrar import get_interface
 from ..utils import version
 
-from ..lib.registrar import get_interface
-
-from .condition_parser import get_condition_parser, stringify_conds
+from .condition_parser import get_condition_parser
 from .groupify import groupify_script_data
-
-
-def wrap_code(code, conditions: Union[bool, list]):
-    if ((type(conditions) is bool) and conditions) or len(conditions) == 0:
-        return code
-
-    else:
-        main_code = "\n".join([f"    {line}" for line in code.split("\n")])
-        return f"if ({stringify_conds(conditions)}) {{\n{main_code}\n}}"
-
-
-def indent(line, indentation):
-    return indentation + line if len(line) > 0 else line
-
-
-def indent_lines(text: str, indent_size: int) -> str:
-    return "\n".join([indent(line, indent_size * " ") for line in text.split("\n")])
-
-
-def stringify_script_data(sd, indent_size: int) -> str:
-    in_html = "label" in sd
-    srcTag = f" src=\"{sd['src']}\"" if "src" in sd else ""
-    module = ' type="module"' if sd["type"] == "esm" else ""
-
-    opening, closing = (
-        (
-            f'<script {sd["tag"]}{module}{srcTag}>',
-            "</script>",
-        )
-        if in_html
-        else (
-            f'// {sd["tag"]}',
-            "",
-        )
-    )
-
-    wrapped_code = wrap_code(sd["code"], sd["conditions"])
-    indented_code = indent_lines(wrapped_code, indent_size if in_html else 0)
-
-    # avoid two empty new lines for external scripts
-    opening, indented_code = (
-        (
-            f"{opening}\n",
-            f"{indented_code}\n",
-        )
-        if len(indented_code) > 0
-        else (opening, "")
-    )
-
-    return opening + indented_code + closing
+from .indent import indent_lines
+from .script_data import stringify_sd, merge_sd
+from .package import package, package_for_external
 
 
 def encapsulate_scripts(scripts, version, indent_size) -> str:
@@ -88,7 +39,8 @@ def gen_data_attributes(name: str, version: str):
     return f'data-name="{name}" data-version="{version}"'
 
 
-def position_does_not_match(script, position) -> bool:
+# skip this script
+def position_does_not_match(script, position: str) -> bool:
     return script.position != position and not (
         script.position in ["into_template", "external"]
         and position in ["question", "answer"]
@@ -118,51 +70,6 @@ def get_script_and_code(
                 position,
             ),
         )
-
-
-def package(
-    tag: str, subtype: str, label: str, code: str, conditions_simplified: list
-) -> object:
-    return {
-        "tag": tag,
-        "type": subtype,
-        "label": label,
-        "code": code,
-        "conditions": conditions_simplified,
-    }
-
-
-def package_for_external(tag: str, subtype: str, filename: str) -> object:
-    return {
-        "tag": tag,
-        "type": subtype,
-        "src": filename,
-        # no code or conditions, as they are present in external file
-        "code": "",
-        "conditions": [],
-    }
-
-
-def stringify_sd(sd, indent_size):
-    return (
-        (sd["filename"], stringify_script_data(sd, indent_size))
-        if "filename" in sd
-        else stringify_script_data(sd, indent_size)
-    )
-
-
-def merge_sd(key: str, sds: list):
-    base = sds[0]  # Top script in list
-    reducer = get_reducer(key)
-    compiled = reducer.reducer([sd["code"] for sd in sds])
-
-    return package(
-        base["tag"],
-        base["type"],
-        key,
-        compiled,
-        base["conditions"],
-    )
 
 
 def stringify_setting(
@@ -204,9 +111,13 @@ def stringify_setting(
             script.version,
         )
 
-        if script.position == "external" and position in ["question", "answer"]:
+        if script.position == "external":
             filename = f"_am_{model_id}_{sha1(script.name.encode()).hexdigest()}.js"
-            script_data.append(package_for_external(tag, script.type, filename))
+            script_data.append(
+                package_for_external(
+                    tag, script.type, filename, code, conditions_simplified
+                )
+            )
         else:
             script_data.append(
                 package(tag, script.type, script.label, code, conditions_simplified)
@@ -214,13 +125,16 @@ def stringify_setting(
 
     stringified = []
     groups = groupify_script_data(script_data)
+    in_html = position in ["question", "answer"]
 
     for key, group in groups:
         if len(key) == 0:
-            stringified.extend([stringify_sd(sd, setting.indent_size) for sd in group])
+            stringified.extend(
+                [stringify_sd(sd, setting.indent_size, in_html) for sd in group]
+            )
         else:
             stringified.append(
-                stringify_sd(merge_sd(key, list(group)), setting.indent_size)
+                stringify_sd(merge_sd(key, list(group)), setting.indent_size, in_html)
             )
 
     return stringified

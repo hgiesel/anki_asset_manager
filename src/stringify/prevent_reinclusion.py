@@ -1,4 +1,6 @@
-from .stringify import package, gen_data_attributes, stringify_script_data
+from .package import package
+from .stringify import gen_data_attributes
+from .script_data import stringify_script_data
 
 prevent_reinclusion = package(
     gen_data_attributes("Prevent reinclusion", "v0.1"),
@@ -16,4 +18,4 @@ prevent_reinclusion = package(
 
 
 def get_prevent_reinclusion(indent_size):
-    return stringify_script_data(prevent_reinclusion, indent_size)
+    return stringify_script_data(prevent_reinclusion, indent_size, True)
