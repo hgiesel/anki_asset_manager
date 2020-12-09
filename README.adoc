@@ -8,5 +8,6 @@
 - *2.1.26*-*2.1.28*: Uses old insertion mechanism
 
 ==== SUPPORTED
-- *2.1.29*-*2.1.33*: Did not have the gui_hooks in Models dialog
-- *2.1.34*+: Current
+- *2.1.29-33*: New insertion mechanism
+- *2.1.34-35*: Uses gui_hooks in Models dialog
+- *2.1.36+*: Adds minification, syntax check for scripts, optional button in editor, hooks on field rename/delete
