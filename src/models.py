@@ -58,7 +58,7 @@ def on_assets(models: Models) -> None:
 def init_asset_button(buttons, models: Models):
     buttons.append(
         (
-            _("Assets..."),
+            "Assets...",
             lambda: on_assets(models),
         )
     )

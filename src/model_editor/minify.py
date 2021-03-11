@@ -43,8 +43,8 @@ minifier.stdHtml(
 
 minifier.eval(
     """
-const minify = require("html-minifier-terser").minify
-const minifyOptions = {
+var minify = require("html-minifier-terser").minify
+var minifyOptions = {
     collapseBooleanAttributes: true,
     collapseWhitespace: true,
     continueOnParseError: true,
