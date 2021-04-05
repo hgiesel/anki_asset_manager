@@ -74,7 +74,7 @@ var minifyOptions = {
     collapseBooleanAttributes: true,
     collapseWhitespace: true,
     continueOnParseError: true,
-    decodeEntities: true,
+    decodeEntities: false,
     minifyCSS: true,
     minifyJS: true,
     processConditionalComments: true,
