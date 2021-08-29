@@ -21,5 +21,7 @@ zip -r "build/$addon_id.ankiaddon" \
   "gui_config/"*".py" \
   "gui_config/forms/"*".py" \
   "json_schemas/"* \
-  "web/"* \
+  "web/terser.js" \
+  "web/htmlminifier.js" \
+  "web/editor-compiled.js" \
   "manifest.json"

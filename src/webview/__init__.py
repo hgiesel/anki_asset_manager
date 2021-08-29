@@ -3,6 +3,7 @@ from aqt.gui_hooks import webview_will_set_content
 from aqt import mw
 from aqt.reviewer import Reviewer
 from aqt.webview import WebContent
+from aqt.editor import Editor
 
 from ..config import maybe_get_setting_from_card
 from ..stringify import stringify_for_head, stringify_for_body
@@ -47,5 +48,17 @@ def append_scripts(web_content: WebContent, context):
     )
 
 
+mw.addonManager.setWebExports(__name__, r"(web|icons)/.*\.(js|css|png)")
+
+
+def load_package(webcontent, context):
+    if isinstance(context, Editor):
+        addon_package = context.mw.addonManager.addonFromModule(__name__)
+        base_path = f"/_addons/{addon_package}/web"
+
+        webcontent.js.append(f"{base_path}/editor-compiled.js")
+
+
 def init_webview():
+    webview_will_set_content.append(load_package)
     webview_will_set_content.append(append_scripts)
