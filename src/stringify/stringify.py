@@ -47,23 +47,28 @@ def position_does_not_match(script, position: str) -> bool:
     )
 
 
-def get_script(
-    script, model_name, cardtype_name, position
-) -> ConcreteScript:
-    return script if isinstance(script, ConcreteScript) else get_interface(script.tag).getter(
-        script.id,
-        script.storage,
+def get_script(script, model_name, cardtype_name, position) -> ConcreteScript:
+    return (
+        script
+        if isinstance(script, ConcreteScript)
+        else get_interface(script.tag).getter(
+            script.id,
+            script.storage,
+        )
     )
 
-def get_code(
-    script, model_name, cardtype_name, position
-) -> str:
-    return script.code if isinstance(script, ConcreteScript) else get_interface(script.tag).generator(
-        script.id,
-        script.storage,
-        model_name,
-        cardtype_name,
-        position,
+
+def get_code(script, model_name, cardtype_name, position) -> str:
+    return (
+        script.code
+        if isinstance(script, ConcreteScript)
+        else get_interface(script.tag).generator(
+            script.id,
+            script.storage,
+            model_name,
+            cardtype_name,
+            position,
+        )
     )
 
 
@@ -88,10 +93,7 @@ def stringify_setting(
             position,
         )
 
-        if (
-            not script.enabled
-                or position_does_not_match(script, position)
-        ):
+        if not script.enabled or position_does_not_match(script, position):
             continue
 
         needs_inject, conditions_simplified = the_parser(script.conditions)

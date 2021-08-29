@@ -11,6 +11,7 @@ from .common import write_model_template
 # mw.mainLayout.addWidget(minifier, 1)
 # mw.minifier = minifier
 
+
 def minify_command(unminifieds: List[str]) -> str:
     escaped = (
         "["
@@ -62,13 +63,16 @@ class Minifier(AnkiWebView):
         if cmd.startswith("insertMinifieds"):
             _, code = cmd.split("::", 1)
             data = json.loads(code)
-            process_minifieds(data, self.template_fmts, notify_minification(self.callback))
+            process_minifieds(
+                data, self.template_fmts, notify_minification(self.callback)
+            )
 
     def minify(
         self,
         unminifieds,
     ) -> None:
-        self.eval("""
+        self.eval(
+            """
 var minify = require("html-minifier-terser").minify
 var minifyOptions = {
     collapseBooleanAttributes: true,
@@ -90,7 +94,8 @@ var minifyOptions = {
     sortClassName: true,
     trimCustomFragments: true,
     useShortDoctype: true,
-}""")
+}"""
+        )
 
         cmd = minify_command(unminifieds)
         self.eval(cmd)

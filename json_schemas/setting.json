@@ -19,11 +19,5 @@
     }
   },
   "additionalProperties": false,
-  "required": [
-    "modelName",
-    "enabled",
-    "insertStub",
-    "indentSize",
-    "scripts"
-  ]
+  "required": ["modelName", "enabled", "insertStub", "indentSize", "scripts"]
 }

@@ -54,10 +54,7 @@
         }
       },
       "additionalProperties": false,
-      "required": [
-        "tag",
-        "id"
-      ]
+      "required": ["tag", "id"]
     },
 
     "storage": {
@@ -103,4 +100,3 @@
 
   "$ref": "#/definitions/scr"
 }
-

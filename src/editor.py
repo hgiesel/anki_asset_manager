@@ -16,16 +16,19 @@ def is_cards_button(button: str) -> bool:
     return "pycmd('cards');" in button
 
 
-linkname = "assetManagerDialog" 
+linkname = "assetManagerDialog"
+
+
 def apply_buttons(editor):
     if linkname not in editor._links:
         editor._links[linkname] = on_assets
 
     if remove_cards.value:
-        editor.web.eval("assetManagerGlobal.hideCardsButton();");
+        editor.web.eval("assetManagerGlobal.hideCardsButton();")
 
     if add_assets.value:
-        editor.web.eval("assetManagerGlobal.addAssetsButton();");
+        editor.web.eval("assetManagerGlobal.addAssetsButton();")
+
 
 def init_editor():
     editor_did_init.append(apply_buttons)

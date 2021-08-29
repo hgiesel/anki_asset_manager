@@ -11,22 +11,11 @@
       "items": [
         {
           "type": "string",
-          "enum": [
-            "card",
-            "tag",
-            "tagFull",
-            "iter"
-          ]
+          "enum": ["card", "tag", "tagFull", "iter"]
         },
         {
           "type": "string",
-          "enum": [
-            "=",
-            "!=",
-            "includes",
-            "startsWith",
-            "endsWith"
-          ]
+          "enum": ["=", "!=", "includes", "startsWith", "endsWith"]
         },
         {
           "type": "string"
@@ -41,27 +30,15 @@
       "items": [
         {
           "type": "string",
-          "enum": [
-            "side"
-          ]
+          "enum": ["side"]
         },
         {
           "type": "string",
-          "enum": [
-            "=",
-            "!="
-          ]
+          "enum": ["=", "!="]
         },
         {
           "type": "string",
-          "enum": [
-            "front",
-            "question",
-            "qfmt",
-            "back",
-            "answer",
-            "afmt"
-          ]
+          "enum": ["front", "question", "qfmt", "back", "answer", "afmt"]
         }
       ]
     },
@@ -73,16 +50,11 @@
       "items": [
         {
           "type": "string",
-          "enum": [
-            "pos"
-          ]
+          "enum": ["pos"]
         },
         {
           "type": "string",
-          "enum": [
-            "=",
-            "!="
-          ]
+          "enum": ["=", "!="]
         },
         {
           "type": "string",
@@ -108,9 +80,7 @@
       "items": [
         {
           "type": "string",
-          "enum": [
-            "!"
-          ]
+          "enum": ["!"]
         }
       ],
       "additionalItems": {
@@ -142,10 +112,7 @@
       "items": [
         {
           "type": "string",
-          "enum": [
-            "&",
-            "|"
-          ]
+          "enum": ["&", "|"]
         }
       ],
       "additionalItems": {
