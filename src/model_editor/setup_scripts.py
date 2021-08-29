@@ -81,4 +81,4 @@ def setup_with_only_scripts(model_id: int, scripts: ScriptSetting) -> None:
 
     # notify anki that models changed (for synchronization e.g.)
     if needs_saving:
-        mw.col.models.save(model, True)
+        mw.col.models.update_dict(model)

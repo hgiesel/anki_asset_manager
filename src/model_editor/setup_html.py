@@ -205,4 +205,4 @@ def setup_full(model_id: int, html: HTMLSetting, scripts: ScriptSetting):
                 unminifieds.append(unminified)
 
     insert = insert_minified if html.minify else insert_unminified
-    insert(unminifieds, template_fmts, lambda: mw.col.models.save(model, True))
+    insert(unminifieds, template_fmts, lambda: mw.col.models.update_dict(model))
