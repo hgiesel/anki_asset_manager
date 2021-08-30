@@ -10,7 +10,7 @@ esbuild
     bundle: true,
     globalName: "assetManagerGlobal",
     splitting: false,
-    external: ["svelte"],
+    external: ["svelte", "anki"],
     plugins: [sveltePlugin()],
   })
   .catch((err) => {
