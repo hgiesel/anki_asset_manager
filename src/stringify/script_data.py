@@ -20,11 +20,12 @@ def wrap_code(code: str, conditions: Union[bool, list]):
 def stringify_script_data(sd: object, indent_size: int, in_html: bool) -> str:
     srcTag = f" src=\"{sd['src']}\"" if "src" in sd else ""
     module = ' type="module"' if sd["type"] == "esm" else ""
+    tag = 'style' if sd["type"] == 'css' else 'script'
 
     opening, closing = (
         (
-            f'<script {sd["tag"]}{module}{srcTag}>',
-            "</script>",
+            f'<{tag} {sd["tag"]}{module}{srcTag}>',
+            f'</{tag}>',
         )
         if in_html
         else (
