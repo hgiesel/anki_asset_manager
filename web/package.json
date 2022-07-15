@@ -6,7 +6,7 @@
   "dependencies": {
     "esbuild": "^0.12.14",
     "esbuild-svelte": "^0.5.3",
-    "svelte": "^3.39.0"
+    "svelte": "^3.49.0"
   },
   "private": true
 }
