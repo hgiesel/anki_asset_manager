@@ -152,7 +152,7 @@ class LabelReducer:
 
 DEFAULT_REDUCER = LabelReducer(
     label="__unnamed",
-    reducer=lambda lst: "\n\n".join(lst),
+    reducer=lambda lst: "\n\n".join(x[0] if isinstance(x, tuple) else str(x) for x in lst),
 )
 
 ################################ HTML

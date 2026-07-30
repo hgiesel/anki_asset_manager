@@ -23,7 +23,7 @@ addons_current: Optional[AddonsDialog] = None
 def show_settings():
     settings = Settings(addons_current, save_settings)
     settings.setupUi(version, add_assets.value, remove_cards.value)
-    settings.exec_()
+    settings.exec()
 
 
 def save_addons_window(addons):

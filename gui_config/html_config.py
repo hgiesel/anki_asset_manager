@@ -62,7 +62,7 @@ class HTMLConfig(QDialog):
     def initEditor(self, editor):
         font = editor.document().defaultFont()
         font.setFamily("Courier New")
-        font.setStyleHint(QFont.Monospace)
+        font.setStyleHint(QFont.StyleHint.Monospace)
         font.setWeight(QFont.Medium)
         font.setFixedPitch(True)
         font.setPointSize(14)

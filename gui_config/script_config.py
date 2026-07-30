@@ -1,8 +1,8 @@
 import os
 import json
 
-from PyQt5.QtCore import pyqtSlot
-from PyQt5.QtWebChannel import QWebChannel
+from PyQt6.QtCore import pyqtSlot
+from PyQt6.QtWebChannel import QWebChannel
 
 from typing import Union
 from dataclasses import asdict, replace
@@ -91,7 +91,7 @@ class ScriptConfig(QDialog):
     def initEditor(self, editor):
         font = editor.document().defaultFont()
         font.setFamily("Courier New")
-        font.setStyleHint(QFont.Monospace)
+        font.setStyleHint(QFont.StyleHint.Monospace)
         font.setWeight(QFont.Medium)
         font.setFixedPitch(True)
         font.setPointSize(14)

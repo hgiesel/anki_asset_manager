@@ -46,7 +46,7 @@ def open_asset_manager_menu(parent_window: QDialog, note_type: NoteType) -> None
 
 def exec_asset_manager_menu(parent_window: QDialog, note_type: NoteType) -> None:
     dialog = asset_manager_menu(parent_window, note_type)
-    dialog.exec_()
+    dialog.exec()
 
 
 def on_assets(models: Models) -> None:

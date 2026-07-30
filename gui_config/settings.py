@@ -1,4 +1,4 @@
-from aqt import QDialog, QLayout, QKeySequence
+from aqt.qt import QDialog, QLayout, QKeySequence
 
 from .forms.settings_ui import Ui_Settings
 
@@ -14,7 +14,7 @@ class Settings(QDialog):
 
         self.cb = callback
 
-        self.layout().setSizeConstraint(QLayout.SetFixedSize)
+        self.layout().setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
 
     def setupUi(self, version: str, add_assets: bool, remove_cards: bool):
         self.ui.version_info.setText(f"Asset Manager v{version}")
