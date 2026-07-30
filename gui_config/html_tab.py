@@ -77,7 +77,7 @@ class HTMLTab(QWidget):
         for i, text in enumerate(args):
             label = QLabel()
             label.setText(text)
-            label.setAlignment(Qt.AlignCenter)
+            label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
             self.ui.scriptsTable.setCellWidget(row, i, label)
 

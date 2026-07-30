@@ -1,5 +1,5 @@
 from aqt.qt import (
-    QRegExp,
+    QRegularExpression as QRegExp,
     QRegularExpression,
     QColor,
     QTextCharFormat,
@@ -17,9 +17,9 @@ class JSHighlighter(QSyntaxHighlighter):
         is_night_mode = mw.pm.night_mode()
 
         keywordFormat = QTextCharFormat()
-        keywordFormat.setForeground(Qt.cyan if is_night_mode else Qt.blue)
-        keywordFormat.setFontStyleHint(QFont.Monospace)
-        keywordFormat.setFontWeight(QFont.Bold)
+        keywordFormat.setForeground(QColor(Qt.GlobalColor.cyan if is_night_mode else Qt.GlobalColor.blue))
+        keywordFormat.setFontStyleHint(QFont.StyleHint.Monospace)
+        keywordFormat.setFontWeight(QFont.Weight.Bold)
 
         keywordPatterns = [
             "\\bfunction\\b",
@@ -70,37 +70,37 @@ class JSHighlighter(QSyntaxHighlighter):
         ]
 
         classFormat = QTextCharFormat()
-        classFormat.setFontWeight(QFont.Bold)
-        classFormat.setFontStyleHint(QFont.Monospace)
-        classFormat.setForeground(Qt.magenta if is_night_mode else Qt.darkMagenta)
+        classFormat.setFontWeight(QFont.Weight.Bold)
+        classFormat.setFontStyleHint(QFont.StyleHint.Monospace)
+        classFormat.setForeground(QColor(Qt.GlobalColor.magenta if is_night_mode else Qt.GlobalColor.darkMagenta))
         self.highlightingRules.append((QRegExp("\\bQ[A-Za-z]+\\b"), classFormat))
 
         singleLineCommentFormat = QTextCharFormat()
-        singleLineCommentFormat.setFontStyleHint(QFont.Monospace)
-        singleLineCommentFormat.setForeground(Qt.red if is_night_mode else Qt.darkRed)
+        singleLineCommentFormat.setFontStyleHint(QFont.StyleHint.Monospace)
+        singleLineCommentFormat.setForeground(QColor(Qt.GlobalColor.red if is_night_mode else Qt.GlobalColor.darkRed))
         self.highlightingRules.append((QRegExp("//[^\n]*"), singleLineCommentFormat))
 
         multiLineCommentFormat = QTextCharFormat()
-        multiLineCommentFormat.setFontStyleHint(QFont.Monospace)
-        multiLineCommentFormat.setForeground(Qt.red if is_night_mode else Qt.darkRed)
+        multiLineCommentFormat.setFontStyleHint(QFont.StyleHint.Monospace)
+        multiLineCommentFormat.setForeground(QColor(Qt.GlobalColor.red if is_night_mode else Qt.GlobalColor.darkRed))
         self.multiLineCommentFormat = multiLineCommentFormat
 
         numberFormat = QTextCharFormat()
-        numberFormat.setFontStyleHint(QFont.Monospace)
-        numberFormat.setForeground(Qt.yellow if is_night_mode else Qt.darkYellow)
+        numberFormat.setFontStyleHint(QFont.StyleHint.Monospace)
+        numberFormat.setForeground(QColor(Qt.GlobalColor.yellow if is_night_mode else Qt.GlobalColor.darkYellow))
         self.highlightingRules.append((QRegExp("\\b\\d+\\b"), numberFormat))
 
         quotationFormat = QTextCharFormat()
-        quotationFormat.setForeground(Qt.green if is_night_mode else Qt.darkGreen)
-        quotationFormat.setFontStyleHint(QFont.Monospace)
+        quotationFormat.setForeground(QColor(Qt.GlobalColor.green if is_night_mode else Qt.GlobalColor.darkGreen))
+        quotationFormat.setFontStyleHint(QFont.StyleHint.Monospace)
         self.highlightingRules.append((QRegExp('".*"'), quotationFormat))
         self.highlightingRules.append((QRegExp("'.*'"), quotationFormat))
         self.highlightingRules.append((QRegExp("`.*`"), quotationFormat))
 
         functionFormat = QTextCharFormat()
         functionFormat.setFontItalic(True)
-        functionFormat.setFontStyleHint(QFont.Monospace)
-        functionFormat.setForeground(Qt.lightGray if is_night_mode else Qt.gray)
+        functionFormat.setFontStyleHint(QFont.StyleHint.Monospace)
+        functionFormat.setForeground(QColor(Qt.GlobalColor.lightGray if is_night_mode else Qt.GlobalColor.gray))
         self.highlightingRules.append(
             (QRegExp("\\b[A-Za-z0-9_]+(?=\\()"), functionFormat)
         )
@@ -147,15 +147,15 @@ class HTMLHighlighter(QSyntaxHighlighter):
         is_night_mode = mw.pm.night_mode()
 
         keywordFormat = QTextCharFormat()
-        keywordFormat.setForeground(Qt.cyan if is_night_mode else Qt.blue)
-        keywordFormat.setFontStyleHint(QFont.Monospace)
-        keywordFormat.setFontWeight(QFont.Bold)
+        keywordFormat.setForeground(QColor(Qt.GlobalColor.cyan if is_night_mode else Qt.GlobalColor.blue))
+        keywordFormat.setFontStyleHint(QFont.StyleHint.Monospace)
+        keywordFormat.setFontWeight(QFont.Weight.Bold)
 
         self.highlightingRules = []
 
         singleLineCommentFormat = QTextCharFormat()
-        singleLineCommentFormat.setFontStyleHint(QFont.Monospace)
-        singleLineCommentFormat.setForeground(Qt.red if is_night_mode else Qt.darkRed)
+        singleLineCommentFormat.setFontStyleHint(QFont.StyleHint.Monospace)
+        singleLineCommentFormat.setForeground(QColor(Qt.GlobalColor.red if is_night_mode else Qt.GlobalColor.darkRed))
         self.highlightingRules.append((QRegExp("\<.*\>"), singleLineCommentFormat))
 
         keywordPatterns = [
@@ -189,32 +189,32 @@ class HTMLHighlighter(QSyntaxHighlighter):
         )
 
         multiLineCommentFormat = QTextCharFormat()
-        multiLineCommentFormat.setFontStyleHint(QFont.Monospace)
-        multiLineCommentFormat.setForeground(Qt.red if is_night_mode else Qt.darkRed)
+        multiLineCommentFormat.setFontStyleHint(QFont.StyleHint.Monospace)
+        multiLineCommentFormat.setForeground(QColor(Qt.GlobalColor.red if is_night_mode else Qt.GlobalColor.darkRed))
         self.multiLineCommentFormat = multiLineCommentFormat
 
         numberFormat = QTextCharFormat()
-        numberFormat.setFontStyleHint(QFont.Monospace)
-        numberFormat.setForeground(Qt.yellow if is_night_mode else Qt.darkYellow)
+        numberFormat.setFontStyleHint(QFont.StyleHint.Monospace)
+        numberFormat.setForeground(QColor(Qt.GlobalColor.yellow if is_night_mode else Qt.GlobalColor.darkYellow))
         self.highlightingRules.append((QRegExp("\\b\\d+\\b"), numberFormat))
 
         quotationFormat = QTextCharFormat()
-        quotationFormat.setForeground(Qt.green if is_night_mode else Qt.darkGreen)
-        quotationFormat.setFontStyleHint(QFont.Monospace)
+        quotationFormat.setForeground(QColor(Qt.GlobalColor.green if is_night_mode else Qt.GlobalColor.darkGreen))
+        quotationFormat.setFontStyleHint(QFont.StyleHint.Monospace)
         self.highlightingRules.append((QRegExp('".*"'), quotationFormat))
         self.highlightingRules.append((QRegExp("'.*'"), quotationFormat))
         self.highlightingRules.append((QRegExp("`.*`"), quotationFormat))
 
         selfTagFormat = QTextCharFormat()
-        # selfTagFormat.setFontWeight(QFont.Bold)
-        selfTagFormat.setFontStyleHint(QFont.Monospace)
-        selfTagFormat.setForeground(Qt.lightGray if is_night_mode else Qt.gray)
+        # selfTagFormat.setFontWeight(QFont.Weight.Bold)
+        selfTagFormat.setFontStyleHint(QFont.StyleHint.Monospace)
+        selfTagFormat.setForeground(QColor(Qt.GlobalColor.lightGray if is_night_mode else Qt.GlobalColor.gray))
         self.highlightingRules.append((QRegExp("\{\{[^<]+\}\}"), selfTagFormat))
 
         tagFormat = QTextCharFormat()
-        # tagFormat.setFontWeight(QFont.Bold)
-        tagFormat.setFontStyleHint(QFont.Monospace)
-        tagFormat.setForeground(Qt.magenta if is_night_mode else Qt.darkMagenta)
+        # tagFormat.setFontWeight(QFont.Weight.Bold)
+        tagFormat.setFontStyleHint(QFont.StyleHint.Monospace)
+        tagFormat.setForeground(QColor(Qt.GlobalColor.magenta if is_night_mode else Qt.GlobalColor.darkMagenta))
         tagRegex = QRegExp("\{\{%.+\}\}")
         tagRegex.setMinimal(True)
         self.highlightingRules.append((tagRegex, tagFormat))
@@ -222,33 +222,39 @@ class HTMLHighlighter(QSyntaxHighlighter):
         self.commentStartExpression = QRegExp("/\\*")
         self.commentEndExpression = QRegExp("\\*/")
 
-    def highlightBlock(self, text):
+
+
+    def highlightBlock(self, text): #chatgpt
+        # --- Handle normal syntax rules ---
         for pattern, format in self.highlightingRules:
-            expression = QRegExp(pattern)
-            index = expression.indexIn(text)
-            while index >= 0:
-                length = expression.matchedLength()
+            expression = QRegularExpression(pattern)
+            match_iterator = expression.globalMatch(text)
+            while match_iterator.hasNext():
+                match = match_iterator.next()
+                index = match.capturedStart()
+                length = match.capturedLength()
                 self.setFormat(index, length, format)
-                index = expression.indexIn(text, index + length)
-
+    
         self.setCurrentBlockState(0)
-
+    
+        # --- Handle multi-line comments ---
         startIndex = 0
         if self.previousBlockState() != 1:
-            startIndex = self.commentStartExpression.indexIn(text)
-
+            start_match = self.commentStartExpression.match(text)
+            startIndex = start_match.capturedStart() if start_match.hasMatch() else -1
+    
         while startIndex >= 0:
-            endIndex = self.commentEndExpression.indexIn(text, startIndex)
-
-            if endIndex == -1:
+            end_match = self.commentEndExpression.match(text, startIndex)
+            if end_match.hasMatch():
+                endIndex = end_match.capturedStart()
+                commentLength = endIndex - startIndex + end_match.capturedLength()
+                self.setCurrentBlockState(0)
+            else:
                 self.setCurrentBlockState(1)
                 commentLength = len(text) - startIndex
-            else:
-                commentLength = (
-                    endIndex - startIndex + self.commentEndExpression.matchedLength()
-                )
-
+    
             self.setFormat(startIndex, commentLength, self.multiLineCommentFormat)
-            startIndex = self.commentStartExpression.indexIn(
-                text, startIndex + commentLength
-            )
+    
+            # Look for next comment start
+            next_match = self.commentStartExpression.match(text, startIndex + commentLength)
+            startIndex = next_match.capturedStart() if next_match.hasMatch() else -1
